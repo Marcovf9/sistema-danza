@@ -1,0 +1,16 @@
+# Base de Datos
+postgres_data/
+
+# Backend (Java / Spring Boot)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+
+# Frontend (React / Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.eslintcache
+
+# Mac (Archivos ocultos del sistema)
+.DS_Store
