@@ -1,101 +1,119 @@
--- 1. Tipos de Datos Personalizados (Enums)
-CREATE TYPE rol_usuario AS ENUM ('ADMIN', 'PROFESOR', 'ALUMNO');
-CREATE TYPE estado_asistencia AS ENUM ('PRESENTE', 'AUSENTE', 'RECUPERA');
-CREATE TYPE concepto_pago AS ENUM ('CUOTA', 'MATRICULA', 'VESTUARIO', 'MERIENDA');
-CREATE TYPE metodo_pago AS ENUM ('EFECTIVO', 'TRANSFERENCIA', 'TARJETA_CREDITO');
-
--- 2. Módulo de Personas y Accesos
+-- 0. SEGURIDAD
 CREATE TABLE usuarios (
     id BIGSERIAL PRIMARY KEY,
-    email VARCHAR(150) UNIQUE NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    rol rol_usuario NOT NULL,
+    rol VARCHAR(50) NOT NULL,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1. PERSONAS Y DESCUENTOS
+CREATE TABLE grupos_familiares (
+    id BIGSERIAL PRIMARY KEY,
+    nombre_referencia VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE alumnos (
     id BIGSERIAL PRIMARY KEY,
-    usuario_id BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
-    telefono VARCHAR(20),
+    dni VARCHAR(20) UNIQUE,
+    telefono VARCHAR(50),
     contacto_emergencia VARCHAR(150),
+    fecha_vencimiento_matricula DATE,
     grupo_familiar_id BIGINT,
-    fecha_ultimo_pago_matricula DATE
+    activo BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_alumno_grupo_familiar FOREIGN KEY (grupo_familiar_id) REFERENCES grupos_familiares(id) ON DELETE SET NULL
 );
 
 CREATE TABLE profesores (
     id BIGSERIAL PRIMARY KEY,
-    usuario_id BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+    usuario_id BIGINT, 
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
-    telefono VARCHAR(20),
-    cbu_alias VARCHAR(100),
-    tarifa_plana_base NUMERIC(10, 2) NOT NULL
+    cbu_alias VARCHAR(255)
 );
 
--- 3. Módulo de Estructura Académica
+-- 2. OPERATIVA FÍSICA
 CREATE TABLE salones (
     id BIGSERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
-    capacidad_maxima INT NOT NULL
+    aforo_maximo INT NOT NULL
 );
 
 CREATE TABLE disciplinas (
     id BIGSERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion VARCHAR(255),
+    precio_base DECIMAL(10, 2)
 );
 
 CREATE TABLE clases_programadas (
     id BIGSERIAL PRIMARY KEY,
-    disciplina_id BIGINT REFERENCES disciplinas(id),
-    profesor_id BIGINT REFERENCES profesores(id),
-    salon_id BIGINT REFERENCES salones(id),
-    dia_semana VARCHAR(15) NOT NULL,
+    disciplina_id BIGINT NOT NULL,
+    salon_id BIGINT NOT NULL,
+    profesor_titular_id BIGINT NOT NULL,
+    dias_semana VARCHAR(100) NOT NULL, 
     hora_inicio TIME NOT NULL,
-    hora_fin TIME NOT NULL,
-    valor_cuota_base NUMERIC(10, 2) NOT NULL
+    CONSTRAINT fk_clase_disciplina FOREIGN KEY (disciplina_id) REFERENCES disciplinas(id),
+    CONSTRAINT fk_clase_salon FOREIGN KEY (salon_id) REFERENCES salones(id),
+    CONSTRAINT fk_clase_profesor FOREIGN KEY (profesor_titular_id) REFERENCES profesores(id)
 );
 
--- 4. Módulo de Cursada y Asistencia
 CREATE TABLE inscripciones (
     id BIGSERIAL PRIMARY KEY,
-    alumno_id BIGINT REFERENCES alumnos(id) ON DELETE CASCADE,
-    clase_programada_id BIGINT REFERENCES clases_programadas(id) ON DELETE CASCADE,
-    fecha_alta DATE DEFAULT CURRENT_DATE,
-    UNIQUE(alumno_id, clase_programada_id)
+    alumno_id BIGINT NOT NULL,
+    clase_programada_id BIGINT NOT NULL,
+    fecha_inscripcion DATE NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_inscripcion_alumno FOREIGN KEY (alumno_id) REFERENCES alumnos(id),
+    CONSTRAINT fk_inscripcion_clase FOREIGN KEY (clase_programada_id) REFERENCES clases_programadas(id)
+);
+
+CREATE TABLE sesiones_clases (
+    id BIGSERIAL PRIMARY KEY,
+    clase_programada_id BIGINT NOT NULL,
+    fecha DATE NOT NULL,
+    profesor_dictante_id BIGINT NOT NULL,
+    CONSTRAINT fk_sesion_clase FOREIGN KEY (clase_programada_id) REFERENCES clases_programadas(id),
+    CONSTRAINT fk_sesion_profesor FOREIGN KEY (profesor_dictante_id) REFERENCES profesores(id)
 );
 
 CREATE TABLE asistencias (
     id BIGSERIAL PRIMARY KEY,
-    clase_programada_id BIGINT REFERENCES clases_programadas(id),
-    alumno_id BIGINT REFERENCES alumnos(id),
-    fecha DATE NOT NULL,
-    estado estado_asistencia NOT NULL,
-    profesor_reemplazo_id BIGINT REFERENCES profesores(id) NULL
+    sesion_clase_id BIGINT NOT NULL,
+    alumno_id BIGINT NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_asistencia_sesion FOREIGN KEY (sesion_clase_id) REFERENCES sesiones_clases(id),
+    CONSTRAINT fk_asistencia_alumno FOREIGN KEY (alumno_id) REFERENCES alumnos(id)
 );
 
--- 5. Módulo Financiero
-CREATE TABLE pagos_alumnos (
+-- 3. FINANCIERO (CAJA Y PAGOS)
+CREATE TABLE recibos (
     id BIGSERIAL PRIMARY KEY,
-    alumno_id BIGINT REFERENCES alumnos(id),
-    monto_total NUMERIC(10, 2) NOT NULL,
-    concepto concepto_pago NOT NULL,
-    metodo_pago metodo_pago NOT NULL,
-    fecha_pago DATE NOT NULL,
-    dias_mora INT DEFAULT 0,
-    recargo_aplicado NUMERIC(10, 2) DEFAULT 0.00
+    alumno_id BIGINT, 
+    fecha_emision TIMESTAMP NOT NULL,
+    metodo_pago VARCHAR(50) NOT NULL,
+    monto_total DECIMAL(10, 2) NOT NULL,
+    CONSTRAINT fk_recibo_alumno FOREIGN KEY (alumno_id) REFERENCES alumnos(id)
 );
 
-CREATE TABLE liquidacion_profesores (
+CREATE TABLE detalles_recibo (
     id BIGSERIAL PRIMARY KEY,
-    profesor_id BIGINT REFERENCES profesores(id),
+    recibo_id BIGINT NOT NULL,
+    tipo_concepto VARCHAR(50) NOT NULL,
+    monto DECIMAL(10, 2) NOT NULL,
+    mes_imputacion VARCHAR(7), 
+    CONSTRAINT fk_detalle_recibo FOREIGN KEY (recibo_id) REFERENCES recibos(id) ON DELETE CASCADE
+);
+
+CREATE TABLE liquidaciones_profesores (
+    id BIGSERIAL PRIMARY KEY,
+    profesor_id BIGINT NOT NULL,
     mes INT NOT NULL,
     anio INT NOT NULL,
-    clases_dadas INT DEFAULT 0,
-    alumnos_extra INT DEFAULT 0,
-    descuentos_por_reemplazo NUMERIC(10, 2) DEFAULT 0.00,
-    total_a_pagar NUMERIC(10, 2) NOT NULL,
-    pagado BOOLEAN DEFAULT FALSE,
-    fecha_liquidacion DATE DEFAULT CURRENT_DATE
+    total_base DECIMAL(10, 2) NOT NULL,
+    total_comisiones DECIMAL(10, 2) NOT NULL,
+    estado VARCHAR(50) DEFAULT 'PENDIENTE',
+    CONSTRAINT fk_liquidacion_profesor FOREIGN KEY (profesor_id) REFERENCES profesores(id)
 );

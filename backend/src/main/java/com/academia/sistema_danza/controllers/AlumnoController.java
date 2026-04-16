@@ -17,11 +17,19 @@ public class AlumnoController {
 
     @GetMapping
     public List<Alumno> obtenerTodos() {
-        return alumnoRepository.findAll();
+    return alumnoRepository.findByActivoTrue(); 
     }
 
     @PostMapping
     public Alumno guardarAlumno(@RequestBody Alumno alumno) {
         return alumnoRepository.save(alumno);
+    }
+
+    @DeleteMapping("/{id}")
+    public void bajaLogica(@PathVariable Long id) {
+        Alumno alumno = alumnoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+        alumno.setActivo(false);
+        alumnoRepository.save(alumno);
     }
 }

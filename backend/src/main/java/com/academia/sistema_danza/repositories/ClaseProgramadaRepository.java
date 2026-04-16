@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ClaseProgramadaRepository extends JpaRepository<ClaseProgramada, Long> {
-    List<ClaseProgramada> findByDiaSemana(String diaSemana);
+    List<ClaseProgramada> findByDiasSemana(String diaSemana);
 }

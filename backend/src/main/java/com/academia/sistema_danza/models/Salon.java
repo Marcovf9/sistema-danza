@@ -1,11 +1,11 @@
 package com.academia.sistema_danza.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
 @Entity
 @Table(name = "salones")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Salon {
 
     @Id
@@ -15,7 +15,6 @@ public class Salon {
     @Column(nullable = false, length = 50)
     private String nombre;
 
-    // Esto es clave para que el sistema avise si se llenó el cupo
-    @Column(name = "capacidad_maxima", nullable = false)
-    private Integer capacidadMaxima; 
+    @Column(name = "aforo_maximo", nullable = false)
+    private Integer aforoMaximo;
 }

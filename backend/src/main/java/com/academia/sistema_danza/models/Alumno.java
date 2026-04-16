@@ -1,22 +1,18 @@
 package com.academia.sistema_danza.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
 
-@Data
 @Entity
 @Table(name = "alumnos")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Alumno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // Relación 1 a 1: Cada alumno tiene un usuario para poder loguearse
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
-    private Usuario usuario;
 
     @Column(nullable = false, length = 100)
     private String nombre;
@@ -24,16 +20,25 @@ public class Alumno {
     @Column(nullable = false, length = 100)
     private String apellido;
 
-    @Column(length = 20)
+    @Column(unique = true, length = 20)
+    private String dni;
+    
+    @Column(length = 50)
     private String telefono;
 
     @Column(name = "contacto_emergencia", length = 150)
     private String contactoEmergencia;
 
-    // Nos servirá para aplicar el descuento del 10% y 20% a hermanos/familia
-    @Column(name = "grupo_familiar_id")
-    private Integer grupoFamiliarId;
+    @Column(name = "fecha_vencimiento_matricula")
+    private LocalDate fechaVencimientoMatricula;
 
-    @Column(name = "fecha_ultimo_pago_matricula")
-    private LocalDate fechaUltimoPagoMatricula;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grupo_familiar_id")
+    private GrupoFamiliar grupoFamiliar;
+
+    @OneToMany(mappedBy = "alumno")
+    private List<Inscripcion> inscripciones;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 }
