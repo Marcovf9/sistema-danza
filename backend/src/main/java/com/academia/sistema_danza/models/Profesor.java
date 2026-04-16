@@ -1,21 +1,19 @@
 package com.academia.sistema_danza.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.math.BigDecimal;
+import lombok.*;
 
-@Data
 @Entity
 @Table(name = "profesores")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Profesor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
-    private Usuario usuario;
+    @Column(name = "usuario_id")
+    private Long usuarioId; 
 
     @Column(nullable = false, length = 100)
     private String nombre;
@@ -23,13 +21,6 @@ public class Profesor {
     @Column(nullable = false, length = 100)
     private String apellido;
 
-    @Column(length = 20)
-    private String telefono;
-
-    @Column(name = "cbu_alias", length = 100)
+    @Column(name = "cbu_alias")
     private String cbuAlias;
-
-    // BigDecimal es obligatorio en Java para manejar dinero sin errores de redondeo
-    @Column(name = "tarifa_plana_base", nullable = false, precision = 10, scale = 2)
-    private BigDecimal tarifaPlanaBase; 
 }

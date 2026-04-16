@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+import com.academia.sistema_danza.models.enums.RolUsuario;
+
 @Data
 @Entity
 @Table(name = "usuarios")

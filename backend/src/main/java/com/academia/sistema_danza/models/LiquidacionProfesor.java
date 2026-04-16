@@ -1,13 +1,14 @@
 package com.academia.sistema_danza.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-@Data
+import com.academia.sistema_danza.models.enums.*;
+
 @Entity
-@Table(name = "liquidacion_profesores")
+@Table(name = "liquidaciones_profesores")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class LiquidacionProfesor {
 
     @Id
@@ -24,21 +25,13 @@ public class LiquidacionProfesor {
     @Column(nullable = false)
     private Integer anio;
 
-    @Column(name = "clases_dadas")
-    private Integer clasesDadas = 0;
+    @Column(name = "total_base", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalBase;
 
-    @Column(name = "alumnos_extra")
-    private Integer alumnosExtra = 0;
+    @Column(name = "total_comisiones", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalComisiones;
 
-    @Column(name = "descuentos_por_reemplazo", precision = 10, scale = 2)
-    private BigDecimal descuentosPorReemplazo = BigDecimal.ZERO;
-
-    @Column(name = "total_a_pagar", nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAPagar;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean pagado = false;
-
-    @Column(name = "fecha_liquidacion")
-    private LocalDate fechaLiquidacion;
+    private EstadoLiquidacion estado = EstadoLiquidacion.PENDIENTE;
 }
