@@ -9,7 +9,7 @@ const AlumnoModal = ({ isOpen, onClose, onSave }) => {
     dni: '',
     telefono: '',
     contactoEmergencia: '',
-    grupoFamiliar: null // Guardará el objeto { id: ... } si se selecciona
+    grupoFamiliar: null
   });
 
   const [familias, setFamilias] = useState([]);
@@ -17,11 +17,9 @@ const AlumnoModal = ({ isOpen, onClose, onSave }) => {
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
   const [creandoFamilia, setCreandoFamilia] = useState(false);
 
-  // Cargar las familias cuando se abre el modal
   useEffect(() => {
     if (isOpen) {
       cargarFamilias();
-      // Limpiar formulario
       setFormData({ nombre: '', apellido: '', dni: '', telefono: '', contactoEmergencia: '', grupoFamiliar: null });
       setBusquedaFamilia('');
     }
@@ -41,7 +39,6 @@ const AlumnoModal = ({ isOpen, onClose, onSave }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Filtrar familias según lo que escribe el usuario
   const familiasFiltradas = familias.filter(f => 
     f.nombreReferencia.toLowerCase().includes(busquedaFamilia.toLowerCase())
   );

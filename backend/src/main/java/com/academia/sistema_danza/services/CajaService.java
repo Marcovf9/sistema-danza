@@ -1,4 +1,3 @@
-// CajaService.java
 package com.academia.sistema_danza.services;
 
 import com.academia.sistema_danza.models.*;
@@ -23,12 +22,10 @@ public class CajaService {
     private final ReciboRepository reciboRepository;
 
     @Transactional
-    public Recibo generarReciboCuotaMensual(Long alumnoId, MetodoPago metodoPago) {
-        // 1. Buscar al alumno
+    public Recibo generarReciboPendienteMensual(Long alumnoId) {
         Alumno alumno = alumnoRepository.findById(alumnoId)
                 .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
 
-        // 2. Obtener sus clases activas para sumar el valor de la cuota base
         List<Inscripcion> inscripciones = inscripcionRepository.findByAlumnoIdAndActivoTrue(alumnoId);
         BigDecimal cuotaBase = inscripciones.stream()
                 .map(inscripcion -> inscripcion.getClase().getDisciplina().getPrecioBase())
@@ -38,55 +35,67 @@ public class CajaService {
             throw new RuntimeException("El alumno no tiene inscripciones activas con costo.");
         }
 
-        // 3. Empezamos a armar la cabecera del Recibo
         Recibo recibo = Recibo.builder()
                 .alumno(alumno)
                 .fechaEmision(LocalDateTime.now())
-                .metodoPago(metodoPago)
+                .estado(EstadoRecibo.PENDIENTE)
+                .metodoPago(null)
                 .detalles(new ArrayList<>())
                 .build();
 
         BigDecimal totalPagar = BigDecimal.ZERO;
 
-        // A. Agregar la Cuota Base al detalle
         recibo.getDetalles().add(crearDetalle(recibo, TipoConcepto.CUOTA_MES, cuotaBase));
         totalPagar = totalPagar.add(cuotaBase);
 
-        // B. Regla de Negocio: Descuento Familiar (Si el alumno pertenece a uno)
         if (alumno.getGrupoFamiliar() != null) {
             int cantFamiliares = alumnoRepository.findByGrupoFamiliarId(alumno.getGrupoFamiliar().getId()).size();
             
             if (cantFamiliares == 2) {
-                BigDecimal descuento = cuotaBase.multiply(new BigDecimal("0.10")); // 10%
+                BigDecimal descuento = cuotaBase.multiply(new BigDecimal("0.10"));
                 recibo.getDetalles().add(crearDetalle(recibo, TipoConcepto.DESCUENTO_FAMILIAR_10, descuento.negate()));
                 totalPagar = totalPagar.subtract(descuento);
             } else if (cantFamiliares >= 3) {
-                BigDecimal descuento = cuotaBase.multiply(new BigDecimal("0.20")); // 20%
+                BigDecimal descuento = cuotaBase.multiply(new BigDecimal("0.20"));
                 recibo.getDetalles().add(crearDetalle(recibo, TipoConcepto.DESCUENTO_FAMILIAR_20, descuento.negate()));
                 totalPagar = totalPagar.subtract(descuento);
             }
         }
 
-        // C. Regla de Negocio: Recargo por Mora (Si el pago es después del día 10)
+        recibo.setMontoTotal(totalPagar);
+        return reciboRepository.save(recibo);
+    }
+
+    @Transactional
+    public Recibo cobrarReciboPendiente(Long reciboId, MetodoPago metodoPago) {
+        Recibo recibo = reciboRepository.findById(reciboId)
+                .orElseThrow(() -> new RuntimeException("Recibo no encontrado"));
+
+        if (recibo.getEstado() == EstadoRecibo.PAGADO) {
+            throw new RuntimeException("Este recibo ya se encuentra pagado.");
+        }
+
+        BigDecimal totalPagar = recibo.getMontoTotal();
+
         if (LocalDate.now().getDayOfMonth() > 10) {
-            BigDecimal recargoMora = cuotaBase.multiply(new BigDecimal("0.05")); // 5%
+            BigDecimal recargoMora = totalPagar.multiply(new BigDecimal("0.05"));
             recibo.getDetalles().add(crearDetalle(recibo, TipoConcepto.RECARGO_MORA_5, recargoMora));
             totalPagar = totalPagar.add(recargoMora);
         }
 
-        // D. Regla de Negocio: Recargo por Tarjeta de Crédito (Sobre el total acumulado)
         if (metodoPago == MetodoPago.TARJETA_CREDITO) {
-            BigDecimal recargoTarjeta = totalPagar.multiply(new BigDecimal("0.10")); // 10%
+            BigDecimal recargoTarjeta = totalPagar.multiply(new BigDecimal("0.10"));
             recibo.getDetalles().add(crearDetalle(recibo, TipoConcepto.RECARGO_TARJETA_10, recargoTarjeta));
             totalPagar = totalPagar.add(recargoTarjeta);
         }
 
-        // E. Guardar en Base de Datos (CascadeType.ALL se encarga de guardar los detalles)
         recibo.setMontoTotal(totalPagar);
-        return reciboRepository.save(recibo); 
+        recibo.setMetodoPago(metodoPago);
+        recibo.setEstado(EstadoRecibo.PAGADO);
+
+        return reciboRepository.save(recibo);
     }
 
-    // Método auxiliar para mantener el código limpio al generar las líneas del recibo
     private DetalleRecibo crearDetalle(Recibo recibo, TipoConcepto concepto, BigDecimal monto) {
         String mesActual = LocalDate.now().getYear() + "-" + String.format("%02d", LocalDate.now().getMonthValue());
         return DetalleRecibo.builder()

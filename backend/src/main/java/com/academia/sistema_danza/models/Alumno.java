@@ -5,9 +5,13 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "alumnos")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Alumno {
 
     @Id
@@ -36,6 +40,7 @@ public class Alumno {
     @JoinColumn(name = "grupo_familiar_id")
     private GrupoFamiliar grupoFamiliar;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "alumno")
     private List<Inscripcion> inscripciones;
 

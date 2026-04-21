@@ -1,0 +1,1 @@
+INSERT INTO usuarios (email, password_hash, rol) VALUES ('admin@gmail.com', 'admin123', 'DIRECTOR');

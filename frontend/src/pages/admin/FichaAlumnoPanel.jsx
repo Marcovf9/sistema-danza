@@ -2,10 +2,18 @@ import { X, GraduationCap, Calendar, DollarSign, ClipboardList, CheckCircle2, XC
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 
+const formatearHora = (hora) => {
+  if (!hora) return "00:00";
+  if (Array.isArray(hora)) {
+    return `${hora[0].toString().padStart(2, '0')}:${(hora[1] || 0).toString().padStart(2, '0')}`;
+  }
+  return hora.toString().slice(0, 5);
+};
+
 const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
   const [inscripciones, setInscripciones] = useState([]);
   const [clasesDisponibles, setClasesDisponibles] = useState([]);
-  const [historialAsistencia, setHistorialAsistencia] = useState([]); // <-- NUEVO ESTADO
+  const [historialAsistencia, setHistorialAsistencia] = useState([]);
   const [claseSeleccionada, setClaseSeleccionada] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -21,13 +29,17 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
       const [inscripcionesRes, clasesRes, asistenciaRes] = await Promise.all([
         api.get(`/academico/inscripciones/alumno/${alumno.id}`),
         api.get('/academico/clases'),
-        api.get(`/asistencias/alumno/${alumno.id}`) // <-- NUEVA LLAMADA
+        api.get(`/asistencias/alumno/${alumno.id}`)
       ]);
-      setInscripciones(inscripcionesRes.data);
-      setClasesDisponibles(clasesRes.data);
-      setHistorialAsistencia(asistenciaRes.data); // <-- GUARDAMOS EL HISTORIAL
+      setInscripciones(Array.isArray(inscripcionesRes.data) ? inscripcionesRes.data : []);
+      setClasesDisponibles(Array.isArray(clasesRes.data) ? clasesRes.data : []);
+      setHistorialAsistencia(Array.isArray(asistenciaRes.data) ? asistenciaRes.data : []);
+      
     } catch (error) {
       console.error("Error cargando ficha:", error);
+      setInscripciones([]);
+      setClasesDisponibles([]);
+      setHistorialAsistencia([]);
     } finally {
       setCargando(false);
     }
@@ -40,9 +52,10 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
         params: { alumnoId: alumno.id, claseId: claseSeleccionada }
       });
       setClaseSeleccionada('');
-      cargarDatos(); 
+      cargarDatos();
     } catch (error) {
       console.error("Error al inscribir:", error);
+      alert("Hubo un error al inscribir al alumno. Verifica la consola.");
     }
   };
 
@@ -66,7 +79,6 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
 
         <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-gray-50">
           
-          {/* Info Básica */}
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Información de Contacto</h3>
             <div className="space-y-3 text-gray-700">
@@ -80,21 +92,20 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
             </div>
           </div>
 
-          {/* Sección Académica */}
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
               <GraduationCap className="w-4 h-4 mr-2" /> Clases Actuales
             </h3>
             
             {cargando ? (
-              <p className="text-gray-500 text-sm">Cargando...</p>
-            ) : inscripciones.length > 0 ? (
+              <p className="text-gray-500 text-sm font-medium animate-pulse">Cargando expediente...</p>
+            ) : Array.isArray(inscripciones) && inscripciones.length > 0 ? (
               <ul className="space-y-3">
                 {inscripciones.map(ins => (
                   <li key={ins.id} className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
                     <p className="font-bold text-indigo-900">{ins.clase.disciplina.nombre}</p>
                     <p className="text-sm text-indigo-700 mt-1 flex items-center">
-                      <Calendar className="w-3 h-3 mr-1" /> {ins.clase.diasSemana} - {ins.clase.horaInicio}hs
+                      <Calendar className="w-3 h-3 mr-1" /> {ins.clase.diasSemana} - {formatearHora(ins.clase.horaInicio)}hs
                     </p>
                   </li>
                 ))}
@@ -104,24 +115,25 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
             )}
 
             <div className="mt-6 pt-4 border-t border-gray-100">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Inscribir en nueva clase:</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Inscribir en nueva clase:</label>
               <div className="flex gap-2">
                 <select 
                   value={claseSeleccionada} 
                   onChange={(e) => setClaseSeleccionada(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-sm outline-none"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium bg-gray-50"
                 >
-                  <option value="">Seleccione una clase...</option>
+                  <option value="">Seleccione una disciplina...</option>
                   {clasesDisponibles.map(c => (
                     <option key={c.id} value={c.id}>
                       {c.disciplina.nombre} ({c.diasSemana})
                     </option>
                   ))}
                 </select>
+                
                 <button 
                   onClick={handleInscribir}
                   disabled={!claseSeleccionada}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 text-sm font-medium transition-colors"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:border disabled:border-gray-200 text-sm font-bold transition-all"
                 >
                   Inscribir
                 </button>
@@ -129,29 +141,27 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
             </div>
           </div>
 
-          {/* NUEVO: HISTORIAL DE ASISTENCIA */}
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
               <ClipboardList className="w-4 h-4 mr-2" /> Últimas Asistencias
             </h3>
             
             {cargando ? (
-              <p className="text-gray-500 text-sm">Cargando...</p>
-            ) : historialAsistencia.length > 0 ? (
+              <p className="text-gray-500 text-sm font-medium animate-pulse">Cargando registros...</p>
+            ) : Array.isArray(historialAsistencia) && historialAsistencia.length > 0 ? (
               <ul className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                {/* Mostramos las asistencias ordenadas, de la más reciente a la más antigua */}
-                {historialAsistencia.reverse().map((registro, idx) => (
+                {[...historialAsistencia].reverse().map((registro, idx) => (
                   <li key={idx} className="flex justify-between items-center p-3 border border-gray-50 rounded-lg hover:bg-gray-50">
                     <div>
-                      <p className="font-semibold text-gray-800 text-sm">{registro.disciplina}</p>
-                      <p className="text-xs text-gray-500">{registro.fecha}</p>
+                      <p className="font-bold text-gray-800 text-sm">{registro.disciplina}</p>
+                      <p className="text-xs font-medium text-gray-500">{registro.fecha}</p>
                     </div>
                     {registro.estado === 'PRESENTE' ? (
-                      <span className="flex items-center text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
+                      <span className="flex items-center text-[10px] font-black tracking-wider text-green-700 bg-green-100 px-2 py-1 rounded-md">
                         <CheckCircle2 className="w-3 h-3 mr-1" /> PRESENTE
                       </span>
                     ) : (
-                      <span className="flex items-center text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-md">
+                      <span className="flex items-center text-[10px] font-black tracking-wider text-red-700 bg-red-100 px-2 py-1 rounded-md">
                         <XCircle className="w-3 h-3 mr-1" /> AUSENTE
                       </span>
                     )}
