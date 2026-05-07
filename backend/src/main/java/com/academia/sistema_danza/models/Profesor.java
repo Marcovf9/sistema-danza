@@ -31,4 +31,8 @@ public class Profesor {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", insertable = false, updatable = false)
     private Usuario usuario;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean activo = true;
 }

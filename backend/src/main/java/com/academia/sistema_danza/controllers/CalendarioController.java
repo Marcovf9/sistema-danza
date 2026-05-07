@@ -38,13 +38,15 @@ public class CalendarioController {
         boolean esDirector = "DIRECTOR".equals(rol);
         boolean esSuClase = false;
 
-        if (profesorIdStr != null && !profesorIdStr.isEmpty()) {
+        if (profesorIdStr != null && !profesorIdStr.isEmpty() && !profesorIdStr.equals("null")) {
             Long pId = Long.parseLong(profesorIdStr);
-            esSuClase = clase.getProfesorTitular().getId().equals(pId);
+            if (clase.getProfesorTitular() != null) {
+                esSuClase = clase.getProfesorTitular().getId().equals(pId);
+            }
         }
 
         if (!esDirector && !esSuClase) {
-            return ResponseEntity.status(403).body(Map.of("error", "No tienes permiso para ver los alumnos de esta clase"));
+            return ResponseEntity.status(403).body(Map.of("error", "No tienes permiso para ver la lista de alumnos."));
         }
 
         List<Inscripcion> inscripciones = inscripcionRepository.findAll().stream()

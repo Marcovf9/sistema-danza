@@ -2,8 +2,13 @@ package com.academia.sistema_danza.controllers;
 
 import com.academia.sistema_danza.models.*;
 import com.academia.sistema_danza.models.enums.EstadoAsistencia;
+import com.academia.sistema_danza.models.enums.EstadoLiquidacion;
 import com.academia.sistema_danza.repositories.*;
+import com.academia.sistema_danza.services.PdfService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +30,8 @@ public class ProfesorPortalController {
     private final SesionClaseRepository sesionClaseRepository;
     private final AsistenciaRepository asistenciaRepository;
     private final AlumnoRepository alumnoRepository;
+    private final LiquidacionProfesorRepository liquidacionRepository;
+    private final PdfService pdfService;
 
     @GetMapping("/agenda")
     public ResponseEntity<?> obtenerMiAgenda(Authentication auth) {
@@ -61,7 +68,11 @@ public class ProfesorPortalController {
 
     @GetMapping("/agenda/{claseId}/asistencia")
     @Transactional
-    public ResponseEntity<?> obtenerListaParaAsistencia(@PathVariable Long claseId, Authentication auth) {
+    public ResponseEntity<?> obtenerListaParaAsistencia(
+            @PathVariable Long claseId, 
+            @RequestParam(required = false) String fecha,
+            Authentication auth) {
+            
         Usuario usuario = usuarioRepository.findByEmail(auth.getName()).orElseThrow();
         Long miProfesorId = usuario.getProfesor().getId();
 
@@ -71,10 +82,10 @@ public class ProfesorPortalController {
             return ResponseEntity.status(403).body("No tienes permiso para tomar lista en esta clase.");
         }
 
-        LocalDate hoy = LocalDate.now();
+        LocalDate fechaAsistencia = (fecha != null && !fecha.isEmpty()) ? LocalDate.parse(fecha) : LocalDate.now();
         
         Optional<SesionClase> sesionOpt = sesionClaseRepository.findAll().stream()
-                .filter(s -> s.getClaseProgramada().getId().equals(claseId) && s.getFecha().equals(hoy))
+                .filter(s -> s.getClaseProgramada().getId().equals(claseId) && s.getFecha().equals(fechaAsistencia))
                 .findFirst();
 
         SesionClase sesionHoy;
@@ -83,7 +94,7 @@ public class ProfesorPortalController {
         } else {
             SesionClase nuevaSesion = SesionClase.builder()
                     .claseProgramada(clase)
-                    .fecha(hoy)
+                    .fecha(fechaAsistencia)
                     .profesorDictante(usuario.getProfesor())
                     .build();
             sesionHoy = sesionClaseRepository.save(nuevaSesion);
@@ -135,5 +146,43 @@ public class ProfesorPortalController {
         }
 
         return ResponseEntity.ok("Asistencia guardada con éxito");
+    }
+
+    @GetMapping("/liquidaciones")
+    public ResponseEntity<?> obtenerMisLiquidaciones(Authentication auth) {
+        Usuario usuario = usuarioRepository.findByEmail(auth.getName()).orElseThrow();
+        Long miProfesorId = usuario.getProfesor().getId();
+        
+        List<LiquidacionProfesor> liquidaciones = liquidacionRepository.findAll().stream()
+                .filter(l -> l.getProfesor().getId().equals(miProfesorId) && l.getEstado() == EstadoLiquidacion.PAGADO)
+                .sorted(Comparator.comparing(LiquidacionProfesor::getAnio).thenComparing(LiquidacionProfesor::getMes).reversed())
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(liquidaciones);
+    }
+
+    @GetMapping("/liquidaciones/{id}/pdf")
+    public ResponseEntity<byte[]> descargarMiReciboSueldo(@PathVariable Long id, Authentication auth) {
+        try {
+            Usuario usuario = usuarioRepository.findByEmail(auth.getName()).orElseThrow();
+            Long miProfesorId = usuario.getProfesor().getId();
+            
+            LiquidacionProfesor liquidacion = liquidacionRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Liquidación no encontrada"));
+            
+            if (!liquidacion.getProfesor().getId().equals(miProfesorId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            
+            byte[] pdfBytes = pdfService.generarReciboSueldoPdf(liquidacion);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "Recibo_Honorarios_" + liquidacion.getMes() + "_" + liquidacion.getAnio() + ".pdf");
+            
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

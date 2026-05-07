@@ -86,4 +86,4 @@ INSERT INTO clases_programadas (disciplina_id, salon_id, profesor_titular_id, di
 VALUES ((SELECT id FROM disciplinas WHERE nombre = 'Jazz Infantil'), 1, 1, 'MARTES,JUEVES', '19:30:00');
 
 INSERT INTO clases_programadas (disciplina_id, salon_id, profesor_titular_id, dias_semana, hora_inicio) 
-VALUES ((SELECT id FROM disciplinas WHERE nombre = 'Matrodance'), 1, 1, 'MARTES,JUEVES', '17:00:00');
+VALUES ((SELECT id FROM disciplinas WHERE nombre = 'Matrodance'), 1, 1, 'MARTES,VIERNES', '17:00:00');

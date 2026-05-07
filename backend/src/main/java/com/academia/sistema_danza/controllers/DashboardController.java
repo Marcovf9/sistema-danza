@@ -1,9 +1,12 @@
 package com.academia.sistema_danza.controllers;
 
 import com.academia.sistema_danza.repositories.*;
+import com.academia.sistema_danza.services.ExcelService;
 import com.academia.sistema_danza.models.Alumno;
 import com.academia.sistema_danza.models.enums.EstadoAsistencia;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +25,10 @@ public class DashboardController {
     private final ReciboRepository reciboRepository;
     private final AsistenciaRepository asistenciaRepository;
     private final InscripcionRepository inscripcionRepository;
+    @Autowired
+    private ExcelService excelService;
+    @Autowired
+    private AuditoriaLogRepository auditoriaLogRepository;
 
     @GetMapping("/datos")
     public ResponseEntity<Map<String, Object>> obtenerDatosDashboard(
@@ -96,5 +103,25 @@ public class DashboardController {
         data.put("alertasAsistencia", alertas);
 
         return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/exportar-excel")
+    public ResponseEntity<byte[]> exportarExcelMensual(@RequestParam int mes, @RequestParam int anio) {
+        try {
+            byte[] excelContent = excelService.generarReporteMensual(mes, anio);
+            
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", "Reporte_Contable_" + mes + "_" + anio + ".xlsx");
+            
+            return ResponseEntity.ok().headers(headers).body(excelContent);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/auditoria")
+    public ResponseEntity<?> obtenerLogs() {
+        return ResponseEntity.ok(auditoriaLogRepository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "fecha")));
     }
 }

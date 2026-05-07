@@ -1,174 +1,270 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { GraduationCap, Calculator, Landmark } from 'lucide-react';
+import { GraduationCap, Calculator, Landmark, Plus, Pencil, Trash2, AlertCircle, Download, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+import ProfesorModal from '../../components/admin/ProfesorModal';
 
 const ProfesoresPage = () => {
   const [profesores, setProfesores] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [mes, setMes] = useState(new Date().getMonth() + 1); // Mes actual (1-12)
+  const [mes, setMes] = useState(new Date().getMonth() + 1); 
   const [anio, setAnio] = useState(new Date().getFullYear());
   const [liquidacionActiva, setLiquidacionActiva] = useState(null);
   const [calculando, setCalculando] = useState(false);
+  
+  const [liquidacionPagadaId, setLiquidacionPagadaId] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profesorAEditar, setProfesorAEditar] = useState(null);
+
+  const fetchProfesores = async () => {
+    try {
+      const response = await api.get('/profesores');
+      setProfesores(response.data);
+    } catch (error) {
+      toast.error("Error cargando profesores.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProfesores = async () => {
-      try {
-        const response = await api.get('/profesores');
-        setProfesores(response.data);
-      } catch (error) {
-        console.error("Error cargando profesores:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProfesores();
   }, []);
 
   useEffect(() => {
     setLiquidacionActiva(null);
+    setLiquidacionPagadaId(null);
   }, [mes, anio]);
 
-  const handleCalcularLiquidacion = async (profesor) => {
-    setCalculando(profesor.id);
+  const handleAbrirCrear = () => {
+    setProfesorAEditar(null);
+    setIsModalOpen(true);
+  };
+
+  const handleAbrirEditar = (prof) => {
+    setProfesorAEditar(prof);
+    setIsModalOpen(true);
+  };
+
+  const handleGuardarProfesor = async (formData) => {
     try {
-      const response = await api.get(`/profesores/${profesor.id}/liquidacion`, {
-        params: { mes, anio }
-      });
-      
-      setLiquidacionActiva({
-        profesor,
-        ...response.data
-      });
+      if (profesorAEditar) {
+        await api.put(`/profesores/${profesorAEditar.id}`, formData);
+        toast.success("¡Profesor actualizado!");
+      } else {
+        await api.post('/profesores', formData);
+        toast.success("¡Profesor creado con su acceso al sistema!");
+      }
+      setIsModalOpen(false);
+      fetchProfesores();
     } catch (error) {
-      console.error("Error al calcular:", error);
-      alert("No se pudo calcular la liquidación.");
-    } finally {
-      setCalculando(null);
+      toast.error("Error al guardar el profesor.");
     }
   };
 
-  const mesesDelAno = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ];
+  const handleDarDeBaja = (id) => {
+    toast((t) => (
+      <div className="flex flex-col gap-3 p-1">
+        <div className="flex items-center gap-2">
+          <AlertCircle className="w-6 h-6 text-red-500" />
+          <p className="font-bold text-gray-800 text-lg">¿Eliminar / Baja?</p>
+        </div>
+        <p className="text-sm text-gray-600">Este profesor ya no tendrá acceso al sistema ni aparecerá en grillas.</p>
+        <div className="flex justify-end gap-2 mt-2">
+          <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">Cancelar</button>
+          <button 
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                await api.patch(`/profesores/${id}/baja`);
+                toast.success("Profesor dado de baja.");
+                fetchProfesores();
+              } catch (error) {
+                toast.error("Error al realizar la baja.");
+              }
+            }} 
+            className="px-4 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-xl shadow-sm transition"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity });
+  };
+
+  const handleCalcularLiquidacion = async (profesor) => {
+    setCalculando(profesor.id);
+    setLiquidacionPagadaId(null);
+    try {
+      const response = await api.get(`/profesores/${profesor.id}/liquidacion`, { params: { mes, anio } });
+      setLiquidacionActiva({ profesor, ...response.data });
+      toast.success("Liquidación calculada.");
+    } catch (error) {
+      toast.error(error.response?.data || "Error al calcular la liquidación.");
+    } finally {
+      setCalculando(false);
+    }
+  };
+
+  const handleMarcarPagado = async () => {
+    if (!liquidacionActiva) return;
+
+    const confirmar = window.confirm(`¿Confirmas el pago de $${liquidacionActiva.totalAPagar} a ${liquidacionActiva.profesor.nombre}? Esto registrará un egreso en caja.`);
+    
+    if (!confirmar) return;
+
+    try {
+      const response = await api.post(`/profesores/${liquidacionActiva.profesor.id}/liquidaciones/pagar`, null, {
+        params: {
+          mes: mes,
+          anio: anio,
+          monto: liquidacionActiva.totalAPagar
+        }
+      });
+      
+      toast.success("¡Sueldo pagado! Se registró el egreso en la Caja.");
+      setLiquidacionPagadaId(response.data.liquidacionId);
+    } catch (error) {
+      toast.error("Error al registrar el pago del sueldo.");
+    }
+  };
+
+  const descargarPdfSueldo = async (id) => {
+    try {
+      const response = await api.get(`/profesores/liquidaciones/${id}/pdf`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Honorarios_Prof_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      toast.error("No se pudo descargar el comprobante.");
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Cabecera y Filtros de Fecha */}
-      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100 gap-4">
-        <div className="flex items-center">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl mr-4">
-            <GraduationCap className="w-8 h-8" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-800">Plantel Docente</h2>
-            <p className="text-gray-500 mt-1">Gestión y liquidación de haberes</p>
-          </div>
+    <div className="h-full flex flex-col space-y-6">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center">Staff Docente y Sueldos</h2>
+          <p className="text-gray-500 mt-1">Calcula honorarios y administra los accesos.</p>
         </div>
-
-        <div className="flex items-center bg-gray-50 p-2 rounded-xl border border-gray-200">
-          <span className="text-sm font-medium text-gray-500 mr-3 ml-2">Período:</span>
-          <select 
-            value={mes} 
-            onChange={(e) => setMes(Number(e.target.value))}
-            className="bg-white border-none text-gray-800 font-bold py-2 px-4 rounded-lg shadow-sm outline-none cursor-pointer"
-          >
-            {mesesDelAno.map((m, index) => (
-              <option key={index + 1} value={index + 1}>{m}</option>
-            ))}
+        <div className="mt-4 sm:mt-0 flex gap-3 items-center">
+          <button onClick={handleAbrirCrear} className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition">
+            <Plus className="w-5 h-5 mr-1" /> Agregar Profe
+          </button>
+          <div className="h-8 w-px bg-gray-200 mx-2"></div>
+          <select value={mes} onChange={(e) => setMes(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-700 outline-none">
+            {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>Mes {m}</option>)}
           </select>
-          <select 
-            value={anio} 
-            onChange={(e) => setAnio(Number(e.target.value))}
-            className="ml-2 bg-white border-none text-gray-800 font-bold py-2 px-4 rounded-lg shadow-sm outline-none cursor-pointer"
-          >
-            <option value={2026}>2026</option>
-            <option value={2027}>2027</option>
-          </select>
+          <input type="number" value={anio} onChange={(e) => setAnio(e.target.value)} className="w-20 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-700 outline-none" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Tabla de Profesores */}
-        <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {loading ? (
-            <div className="p-12 text-center text-gray-500">Cargando plantel...</div>
-          ) : (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider border-b border-gray-100">
-                  <th className="p-5 font-semibold">Profesor</th>
-                  <th className="p-5 font-semibold">CBU / Alias</th>
-                  <th className="p-5 font-semibold text-center">Acción</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {profesores.map((profe) => (
-                  <tr key={profe.id} className="hover:bg-gray-50/50 transition-colors text-gray-800">
-                    <td className="p-5 font-medium flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold mr-3">
-                        {profe.nombre.charAt(0)}{profe.apellido.charAt(0)}
-                      </div>
-                      {profe.nombre} {profe.apellido}
-                    </td>
-                    <td className="p-5 text-gray-500 font-mono text-sm">
-                      {profe.cbuAlias || 'No registrado'}
-                    </td>
-                    <td className="p-5 text-center">
-                      <button 
-                        onClick={() => handleCalcularLiquidacion(profe)}
-                        disabled={calculando === profe.id}
-                        className="inline-flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        <Calculator className="w-4 h-4 mr-2" />
-                        {calculando === profe.id ? 'Calculando...' : 'Liquidar Mes'}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[500px]">
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-gray-100 bg-gray-50">
+            <h3 className="font-bold text-gray-700">Listado de Profesores</h3>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {loading ? (
+              <div className="flex justify-center p-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+            ) : (
+              <div className="space-y-3">
+                {profesores.map((prof) => (
+                  <div key={prof.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow gap-4 ${prof.activo === false ? 'opacity-50' : ''}`}>
+                    <div className="flex items-center gap-4">
+                       <div className="w-12 h-12 bg-indigo-50 text-indigo-700 rounded-full flex items-center justify-center">
+                          <GraduationCap className="w-6 h-6" />
+                        </div>
+                      <div>
+                        <p className="font-bold text-gray-800 text-lg">
+                          {prof.nombre} {prof.apellido}
+                          {prof.activo === false && <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">INACTIVO</span>}
+                        </p>
+                      <p className="text-sm text-gray-500 font-mono">{prof.cbuAlias || 'Sin CBU'}</p>
+                    </div>
+                  </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => handleAbrirEditar(prof)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar"><Pencil className="w-5 h-5" /></button>
+                      <button onClick={() => handleDarDeBaja(prof.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Baja"><Trash2 className="w-5 h-5" /></button>
+                      <button onClick={() => handleCalcularLiquidacion(prof)} disabled={calculando === prof.id} className="ml-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-bold text-sm transition flex items-center gap-2">
+                        {calculando === prof.id ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <><Calculator className="w-4 h-4"/> Liquidar</>}
                       </button>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Panel de Resultado de Liquidación */}
-        <div className="xl:col-span-1">
-          {liquidacionActiva ? (
-            <div className="bg-white p-6 rounded-2xl shadow-xl border border-indigo-100 relative overflow-hidden animate-in slide-in-from-right-4">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-500"></div>
-              <h3 className="text-xl font-bold text-gray-800 mb-1">Recibo de Haberes</h3>
-              <p className="text-gray-500 text-sm mb-6">{mesesDelAno[liquidacionActiva.mes - 1]} {liquidacionActiva.anio}</p>
-              
-              <div className="bg-gray-50 p-4 rounded-xl mb-6">
-                <p className="text-sm text-gray-500 font-medium mb-1">Profesor/a</p>
-                <p className="text-lg font-bold text-gray-800">
-                  {liquidacionActiva.profesor.nombre} {liquidacionActiva.profesor.apellido}
-                </p>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+          {liquidacionPagadaId ? (
+             <div className="p-6 flex-1 flex flex-col items-center justify-center space-y-6 animate-in fade-in zoom-in duration-300">
+               <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.3)]">
+                 <CheckCircle className="w-10 h-10 text-white" />
+               </div>
+               <div className="text-center">
+                 <h4 className="text-2xl font-bold text-gray-800">¡Sueldo Abonado!</h4>
+                 <p className="text-gray-500 mt-1 text-sm">Se registró el egreso en la Caja Central.</p>
+               </div>
+               
+               <button 
+                 onClick={() => descargarPdfSueldo(liquidacionPagadaId)}
+                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md"
+               >
+                 <Download className="w-5 h-5" />
+                 Descargar Recibo PDF
+               </button>
+               
+               <button 
+                 onClick={() => { setLiquidacionPagadaId(null); setLiquidacionActiva(null); }}
+                 className="text-sm text-gray-500 hover:text-gray-700 font-bold transition"
+               >
+                 ← Volver al listado
+               </button>
+             </div>
+          ) : liquidacionActiva ? (
+            <div className="p-6 flex-1 flex flex-col justify-between animate-in fade-in slide-in-from-right-4 duration-300">
+              <div>
+                <h3 className="text-xl font-black text-gray-800 mb-6 border-b pb-4">Detalle de Pago</h3>
+                <p className="text-sm text-gray-500 uppercase tracking-wider mb-1">Profesor/a</p>
+                <p className="text-lg font-bold text-gray-800">{liquidacionActiva.profesor.nombre} {liquidacionActiva.profesor.apellido}</p>
               </div>
-
               <div className="border-t border-dashed border-gray-200 py-6 mb-2">
                 <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4">Total a Transferir</p>
                 <div className="flex items-center justify-between">
                   <Landmark className="text-gray-400 w-8 h-8" />
-                  <span className="text-4xl font-black text-indigo-600">
-                    ${liquidacionActiva.totalAPagar.toLocaleString('es-AR')}
-                  </span>
+                  <span className="text-4xl font-black text-indigo-600">${liquidacionActiva.totalAPagar?.toLocaleString('es-AR') || '0'}</span>
                 </div>
               </div>
-
-              <button className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-sm transition-colors flex justify-center items-center">
-                Marcar como Pagado
+              <button 
+                onClick={handleMarcarPagado} 
+                className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-sm transition-colors flex justify-center items-center"
+              >
+                Confirmar Pago y Registrar Egreso
               </button>
             </div>
           ) : (
             <div className="h-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-8 text-gray-400">
               <Calculator className="w-12 h-12 mb-4 text-gray-300" />
-              <p className="text-center font-medium">Selecciona "Liquidar Mes" en un profesor para ver el desglose de su sueldo.</p>
+              <p className="text-center font-medium">Selecciona "Liquidar" para ver el desglose.</p>
             </div>
           )}
         </div>
       </div>
+
+      <ProfesorModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSave={handleGuardarProfesor}
+        profesorAEditar={profesorAEditar} 
+      />
     </div>
   );
 };

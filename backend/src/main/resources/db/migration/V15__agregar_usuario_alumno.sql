@@ -1,0 +1,1 @@
+ALTER TABLE alumnos ADD COLUMN usuario_id BIGINT;

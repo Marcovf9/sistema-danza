@@ -46,4 +46,58 @@ public class Alumno {
 
     @Column(nullable = false)
     private boolean activo = true;
+
+    @Column(length = 150)
+    private String email;
+
+    @Column(name = "usuario_id")
+    private Long usuarioId;
+
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", insertable = false, updatable = false)
+    private Usuario usuario;
+    
+    @Column(name = "lugar_nacimiento", length = 100)
+    private String lugarNacimiento;
+    
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+    
+    @Column(length = 200)
+    private String direccion;
+    
+    @Column(name = "codigo_postal", length = 20)
+    private String codigoPostal;
+    
+    @Column(length = 100)
+    private String localidad;
+    
+    @Column(length = 100)
+    private String provincia;
+    
+    @Column(length = 100)
+    private String facebook;
+    
+    @Column(length = 100)
+    private String instagram;
+    
+    @Column(name = "es_menor", nullable = false)
+    @Builder.Default
+    private Boolean esMenor = false;
+
+    @Column(name = "cobertura_medica", length = 100)
+    private String coberturaMedica;
+    
+    @Column(name = "nro_afiliado", length = 100)
+    private String nroAfiliado;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tutor_id")
+    @JsonIgnoreProperties({"menoresACargo", "tutor", "inscripciones", "hibernateLazyInitializer", "handler"})
+    private Alumno tutor;
+
+    @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"tutor", "inscripciones", "hibernateLazyInitializer", "handler"})
+    private List<Alumno> menoresACargo;
 }

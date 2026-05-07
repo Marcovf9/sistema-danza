@@ -26,7 +26,7 @@ const CalendarioPage = () => {
   const [loading, setLoading] = useState(true);
   
   const rol = localStorage.getItem('rol');
-  const profesorId = localStorage.getItem('profesorId');
+  const profesorId = localStorage.getItem('entidadId') || '';
 
   const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
   const horas = Array.from({ length: 15 }, (_, i) => i + 8); 
@@ -49,7 +49,7 @@ const CalendarioPage = () => {
   const verDetalles = async (clase) => {
     try {
       const res = await api.get(`/calendario/clase/${clase.id}/detalles`, {
-        headers: { rol, profesorId }
+        headers: { rol, profesorId: profesorId }
       });
       setClaseDetalle(res.data);
     } catch (err) {

@@ -37,4 +37,7 @@ public class Inscripcion {
         }
         this.activo = true;
     }
+
+    @Column(name = "dias_seleccionados", length = 100)
+    private String diasSeleccionados;
 }
