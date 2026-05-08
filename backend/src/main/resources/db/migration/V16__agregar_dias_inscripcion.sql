@@ -1,0 +1,1 @@
+ALTER TABLE inscripciones ADD COLUMN dias_seleccionados VARCHAR(100);

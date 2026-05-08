@@ -1,14 +1,19 @@
 package com.academia.sistema_danza.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 import com.academia.sistema_danza.models.enums.RolUsuario;
 
-@Data
 @Entity
 @Table(name = "usuarios")
+@Getter 
+@Setter 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
 
     @Id
@@ -27,4 +32,11 @@ public class Usuario {
 
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
+
+    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private Profesor profesor;
+
+    @Builder.Default
+    @Column(name = "requiere_cambio_password", nullable = false)
+    private Boolean requiereCambioPassword = false;
 }

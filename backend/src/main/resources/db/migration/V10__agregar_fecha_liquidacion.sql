@@ -1,0 +1,1 @@
+ALTER TABLE liquidaciones_profesores ADD COLUMN fecha_generacion TIMESTAMP;

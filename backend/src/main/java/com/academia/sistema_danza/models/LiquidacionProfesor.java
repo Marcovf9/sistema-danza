@@ -3,6 +3,7 @@ package com.academia.sistema_danza.models;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime; // <--- IMPORTACIÓN NECESARIA
 
 import com.academia.sistema_danza.models.enums.*;
 
@@ -34,4 +35,7 @@ public class LiquidacionProfesor {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoLiquidacion estado = EstadoLiquidacion.PENDIENTE;
+
+    @Column(name = "fecha_generacion")
+    private LocalDateTime fechaGeneracion;
 }

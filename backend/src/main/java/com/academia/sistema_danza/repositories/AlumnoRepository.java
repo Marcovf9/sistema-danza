@@ -11,4 +11,5 @@ public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
     List<Alumno> findByActivoTrue();
     Optional<Alumno> findByDni(String dni);
     List<Alumno> findByGrupoFamiliarId(Long grupoFamiliarId);
+    long countByActivoTrue();
 }
