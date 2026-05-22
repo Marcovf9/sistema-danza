@@ -7,6 +7,8 @@ import CajaPage from './pages/admin/CajaPage';
 import ProfesoresPage from './pages/profesor/ProfesoresPage';
 import AsistenciaPage from './pages/admin/AsistenciaPage';
 import LoginPage from './pages/auth/LoginPage';
+import OlvidePasswordPage from './pages/auth/OlvidePasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import CalendarioPage from './pages/admin/CalendarioPage';
 import AgendaProfesorPage from './pages/profesor/AgendaProfesorPage';
 import AuditoriaPage from './pages/admin/AuditoriaPage';
@@ -51,6 +53,8 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/olvide-password" element={<OlvidePasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/" element={<RutaProtegida><LayoutPrincipal /></RutaProtegida>}>
           
           <Route index element={

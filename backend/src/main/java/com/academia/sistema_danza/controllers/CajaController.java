@@ -1,30 +1,29 @@
 package com.academia.sistema_danza.controllers;
 
+import com.academia.sistema_danza.dto.EgresoRequestDTO;
+import com.academia.sistema_danza.dto.ReciboResponseDTO;
+import com.academia.sistema_danza.models.Egreso;
 import com.academia.sistema_danza.models.Recibo;
-import com.academia.sistema_danza.models.Alumno;
 import com.academia.sistema_danza.models.enums.EstadoRecibo;
 import com.academia.sistema_danza.models.enums.MetodoPago;
+import com.academia.sistema_danza.repositories.EgresoRepository;
+import com.academia.sistema_danza.repositories.ReciboRepository;
 import com.academia.sistema_danza.services.AuditoriaService;
 import com.academia.sistema_danza.services.CajaService;
-import com.academia.sistema_danza.services.EmailService;
 import com.academia.sistema_danza.services.FacturacionAutomaticaService;
 import com.academia.sistema_danza.services.PdfService;
-import com.academia.sistema_danza.repositories.ReciboRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.academia.sistema_danza.models.Egreso;
-import com.academia.sistema_danza.repositories.EgresoRepository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.data.domain.Sort;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,61 +36,43 @@ public class CajaController {
     private final PdfService pdfService;
     private final ReciboRepository reciboRepository;
     private final FacturacionAutomaticaService facturacionRobot;
-    
     private final EgresoRepository egresoRepository;
     private final AuditoriaService auditoriaService;
-    private final EmailService emailService;
 
     @GetMapping("/pendientes")
-    public ResponseEntity<List<Recibo>> obtenerRecibosPendientes() {
-        List<Recibo> pendientes = reciboRepository.findAll().stream()
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ReciboResponseDTO>> obtenerRecibosPendientes() {
+        List<ReciboResponseDTO> pendientes = reciboRepository.findAll().stream()
                 .filter(r -> r.getEstado() == EstadoRecibo.PENDIENTE)
-                .toList();
+                .map(cajaService::toReciboDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(pendientes);
     }
 
     @PostMapping("/cobrar-recibo")
-    public ResponseEntity<Recibo> cobrarRecibo(
-            @RequestParam Long reciboId, 
+    @Transactional
+    public ResponseEntity<ReciboResponseDTO> cobrarRecibo(
+            @RequestParam Long reciboId,
             @RequestParam MetodoPago metodoPago) {
-        
+
         Recibo reciboPagado = cajaService.cobrarReciboPendiente(reciboId, metodoPago);
-        Alumno alumno = reciboPagado.getAlumno();
-        
+
         auditoriaService.registrarAccion(
-            "COBRO_CUOTA", "Recibo", reciboPagado.getId(), 
-            "Se cobró $" + reciboPagado.getMontoTotal() + " al alumno " + alumno.getNombre() + " mediante " + metodoPago.name()
+                "COBRO_CUOTA",
+                "Recibo",
+                reciboPagado.getId(),
+                "Se cobró $" + reciboPagado.getMontoTotal() + " al alumno "
+                        + reciboPagado.getAlumno().getNombre() + " " + reciboPagado.getAlumno().getApellido()
+                        + " mediante " + metodoPago.name()
         );
 
-        String emailDestino = alumno.getEmail();
-        String nombreDestino = alumno.getNombre();
-
-        if (Boolean.TRUE.equals(alumno.getEsMenor()) && alumno.getTutor() != null) {
-            emailDestino = alumno.getTutor().getEmail();
-            nombreDestino = alumno.getTutor().getNombre();
-        }
-
-        try {
-            byte[] pdf = pdfService.generarReciboPdf(reciboPagado);
-            emailService.enviarConfirmacionPago(
-                emailDestino,
-                nombreDestino,
-                reciboPagado.getMontoTotal().toString(),
-                reciboPagado.getId().toString(),
-                pdf, 
-                "Recibo_Epifania_" + reciboPagado.getId() + ".pdf"
-            );
-        } catch (Exception e) {
-            System.err.println("No se pudo enviar el recibo por email: " + e.getMessage());
-        }
-
-        return ResponseEntity.ok(reciboPagado);
+        return ResponseEntity.ok(cajaService.toReciboDTO(reciboPagado));
     }
 
     @GetMapping("/recibos/{id}/pdf")
     public ResponseEntity<byte[]> descargarReciboPdf(@PathVariable Long id) {
         Recibo recibo = reciboRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recibo no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Recibo no encontrado con id: " + id));
 
         byte[] pdfBytes = pdfService.generarReciboPdf(recibo);
 
@@ -115,49 +96,24 @@ public class CajaController {
     }
 
     @PostMapping("/egresos")
-    public ResponseEntity<?> registrarEgreso(@RequestBody Egreso egreso) {
-        try {
-            egreso.setFecha(LocalDateTime.now());
-            Egreso nuevoEgreso = egresoRepository.save(egreso);
-            return ResponseEntity.ok(nuevoEgreso);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al registrar el egreso: " + e.getMessage());
-        }
+    public ResponseEntity<Egreso> registrarEgreso(@Valid @RequestBody EgresoRequestDTO dto) {
+        Egreso egreso = Egreso.builder()
+                .concepto(dto.getConcepto())
+                .monto(dto.getMonto())
+                .observaciones(dto.getObservaciones())
+                .fecha(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(egresoRepository.save(egreso));
     }
 
     @GetMapping("/recibos/alumno/{alumnoId}")
-    public ResponseEntity<List<Recibo>> obtenerHistorialAlumno(@PathVariable Long alumnoId) {
-        return ResponseEntity.ok(reciboRepository.findByAlumnoIdOrderByFechaEmisionDesc(alumnoId));
-    }
-
-
-    @GetMapping("/limpiar-duplicados")
-    @Transactional
-    public ResponseEntity<String> limpiarRecibosDuplicados() {
-        int mesActual = LocalDate.now().getMonthValue();
-        int anioActual = LocalDate.now().getYear();
-        
-        List<Recibo> todosPendientes = reciboRepository.findAll().stream()
-                .filter(r -> r.getEstado() == EstadoRecibo.PENDIENTE &&
-                             r.getFechaEmision().getMonthValue() == mesActual &&
-                             r.getFechaEmision().getYear() == anioActual)
-                .toList();
-                
-        Map<Long, List<Recibo>> recibosPorAlumno = todosPendientes.stream()
-                .collect(Collectors.groupingBy(r -> r.getAlumno().getId()));
-                
-        int borrados = 0;
-        
-        for (List<Recibo> recibosDelAlumno : recibosPorAlumno.values()) {
-            if (recibosDelAlumno.size() > 1) {
-                for (int i = 1; i < recibosDelAlumno.size(); i++) {
-                    reciboRepository.delete(recibosDelAlumno.get(i));
-                    borrados++;
-                }
-            }
-        }
-        
-        return ResponseEntity.ok("¡Limpieza completada! Se eliminaron " + borrados + " recibos duplicados de tu base de datos.");
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ReciboResponseDTO>> obtenerHistorialAlumno(@PathVariable Long alumnoId) {
+        List<ReciboResponseDTO> historial = reciboRepository
+                .findByAlumnoIdOrderByFechaEmisionDesc(alumnoId).stream()
+                .map(cajaService::toReciboDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(historial);
     }
 
     @DeleteMapping("/recibos/{id}")
