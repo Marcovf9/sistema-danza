@@ -119,7 +119,7 @@ const LoginPage = () => {
             </h1>
           </div>
 
-          <h2 className="text-3xl font-black text-gray-800 mb-1">Bienvenida 👋</h2>
+          <h2 className="text-3xl font-black text-gray-800 mb-1">Bienvenido/a 👋</h2>
           <p className="text-gray-500 text-sm mb-8">Ingresá tus credenciales para continuar.</p>
 
           {error && (
