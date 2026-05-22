@@ -8,11 +8,13 @@ const PortalAlumnoPage = ({ vista }) => {
   const [perfilActivoId, setPerfilActivoId] = useState(localStorage.getItem('entidadId'));
 
   const [recibos, setRecibos] = useState([]);
+  const [historialPagos, setHistorialPagos] = useState([]);
   const [misClases, setMisClases] = useState([]);
   const [todasLasClases, setTodasLasClases] = useState([]);
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [enviandoPedido, setEnviandoPedido] = useState(false);
 
   const [claseAInscribir, setClaseAInscribir] = useState(null);
   const [diasSeleccionados, setDiasSeleccionados] = useState([]);
@@ -51,6 +53,7 @@ const PortalAlumnoPage = ({ vista }) => {
       ]);
 
       setRecibos(recibosRes.data.filter(r => r.estado === 'PENDIENTE'));
+      setHistorialPagos(recibosRes.data.filter(r => r.estado === 'PAGADO'));
       setMisClases(inscripcionesRes.data);
       setProductos(productosRes.data);
       setTodasLasClases(clasesRes.data);
@@ -97,7 +100,9 @@ const PortalAlumnoPage = ({ vista }) => {
       setClaseAInscribir(null);
       cargarDatos(perfilActivoId);
     } catch (error) {
-      toast.error("Error al procesar la inscripción.");
+      // Muestra el mensaje real del backend (ej: "Conflicto de alumno: ya está en otra clase...")
+      const msg = error.response?.data?.error || error.response?.data || 'Error al procesar la inscripción.';
+      toast.error(msg, { duration: 6000 });
     }
   };
 
@@ -153,11 +158,27 @@ const PortalAlumnoPage = ({ vista }) => {
   const totalCarrito = carrito.reduce((acc, item) => acc + (item.producto.precio * item.cantidad), 0);
   const granTotal = totalDeuda + totalCarrito;
 
-  const enviarWhatsApp = () => {
+  const enviarWhatsApp = async () => {
     if (granTotal === 0) return toast.error("No hay nada para pagar.");
-    
+
     const perfilActual = perfiles.find(p => p.id.toString() === perfilActivoId);
     const nombreRef = perfilActual ? `${perfilActual.nombre} ${perfilActual.apellido}` : '';
+
+    // Si hay productos en el carrito, confirmar el pedido en el backend primero
+    if (carrito.length > 0) {
+      setEnviandoPedido(true);
+      try {
+        const items = carrito.map(item => ({ productoId: item.producto.id, cantidad: item.cantidad }));
+        await api.post('/productos/pedido', items);
+      } catch (error) {
+        const msg = error.response?.data?.error || 'Error al confirmar el pedido. Verificá el stock disponible.';
+        toast.error(msg, { duration: 6000 });
+        setEnviandoPedido(false);
+        return; // No abrir WhatsApp si el pedido falló
+      } finally {
+        setEnviandoPedido(false);
+      }
+    }
 
     let mensaje = `¡Hola Epifania! 💃%0A`;
     mensaje += `Te envío el comprobante de pago de *${nombreRef}*:%0A%0A`;
@@ -175,17 +196,17 @@ const PortalAlumnoPage = ({ vista }) => {
     if (carrito.length > 0) {
       mensaje += `*PRODUCTOS (TIENDA):*%0A`;
       carrito.forEach(item => {
-        mensaje += `• ${item.cantidad}x ${item.producto.nombre}: $${item.producto.precio * item.cantidad}%0A`;
+        mensaje += `• ${item.cantidad}x ${item.producto.nombre}: $${(item.producto.precio * item.cantidad).toLocaleString('es-AR')}%0A`;
       });
       mensaje += `%0A`;
     }
 
-    mensaje += `*TOTAL TRANSFERIDO: $${granTotal}*%0A%0A`;
+    mensaje += `*TOTAL TRANSFERIDO: $${granTotal.toLocaleString('es-AR')}*%0A%0A`;
     mensaje += `(Adjunto la foto del comprobante 🧾)`;
 
-    const numeroEpifania = "5493510000000"; 
+    const numeroEpifania = "5493510000000";
     window.open(`https://wa.me/${numeroEpifania}?text=${mensaje}`, '_blank');
-    setCarrito([]); 
+    setCarrito([]);
   };
 
   return (
@@ -235,30 +256,63 @@ const PortalAlumnoPage = ({ vista }) => {
       ) : (
         <>
           {vista === 'CUENTA' && (
-            <div className="space-y-4">
-              {recibos.length === 0 ? (
-                <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
-                  <CheckCircle className="w-16 h-16 text-emerald-400 mb-4" />
-                  <p className="font-bold text-xl text-gray-800">¡Al día!</p>
-                  <p className="text-gray-500 mt-2">No hay cuotas pendientes para este perfil.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {recibos.map(recibo => {
-                    const mesString = new Date(recibo.fechaEmision).toLocaleString('es-ES', { month: 'long' });
-                    return (
-                      <div key={recibo.id} className="bg-white p-6 rounded-2xl border-l-4 border-l-red-500 shadow-sm flex flex-col justify-between">
-                        <div className="mb-4">
-                          <p className="font-bold text-gray-800 text-lg capitalize">Cuota {mesString}</p>
-                          <p className="text-sm text-gray-500 font-medium">Recibo #{recibo.id}</p>
+            <div className="space-y-8">
+
+              {/* ── Pendientes ── */}
+              <div>
+                <h3 className="text-lg font-black text-gray-800 mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-500" /> Cuotas Pendientes
+                </h3>
+                {recibos.length === 0 ? (
+                  <div className="bg-white p-10 rounded-3xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
+                    <CheckCircle className="w-14 h-14 text-emerald-400 mb-3" />
+                    <p className="font-bold text-xl text-gray-800">¡Al día!</p>
+                    <p className="text-gray-500 mt-1">No hay cuotas pendientes para este perfil.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {recibos.map(recibo => {
+                      const mesString = new Date(recibo.fechaEmision).toLocaleString('es-ES', { month: 'long' });
+                      return (
+                        <div key={recibo.id} className="bg-white p-6 rounded-2xl border-l-4 border-l-red-500 shadow-sm flex flex-col justify-between">
+                          <div className="mb-4">
+                            <p className="font-bold text-gray-800 text-lg capitalize">Cuota {mesString}</p>
+                            <p className="text-sm text-gray-500 font-medium">Recibo #{recibo.id}</p>
+                          </div>
+                          <div className="flex justify-between items-end">
+                            <span className="text-xs font-bold text-red-500 uppercase tracking-widest bg-red-50 px-2 py-1 rounded-md">Pendiente</span>
+                            <span className="text-2xl font-black text-gray-800">${recibo.montoTotal.toLocaleString('es-AR')}</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-end">
-                          <span className="text-xs font-bold text-red-500 uppercase tracking-widest bg-red-50 px-2 py-1 rounded-md">Pendiente</span>
-                          <span className="text-2xl font-black text-gray-800">${recibo.montoTotal.toLocaleString('es-AR')}</span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Historial de pagos ── */}
+              {historialPagos.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-black text-gray-800 mb-4 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-emerald-500" /> Historial de Pagos
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {historialPagos.map(recibo => {
+                      const mesString = new Date(recibo.fechaEmision).toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+                      return (
+                        <div key={recibo.id} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between opacity-80">
+                          <div className="mb-3">
+                            <p className="font-bold text-gray-700 capitalize">{mesString}</p>
+                            <p className="text-xs text-gray-400 font-medium">Recibo #{recibo.id}</p>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">Pagado</span>
+                            <span className="text-xl font-black text-gray-600">${recibo.montoTotal.toLocaleString('es-AR')}</span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -378,7 +432,14 @@ const PortalAlumnoPage = ({ vista }) => {
                   {totalCarrito > 0 && <span className="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded">Tienda: ${totalCarrito}</span>}
                 </div>
               </div>
-              <button onClick={enviarWhatsApp} className="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg rounded-xl shadow-lg flex justify-center items-center gap-2 active:scale-95"><Send className="w-5 h-5" /> Informar Pago</button>
+              <button
+                onClick={enviarWhatsApp}
+                disabled={enviandoPedido}
+                className="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white font-black text-lg rounded-xl shadow-lg flex justify-center items-center gap-2 active:scale-95 transition-colors"
+              >
+                <Send className="w-5 h-5" />
+                {enviandoPedido ? 'Confirmando...' : 'Informar Pago'}
+              </button>
             </div>
           </div>
         </div>
