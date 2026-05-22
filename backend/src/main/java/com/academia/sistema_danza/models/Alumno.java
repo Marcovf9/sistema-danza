@@ -1,5 +1,6 @@
 package com.academia.sistema_danza.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;

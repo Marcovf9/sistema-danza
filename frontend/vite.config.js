@@ -9,7 +9,7 @@ export default defineConfig({
     // El frontend en prod usa nginx que hace proxy de /api → backend:8080.
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: `http://localhost:${process.env.BACKEND_PORT || 8080}`,
         changeOrigin: true,
       },
     },
