@@ -5,13 +5,9 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @Entity
 @Table(name = "alumnos")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Alumno {
 
     @Id
@@ -40,7 +36,6 @@ public class Alumno {
     @JoinColumn(name = "grupo_familiar_id")
     private GrupoFamiliar grupoFamiliar;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "alumno")
     private List<Inscripcion> inscripciones;
 
@@ -53,7 +48,6 @@ public class Alumno {
     @Column(name = "usuario_id")
     private Long usuarioId;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", insertable = false, updatable = false)
     private Usuario usuario;
@@ -94,10 +88,8 @@ public class Alumno {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_id")
-    @JsonIgnoreProperties({"menoresACargo", "tutor", "inscripciones", "hibernateLazyInitializer", "handler"})
     private Alumno tutor;
 
     @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"tutor", "inscripciones", "hibernateLazyInitializer", "handler"})
     private List<Alumno> menoresACargo;
 }

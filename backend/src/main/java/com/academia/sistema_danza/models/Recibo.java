@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.academia.sistema_danza.models.enums.*;
 
 @Entity
@@ -36,7 +35,6 @@ public class Recibo {
     @Column(name = "monto_total", nullable = false, precision = 10, scale = 2)
     private BigDecimal montoTotal;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "recibo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleRecibo> detalles;
 

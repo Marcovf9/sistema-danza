@@ -1,5 +1,7 @@
 package com.academia.sistema_danza.services;
 
+import com.academia.sistema_danza.dto.DetalleReciboDTO;
+import com.academia.sistema_danza.dto.ReciboResponseDTO;
 import com.academia.sistema_danza.models.*;
 import com.academia.sistema_danza.models.enums.*;
 import com.academia.sistema_danza.repositories.*;
@@ -11,7 +13,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +98,31 @@ public class CajaService {
         recibo.setEstado(EstadoRecibo.PAGADO);
 
         return reciboRepository.save(recibo);
+    }
+
+    public ReciboResponseDTO toReciboDTO(Recibo recibo) {
+        List<DetalleReciboDTO> detallesDTO = (recibo.getDetalles() != null)
+                ? recibo.getDetalles().stream()
+                        .map(d -> DetalleReciboDTO.builder()
+                                .id(d.getId())
+                                .tipoConcepto(d.getTipoConcepto())
+                                .monto(d.getMonto())
+                                .mesImputacion(d.getMesImputacion())
+                                .build())
+                        .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        return ReciboResponseDTO.builder()
+                .id(recibo.getId())
+                .alumnoId(recibo.getAlumno() != null ? recibo.getAlumno().getId() : null)
+                .alumnoNombre(recibo.getAlumno() != null ? recibo.getAlumno().getNombre() : null)
+                .alumnoApellido(recibo.getAlumno() != null ? recibo.getAlumno().getApellido() : null)
+                .fechaEmision(recibo.getFechaEmision())
+                .estado(recibo.getEstado())
+                .metodoPago(recibo.getMetodoPago())
+                .montoTotal(recibo.getMontoTotal())
+                .detalles(detallesDTO)
+                .build();
     }
 
     private DetalleRecibo crearDetalle(Recibo recibo, TipoConcepto concepto, BigDecimal monto) {
