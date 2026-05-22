@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { GraduationCap, Calculator, Landmark, Plus, Pencil, Trash2, AlertCircle, Download, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ProfesorModal from '../../components/admin/ProfesorModal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 const ProfesoresPage = () => {
   const [profesores, setProfesores] = useState([]);
@@ -17,6 +18,15 @@ const ProfesoresPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profesorAEditar, setProfesorAEditar] = useState(null);
+
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    titulo: '',
+    mensaje: '',
+    tipo: 'info',
+    textoConfirmar: '',
+    onConfirm: () => {}
+  });
 
   const fetchProfesores = async () => {
     try {
@@ -64,34 +74,23 @@ const ProfesoresPage = () => {
     }
   };
 
-  const handleDarDeBaja = (id) => {
-    toast((t) => (
-      <div className="flex flex-col gap-3 p-1">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="w-6 h-6 text-red-500" />
-          <p className="font-bold text-gray-800 text-lg">¿Eliminar / Baja?</p>
-        </div>
-        <p className="text-sm text-gray-600">Este profesor ya no tendrá acceso al sistema ni aparecerá en grillas.</p>
-        <div className="flex justify-end gap-2 mt-2">
-          <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">Cancelar</button>
-          <button 
-            onClick={async () => {
-              toast.dismiss(t.id);
-              try {
-                await api.patch(`/profesores/${id}/baja`);
-                toast.success("Profesor dado de baja.");
-                fetchProfesores();
-              } catch (error) {
-                toast.error("Error al realizar la baja.");
-              }
-            }} 
-            className="px-4 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-xl shadow-sm transition"
-          >
-            Confirmar
-          </button>
-        </div>
-      </div>
-    ), { duration: Infinity });
+  const handleDarDeBaja = (id, nombre) => {
+    setConfirmConfig({
+      isOpen: true,
+      titulo: 'Eliminar / Baja de Profesor',
+      mensaje: `¿Estás seguro de dar de baja a ${nombre}? Este profesor ya no tendrá acceso al sistema ni aparecerá en las grillas de clases.`,
+      tipo: 'danger',
+      textoConfirmar: 'Eliminar Profesor',
+      onConfirm: async () => {
+        try {
+          await api.patch(`/profesores/${id}/baja`);
+          toast.success("Profesor dado de baja.");
+          fetchProfesores();
+        } catch (error) {
+          toast.error("Error al realizar la baja.");
+        }
+      }
+    });
   };
 
   const handleCalcularLiquidacion = async (profesor) => {
@@ -108,27 +107,32 @@ const ProfesoresPage = () => {
     }
   };
 
-  const handleMarcarPagado = async () => {
+  const handleMarcarPagado = () => {
     if (!liquidacionActiva) return;
 
-    const confirmar = window.confirm(`¿Confirmas el pago de $${liquidacionActiva.totalAPagar} a ${liquidacionActiva.profesor.nombre}? Esto registrará un egreso en caja.`);
-    
-    if (!confirmar) return;
-
-    try {
-      const response = await api.post(`/profesores/${liquidacionActiva.profesor.id}/liquidaciones/pagar`, null, {
-        params: {
-          mes: mes,
-          anio: anio,
-          monto: liquidacionActiva.totalAPagar
+    setConfirmConfig({
+      isOpen: true,
+      titulo: 'Confirmar Pago de Sueldo',
+      mensaje: `¿Confirmas el pago de $${liquidacionActiva.totalAPagar.toLocaleString('es-AR')} al profesor/a ${liquidacionActiva.profesor.nombre}? Esta acción registrará un egreso automático en la Caja General.`,
+      tipo: 'info',
+      textoConfirmar: 'Confirmar y Pagar',
+      onConfirm: async () => {
+        try {
+          const response = await api.post(`/profesores/${liquidacionActiva.profesor.id}/liquidaciones/pagar`, null, {
+            params: {
+              mes: mes,
+              anio: anio,
+              monto: liquidacionActiva.totalAPagar
+            }
+          });
+          
+          toast.success("¡Sueldo pagado! Se registró el egreso en la Caja.");
+          setLiquidacionPagadaId(response.data.liquidacionId);
+        } catch (error) {
+          toast.error("Error al registrar el pago del sueldo.");
         }
-      });
-      
-      toast.success("¡Sueldo pagado! Se registró el egreso en la Caja.");
-      setLiquidacionPagadaId(response.data.liquidacionId);
-    } catch (error) {
-      toast.error("Error al registrar el pago del sueldo.");
-    }
+      }
+    });
   };
 
   const descargarPdfSueldo = async (id) => {
@@ -191,7 +195,7 @@ const ProfesoresPage = () => {
                   </div>
                     <div className="flex items-center gap-2">
                       <button onClick={() => handleAbrirEditar(prof)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar"><Pencil className="w-5 h-5" /></button>
-                      <button onClick={() => handleDarDeBaja(prof.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Baja"><Trash2 className="w-5 h-5" /></button>
+                      <button onClick={() => handleDarDeBaja(prof.id, prof.nombre)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Baja"><Trash2 className="w-5 h-5" /></button>
                       <button onClick={() => handleCalcularLiquidacion(prof)} disabled={calculando === prof.id} className="ml-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-bold text-sm transition flex items-center gap-2">
                         {calculando === prof.id ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <><Calculator className="w-4 h-4"/> Liquidar</>}
                       </button>
@@ -264,6 +268,17 @@ const ProfesoresPage = () => {
         onClose={() => setIsModalOpen(false)} 
         onSave={handleGuardarProfesor}
         profesorAEditar={profesorAEditar} 
+      />
+
+      {/* RENDERIZADO DEL MODAL DE CONFIRMACIÓN */}
+      <ConfirmModal 
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+        onConfirm={confirmConfig.onConfirm}
+        titulo={confirmConfig.titulo}
+        mensaje={confirmConfig.mensaje}
+        tipo={confirmConfig.tipo}
+        textoConfirmar={confirmConfig.textoConfirmar}
       />
     </div>
   );

@@ -5,7 +5,9 @@ import com.academia.sistema_danza.models.Usuario;
 import com.academia.sistema_danza.models.enums.RolUsuario;
 import com.academia.sistema_danza.repositories.AlumnoRepository;
 import com.academia.sistema_danza.repositories.UsuarioRepository;
+import com.academia.sistema_danza.repositories.InscripcionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ public class AlumnoController {
 
     private final AlumnoRepository alumnoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final InscripcionRepository inscripcionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping
@@ -32,14 +35,11 @@ public class AlumnoController {
     public Alumno guardarAlumno(@RequestBody Alumno alumno) {
         alumno.setActivo(true);
         
-        // Si el frontend envía un tutor asignado, lo vinculamos
         if (alumno.getTutor() != null && alumno.getTutor().getId() != null) {
             Alumno tutorDb = alumnoRepository.findById(alumno.getTutor().getId())
                     .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
             alumno.setTutor(tutorDb);
-            // Un menor que tiene tutor, no necesita cuenta de usuario propia
         } else {
-            // Es un adulto o tutor principal: Si tiene mail y DNI, le creamos la cuenta
             if (alumno.getEmail() != null && !alumno.getEmail().isEmpty() && alumno.getDni() != null) {
                 Usuario nuevoUsuario = Usuario.builder()
                         .email(alumno.getEmail().trim())
@@ -47,7 +47,6 @@ public class AlumnoController {
                         .rol(RolUsuario.ALUMNO)
                         .requiereCambioPassword(true) 
                         .build();
-                
                 usuarioRepository.save(nuevoUsuario);
                 alumno.setUsuarioId(nuevoUsuario.getId());
             }
@@ -69,7 +68,6 @@ public class AlumnoController {
         alumnoExistente.setEmail(datosNuevos.getEmail());
         alumnoExistente.setContactoEmergencia(datosNuevos.getContactoEmergencia());
         alumnoExistente.setGrupoFamiliar(datosNuevos.getGrupoFamiliar());
-        
         alumnoExistente.setLugarNacimiento(datosNuevos.getLugarNacimiento());
         alumnoExistente.setFechaNacimiento(datosNuevos.getFechaNacimiento());
         alumnoExistente.setDireccion(datosNuevos.getDireccion());
@@ -81,6 +79,7 @@ public class AlumnoController {
         alumnoExistente.setEsMenor(datosNuevos.getEsMenor());
         alumnoExistente.setCoberturaMedica(datosNuevos.getCoberturaMedica());
         alumnoExistente.setNroAfiliado(datosNuevos.getNroAfiliado());
+        alumnoExistente.setBarrio(datosNuevos.getBarrio());
 
         if (datosNuevos.getTutor() != null && datosNuevos.getTutor().getId() != null) {
             Alumno tutorDb = alumnoRepository.findById(datosNuevos.getTutor().getId())
@@ -100,7 +99,7 @@ public class AlumnoController {
                         .build();
                 usuarioRepository.save(nuevoUsuario);
                 alumnoExistente.setUsuarioId(nuevoUsuario.getId());
-            } else if (alumnoExistente.getUsuarioId() != null) {
+            } else if (alumnoExistente.getUsuarioId() != null && datosNuevos.getEmail() != null) {
                 Usuario usuario = usuarioRepository.findById(alumnoExistente.getUsuarioId()).orElseThrow();
                 usuario.setEmail(datosNuevos.getEmail().trim());
                 usuarioRepository.save(usuario);
@@ -110,11 +109,41 @@ public class AlumnoController {
         return alumnoRepository.save(alumnoExistente);
     }
 
-    @PatchMapping("/{id}/baja")
-    public void bajaLogica(@PathVariable Long id) {
-        Alumno alumno = alumnoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
-        alumno.setActivo(false);
-        alumnoRepository.save(alumno);
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> darDeBajaAlumno(@PathVariable Long id) {
+        return alumnoRepository.findById(id).map(alumno -> {
+            
+            if (alumno.getMenoresACargo() != null) {
+                boolean tieneMenoresActivos = alumno.getMenoresACargo().stream()
+                        .anyMatch(Alumno::isActivo);
+                
+                if (tieneMenoresActivos) {
+                    return ResponseEntity.badRequest().body("No se puede dar de baja. Este alumno es el adulto responsable de uno o más menores que aún están activos en el sistema.");
+                }
+            }
+
+            inscripcionRepository.findByAlumnoIdAndActivoTrue(alumno.getId())
+                .forEach(inscripcion -> {
+                    inscripcion.setActivo(false);
+                    inscripcionRepository.save(inscripcion);
+                });
+
+            alumno.setActivo(false);
+            alumnoRepository.save(alumno);
+            
+            return ResponseEntity.ok().build();
+            
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}/reactivar")
+    @Transactional
+    public ResponseEntity<?> reactivarAlumno(@PathVariable Long id) {
+        return alumnoRepository.findById(id).map(alumno -> {
+            alumno.setActivo(true);
+            alumnoRepository.save(alumno);
+            return ResponseEntity.ok().build();
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

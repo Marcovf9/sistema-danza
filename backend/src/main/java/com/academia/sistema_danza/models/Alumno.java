@@ -94,10 +94,14 @@ public class Alumno {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_id")
-    @JsonIgnoreProperties({"menoresACargo", "tutor", "inscripciones", "hibernateLazyInitializer", "handler"})
+    
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Alumno tutor;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"tutor", "inscripciones", "hibernateLazyInitializer", "handler"})
     private List<Alumno> menoresACargo;
+
+    @Column(length = 100)
+    private String barrio;
 }

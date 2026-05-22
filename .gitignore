@@ -14,3 +14,6 @@ frontend/.eslintcache
 
 # Mac (Archivos ocultos del sistema)
 .DS_Store
+# Worktrees de Claude (carpetas de trabajo internas)
+.claude/
+.claire/

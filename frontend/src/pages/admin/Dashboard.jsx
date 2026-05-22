@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download, Users, DollarSign, Activity, TrendingUp, TrendingDown, AlertTriangle, CreditCard, Calendar, ChevronRight, Calculator, CheckCircle } from 'lucide-react';
+import { Download, Users, DollarSign, Activity, TrendingUp, TrendingDown, AlertTriangle, CreditCard, Calendar, ChevronRight, Calculator, CheckCircle, MapPin, GraduationCap, Clock } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -150,7 +150,7 @@ const PanelGeneral = () => {
 
       </div>
 
-      {/* GRÁFICOS */}
+      {/* GRÁFICOS - FILA 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border min-h-[350px] flex flex-col">
           <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-indigo-500"/>Inscriptos por Disciplina</h3>
@@ -183,8 +183,63 @@ const PanelGeneral = () => {
         </div>
       </div>
 
+      {/* GRÁFICO DE CONVOCATORIA PROFESORES (Añadido) */}
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px] mt-8">
+        <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <GraduationCap className="w-5 h-5 text-indigo-500"/> Convocatoria por Profesor
+        </h3>
+        <div className="h-[250px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.profesores || []} margin={{top: 0, right: 0, left: -20, bottom: 0}}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#6b7280'}} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#6b7280'}} />
+              <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={60} name="Alumnos Inscritos" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* GRÁFICOS - FILA 2 (Edades y Barrios) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        {/* GRÁFICO DE EDADES */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px]">
+          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><Users className="w-5 h-5 text-indigo-500"/> Edades de los Alumnos</h3>
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={data.edades} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                  {data.edades.map((entry, index) => <Cell key={index} fill={COLORES[index % COLORES.length]} />)}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* GRÁFICO DE BARRIOS */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px]">
+          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-emerald-500"/> Distribución por Barrios
+          </h3>
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.localidades} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                <XAxis type="number" hide/>
+                <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12}} />
+                <Tooltip />
+                <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
       {/* ALERTAS DE ABANDONO */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden mt-8">
         <div className="absolute right-0 top-0 w-2 h-full bg-red-500"></div>
         <h3 className="font-bold text-red-600 mb-6 flex items-center gap-2 text-lg"><AlertTriangle className="w-6 h-6"/> Alumnos en Riesgo de Abandono</h3>
         

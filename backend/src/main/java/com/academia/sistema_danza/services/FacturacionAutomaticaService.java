@@ -1,8 +1,10 @@
 package com.academia.sistema_danza.services;
 
 import com.academia.sistema_danza.models.Alumno;
+import com.academia.sistema_danza.models.DetalleRecibo;
 import com.academia.sistema_danza.models.Recibo;
 import com.academia.sistema_danza.models.enums.EstadoRecibo;
+import com.academia.sistema_danza.models.enums.TipoConcepto;
 import com.academia.sistema_danza.repositories.AlumnoRepository;
 import com.academia.sistema_danza.repositories.InscripcionRepository;
 import com.academia.sistema_danza.repositories.ReciboRepository;
@@ -12,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -50,8 +53,9 @@ public class FacturacionAutomaticaService {
     }
 
     @Scheduled(cron = "0 0 9 11 * ?")
+    @Transactional 
     public void notificarDeudoresAutomaticamente() {
-        log.info("🤖 [ROBOT DE CORREOS] Iniciando notificación de mora...");
+        log.info("🤖 [ROBOT DE CORREOS] Iniciando notificación y recargos por mora...");
         
         int mesActual = LocalDate.now().getMonthValue();
         int anioActual = LocalDate.now().getYear();
@@ -64,17 +68,43 @@ public class FacturacionAutomaticaService {
 
         int correosEnviados = 0;
         for (Recibo recibo : pendientes) {
+            
+            BigDecimal totalActual = recibo.getMontoTotal();
+            BigDecimal recargoMora = totalActual.multiply(new BigDecimal("0.05"));
+            
+            String mesImputacion = anioActual + "-" + String.format("%02d", mesActual);
+            
+            DetalleRecibo detalleMora = DetalleRecibo.builder()
+                    .recibo(recibo)
+                    .tipoConcepto(TipoConcepto.RECARGO_MORA_5)
+                    .monto(recargoMora)
+                    .mesImputacion(mesImputacion)
+                    .build();
+
+            recibo.getDetalles().add(detalleMora);
+            recibo.setMontoTotal(totalActual.add(recargoMora));
+            
+            reciboRepository.save(recibo);
+
             Alumno alumno = recibo.getAlumno();
-            if (alumno.getEmail() != null && !alumno.getEmail().isEmpty()) {
+            String emailDestino = alumno.getEmail();
+            String nombreDestino = alumno.getNombre();
+
+            if (Boolean.TRUE.equals(alumno.getEsMenor()) && alumno.getTutor() != null) {
+                emailDestino = alumno.getTutor().getEmail();
+                nombreDestino = alumno.getTutor().getNombre();
+            }
+
+            if (emailDestino != null && !emailDestino.isEmpty()) {
                 emailService.enviarCorreoRecordatorio(
-                        alumno.getEmail(),
-                        alumno.getNombre() + " " + alumno.getApellido(),
+                        emailDestino,
+                        nombreDestino,
                         recibo.getMontoTotal().toString(),
                         recibo.getId()
                 );
                 correosEnviados++;
             }
         }
-        log.info("🤖 [ROBOT DE CORREOS] Finalizado. Correos enviados: " + correosEnviados);
+        log.info("🤖 [ROBOT DE CORREOS] Finalizado. Correos enviados y recargos aplicados: " + correosEnviados);
     }
 }

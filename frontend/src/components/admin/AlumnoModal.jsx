@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
   const [formData, setFormData] = useState({
     nombre: '', apellido: '', dni: '', telefono: '', email: '',
-    lugarNacimiento: '', fechaNacimiento: '', direccion: '', codigoPostal: '', localidad: '', provincia: '', 
+    lugarNacimiento: '', fechaNacimiento: '', direccion: '', barrio: '', codigoPostal: '', localidad: '', provincia: '', 
     facebook: '', instagram: '', contactoEmergencia: '', coberturaMedica: '', nroAfiliado: '',
     grupoFamiliar: null, esMenor: false, tutor: null
   });
@@ -27,6 +27,19 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
           grupoFamiliar: alumnoAEditar.grupoFamiliar ? { id: alumnoAEditar.grupoFamiliar.id } : null,
           tutor: alumnoAEditar.tutor ? { id: alumnoAEditar.tutor.id } : null,
           fechaNacimiento: alumnoAEditar.fechaNacimiento || '',
+          barrio: alumnoAEditar.barrio || '',
+          lugarNacimiento: alumnoAEditar.lugarNacimiento || '',
+          direccion: alumnoAEditar.direccion || '',
+          codigoPostal: alumnoAEditar.codigoPostal || '',
+          localidad: alumnoAEditar.localidad || '',
+          provincia: alumnoAEditar.provincia || '',
+          facebook: alumnoAEditar.facebook || '',
+          instagram: alumnoAEditar.instagram || '',
+          contactoEmergencia: alumnoAEditar.contactoEmergencia || '',
+          coberturaMedica: alumnoAEditar.coberturaMedica || '',
+          nroAfiliado: alumnoAEditar.nroAfiliado || '',
+          telefono: alumnoAEditar.telefono || '',
+          email: alumnoAEditar.email || '',
           esMenor: alumnoAEditar.esMenor || false
         });
         setBusquedaFamilia(alumnoAEditar.grupoFamiliar ? alumnoAEditar.grupoFamiliar.nombreReferencia : '');
@@ -34,7 +47,7 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
       } else {
         setFormData({ 
           nombre: '', apellido: '', dni: '', telefono: '', email: '', lugarNacimiento: '', fechaNacimiento: '', 
-          direccion: '', codigoPostal: '', localidad: '', provincia: '', facebook: '', instagram: '', 
+          direccion: '', barrio: '', codigoPostal: '', localidad: '', provincia: '', facebook: '', instagram: '', 
           contactoEmergencia: '', coberturaMedica: '', nroAfiliado: '', grupoFamiliar: null, esMenor: false, tutor: null
         });
         setBusquedaFamilia('');
@@ -75,6 +88,7 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
       tutor: { id: tutor.id },
       telefono: prev.telefono || tutor.telefono,
       direccion: prev.direccion || tutor.direccion,
+      barrio: prev.barrio || tutor.barrio,
       codigoPostal: prev.codigoPostal || tutor.codigoPostal,
       localidad: prev.localidad || tutor.localidad,
       provincia: prev.provincia || tutor.provincia,
@@ -86,16 +100,20 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
     setMostrarSugerenciasTut(false);
   };
 
-  // MODIFICACIÓN: Async para auto-crear familia si no existe
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nombre || !formData.apellido || !formData.dni) return toast.error("Nombre, Apellido y DNI son obligatorios.");
     if (formData.esMenor && !formData.tutor) return toast.error("Selecciona un Adulto Responsable para este menor.");
     if (!formData.esMenor && !formData.email) return toast.error("Los adultos necesitan un Email para el portal.");
 
+    // CREAMOS UNA COPIA PARA LIMPIARLA ANTES DE ENVIAR
     let datosFinales = { ...formData };
 
-    // Auto-crear grupo familiar si escribió algo pero no seleccionó de la lista
+    // ESTO EVITA EL ERROR 400 DEL BACKEND
+    if (datosFinales.fechaNacimiento === '') datosFinales.fechaNacimiento = null;
+    if (datosFinales.barrio === '') datosFinales.barrio = null;
+    if (datosFinales.email === '') datosFinales.email = null;
+
     if (busquedaFamilia.trim() && !formData.grupoFamiliar) {
       try {
         const response = await api.post('/grupos-familiares', { nombreReferencia: busquedaFamilia });
@@ -123,7 +141,6 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
           <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X className="w-6 h-6" /></button>
         </div>
 
-        {/* MODIFICACIÓN: pb-32 para que el scroll permita ver los menúes absolutos */}
         <div className="flex-1 overflow-y-auto p-6 relative">
           <form id="formAlumno" onSubmit={handleSubmit} className="space-y-6 pb-32">
             
@@ -183,9 +200,22 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
                 <div><label className="block text-xs font-bold text-gray-600 mb-1">Teléfono</label><input type="text" name="telefono" value={formData.telefono} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
 
                 <div className="md:col-span-2"><label className="block text-xs font-bold text-gray-600 mb-1">Dirección</label><input type="text" name="direccion" value={formData.direccion} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">Barrio</label>
+                  <input 
+                    type="text" 
+                    name="barrio" 
+                    value={formData.barrio} 
+                    onChange={handleChange} 
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" 
+                  />
+                </div>
+                
                 <div><label className="block text-xs font-bold text-gray-600 mb-1">Cod. Postal</label><input type="text" name="codigoPostal" value={formData.codigoPostal} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
 
                 <div><label className="block text-xs font-bold text-gray-600 mb-1">Localidad</label><input type="text" name="localidad" value={formData.localidad} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+              
                 <div><label className="block text-xs font-bold text-gray-600 mb-1">Provincia</label><input type="text" name="provincia" value={formData.provincia} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
                 
                 {!formData.esMenor && (

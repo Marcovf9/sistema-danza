@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Search, Receipt, Download, Bot, CheckCircle, AlertCircle, CreditCard, Clock, TrendingUp, TrendingDown, PlusCircle, Calendar as CalendarIcon, MessageCircle } from 'lucide-react';
+import { DollarSign, Search, Receipt, Download, Bot, CheckCircle, AlertCircle, CreditCard, Clock, TrendingUp, TrendingDown, PlusCircle, Calendar as CalendarIcon, MessageCircle, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 const CajaPage = () => {
   const [tabActiva, setTabActiva] = useState('INGRESOS');
@@ -18,6 +19,15 @@ const CajaPage = () => {
   const [cargandoEgresos, setCargandoEgresos] = useState(true);
   const [guardandoEgreso, setGuardandoEgreso] = useState(false);
   const [formEgreso, setFormEgreso] = useState({ concepto: '', monto: '', observaciones: '' });
+
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    titulo: '',
+    mensaje: '',
+    tipo: 'info',
+    textoConfirmar: '',
+    onConfirm: () => {}
+  });
 
   const diaActual = new Date().getDate();
   const esEpocaDeMora = diaActual > 10;
@@ -52,48 +62,57 @@ const CajaPage = () => {
   };
 
   const dispararRobot = () => {
-    toast((t) => (
-      <div className="flex flex-col gap-3 p-1">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="w-6 h-6 text-indigo-500" />
-          <p className="font-bold text-gray-800 text-lg">¿Simular Facturación?</p>
-        </div>
-        <p className="text-sm text-gray-600">Generará deudas para todos los alumnos activos. ¿Continuar?</p>
-        <div className="flex justify-end gap-2 mt-2">
-          <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">Cancelar</button>
-          <button onClick={async () => {
-              toast.dismiss(t.id);
-              setCargandoPendientes(true);
-              try {
-                await api.post('/caja/disparar-robot-facturacion');
-                await cargarPendientes(); 
-                toast.success("¡Robot ejecutado! Revisa la lista.");
-              } catch (error) {
-                toast.error("Hubo un error al ejecutar el robot.");
-                setCargandoPendientes(false);
-              }
-            }} className="px-4 py-2 text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl shadow-sm transition">
-            Sí, simular mes
-          </button>
-        </div>
-      </div>
-    ), { duration: Infinity, position: 'top-center', style: { minWidth: '350px' } });
+    setConfirmConfig({
+      isOpen: true,
+      titulo: '¿Simular Facturación?',
+      mensaje: 'Generará deudas base y recargos para todos los alumnos activos. ¿Continuar?',
+      tipo: 'info',
+      textoConfirmar: 'Sí, simular mes',
+      onConfirm: async () => {
+        setCargandoPendientes(true);
+        try {
+          await api.post('/caja/disparar-robot-facturacion');
+          await cargarPendientes(); 
+          toast.success("¡Simulación completada! Revisa la lista.");
+        } catch (error) {
+          toast.error("Hubo un error al ejecutar el robot.");
+          setCargandoPendientes(false);
+        }
+      }
+    });
   };
 
-  const confirmarPago = async () => {
+  const confirmarPago = () => {
     if (!reciboSeleccionado) return;
-    setProcesando(true);
-    try {
-      const response = await api.post(`/caja/cobrar-recibo?reciboId=${reciboSeleccionado.id}&metodoPago=${metodoPago}`);
-      setReciboPagado(response.data);
-      setReciboSeleccionado(null);
-      cargarPendientes();
-      toast.success("¡Pago registrado exitosamente!");
-    } catch (error) {
-      toast.error(error.response?.data || "Error al procesar el pago.");
-    } finally {
-      setProcesando(false);
+
+    let total = reciboSeleccionado.montoTotal;
+    let recargoMsg = "";
+    if (metodoPago === 'TARJETA_CREDITO') {
+       total = total * 1.10;
+       recargoMsg = " (incluye 10% de recargo por Tarjeta)";
     }
+
+    setConfirmConfig({
+      isOpen: true,
+      titulo: 'Confirmar Cobro',
+      mensaje: `¿Confirmas el pago de $${total.toLocaleString('es-AR')}${recargoMsg} del alumno ${reciboSeleccionado.alumno?.nombre}? Esta acción no se puede deshacer.`,
+      tipo: 'info',
+      textoConfirmar: 'CONFIRMAR COBRO',
+      onConfirm: async () => {
+        setProcesando(true);
+        try {
+          const response = await api.post(`/caja/cobrar-recibo?reciboId=${reciboSeleccionado.id}&metodoPago=${metodoPago}`);
+          setReciboPagado(response.data);
+          setReciboSeleccionado(null);
+          cargarPendientes();
+          toast.success("¡Pago registrado exitosamente!");
+        } catch (error) {
+          toast.error(error.response?.data || "Error al procesar el pago.");
+        } finally {
+          setProcesando(false);
+        }
+      }
+    });
   };
 
   const descargarPdf = async (id) => {
@@ -132,6 +151,25 @@ const CajaPage = () => {
     } finally {
       setGuardandoEgreso(false);
     }
+  };
+
+  const handleEliminarEgreso = (egresoId, concepto) => {
+    setConfirmConfig({
+      isOpen: true,
+      titulo: 'Eliminar Gasto',
+      mensaje: `¿Estás seguro de que deseas eliminar el gasto "${concepto}"? Esta acción no se puede deshacer y modificará el balance mensual.`,
+      tipo: 'danger',
+      textoConfirmar: 'Sí, eliminar',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/caja/egresos/${egresoId}`);
+          toast.success("Gasto eliminado correctamente.");
+          cargarEgresos();
+        } catch (error) {
+          toast.error("Error al intentar eliminar el gasto.");
+        }
+      }
+    });
   };
 
   const enviarWhatsApp = (e, recibo) => {
@@ -239,7 +277,7 @@ const CajaPage = () => {
                           <div>
                             <p className="font-bold text-gray-800">{recibo.alumno?.nombre} {recibo.alumno?.apellido}</p>
                             <p className="text-xs text-gray-500 flex items-center gap-1">
-                              <Clock className="w-3 h-3" /> Emitido: {new Date(recibo.fechaEmision).toLocaleDateString()}
+                              <Clock className="w-3 h-3" /> Emitido: {new Date(recibo.fechaEmision).toLocaleDateString('es-AR')}
                             </p>
                           </div>
                         </div>
@@ -321,7 +359,7 @@ const CajaPage = () => {
                       </div>
                     </div>
                     <button onClick={confirmarPago} disabled={procesando} className={`w-full py-4 mt-6 rounded-xl font-black text-lg transition flex items-center justify-center shadow-lg ${procesando ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-400 text-white'}`}>
-                      {procesando ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div> : 'CONFIRMAR COBRO'}
+                      {procesando ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div> : 'COBRAR CUOTA'}
                     </button>
                   </div>
                 )}
@@ -397,7 +435,7 @@ const CajaPage = () => {
               ) : (
                 <div className="space-y-3">
                   {egresos.map((egreso) => (
-                    <div key={egreso.id} className="p-4 rounded-xl border border-gray-100 bg-white hover:shadow-sm transition flex justify-between items-center">
+                    <div key={egreso.id} className="p-4 rounded-xl border border-gray-100 bg-white hover:shadow-sm transition flex justify-between items-center group">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
                           <TrendingDown className="w-5 h-5" />
@@ -405,14 +443,24 @@ const CajaPage = () => {
                         <div>
                           <p className="font-bold text-gray-800">{egreso.concepto}</p>
                           <div className="text-xs text-gray-500 flex items-center gap-3 mt-0.5">
-                            <span className="flex items-center"><CalendarIcon className="w-3 h-3 mr-1" /> {new Date(egreso.fecha).toLocaleDateString()}</span>
+                            <span className="flex items-center"><CalendarIcon className="w-3 h-3 mr-1" /> {new Date(egreso.fecha).toLocaleDateString('es-AR')}</span>
                             <span className="flex items-center"><Clock className="w-3 h-3 mr-1" /> {new Date(egreso.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                           </div>
                           {egreso.observaciones && <p className="text-xs text-gray-400 mt-1 italic">"{egreso.observaciones}"</p>}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-black text-lg text-red-600">-${egreso.monto.toLocaleString('es-AR')}</p>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="font-black text-lg text-red-600">-${egreso.monto.toLocaleString('es-AR')}</p>
+                        </div>
+                        {/* BOTÓN ELIMINAR EGRESO */}
+                        <button 
+                          onClick={() => handleEliminarEgreso(egreso.id, egreso.concepto)}
+                          className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                          title="Eliminar Gasto"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -423,6 +471,16 @@ const CajaPage = () => {
         </div>
       )}
 
+      {/* RENDERIZADO DEL MODAL */}
+      <ConfirmModal 
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+        onConfirm={confirmConfig.onConfirm}
+        titulo={confirmConfig.titulo}
+        mensaje={confirmConfig.mensaje}
+        tipo={confirmConfig.tipo}
+        textoConfirmar={confirmConfig.textoConfirmar}
+      />
     </div>
   );
 };

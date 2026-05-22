@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Calendar, CreditCard, ShoppingBag, Plus, Minus, Send, AlertCircle, CheckCircle, Package, PlusCircle, Check, X, User, Baby, Trash2 } from 'lucide-react';
+import { Calendar, CreditCard, ShoppingBag, Plus, Minus, Send, AlertCircle, CheckCircle, Package, PlusCircle, Check, X, User, Baby, Trash2, CalendarDays } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import CalendarioAlumno from './CalendarioAlumno';
 
 const PortalAlumnoPage = ({ vista }) => {
   const [perfiles, setPerfiles] = useState([]);
@@ -114,7 +115,7 @@ const PortalAlumnoPage = ({ vista }) => {
               try {
                 await api.patch(`/academico/inscripciones/${inscripcionId}/baja`);
                 toast.success("Te has dado de baja de la clase.");
-                cargarDatos(perfilActivoId); // Recarga las clases de la pantalla actual
+                cargarDatos(perfilActivoId); 
               } catch (error) {
                 toast.error("Error al procesar la baja.");
               }
@@ -127,7 +128,6 @@ const PortalAlumnoPage = ({ vista }) => {
       </div>
     ), { duration: Infinity });
   };
-
 
   const agregarAlCarrito = (producto) => {
     setCarrito(prev => {
@@ -183,15 +183,23 @@ const PortalAlumnoPage = ({ vista }) => {
     mensaje += `*TOTAL TRANSFERIDO: $${granTotal}*%0A%0A`;
     mensaje += `(Adjunto la foto del comprobante 🧾)`;
 
-    const numeroEpifania = "5493510000000"; 
+    const numeroEpifania = "5493515073081"; // Asegurate que sea el de la academia
     window.open(`https://wa.me/${numeroEpifania}?text=${mensaje}`, '_blank');
     setCarrito([]); 
   };
 
+  if (vista === 'GRILLA') {
+    return (
+      <div className="max-w-6xl mx-auto pb-10">
+        <CalendarioAlumno />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto pb-32 animate-in fade-in duration-500">
       
-      {/* SELECTOR DE PERFILES (Aparece solo si tiene hijos a cargo) */}
+      {/* SELECTOR DE PERFILES */}
       {perfiles.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-4 mb-2 scrollbar-hide">
           {perfiles.map(p => (
@@ -221,7 +229,7 @@ const PortalAlumnoPage = ({ vista }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">
             {vista === 'CUENTA' && 'Estado de Cuenta'}
-            {vista === 'CLASES' && 'Clases Inscritas'}
+            {vista === 'CLASES' && 'Gestión de Clases'}
             {vista === 'TIENDA' && 'Catálogo Oficial'}
           </h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -346,7 +354,7 @@ const PortalAlumnoPage = ({ vista }) => {
       )}
 
       {/* CHECKOUT FLOTANTE */}
-      {granTotal > 0 && (
+      {granTotal > 0 && vista !== 'GRILLA' && (
         <div className="fixed bottom-0 left-0 lg:left-72 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 transition-all">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="w-full lg:w-1/2">

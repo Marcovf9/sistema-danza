@@ -10,6 +10,8 @@ import com.academia.sistema_danza.repositories.InscripcionRepository;
 import com.academia.sistema_danza.repositories.AlumnoRepository;
 import com.academia.sistema_danza.repositories.ProfesorRepository;
 import com.academia.sistema_danza.repositories.SalonRepository;
+import com.academia.sistema_danza.services.EmailService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,7 @@ public class AcademicoController {
     private final AlumnoRepository alumnoRepository;
     private final ProfesorRepository profesorRepository;
     private final SalonRepository salonRepository;
+    private final EmailService emailService;
 
     @GetMapping("/clases")
     public List<ClaseProgramada> obtenerClasesDisponibles() {
@@ -71,6 +74,8 @@ public class AcademicoController {
                 .build();
                 
         inscripcionRepository.save(nueva);
+
+        emailService.notificarInscripcionDirectora(alumno.getNombre() + " " + alumno.getApellido(), clase.getDisciplina().getNombre());
         return ResponseEntity.ok().build();
     }
 

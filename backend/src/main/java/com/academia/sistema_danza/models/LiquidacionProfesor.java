@@ -3,7 +3,7 @@ package com.academia.sistema_danza.models;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime; // <--- IMPORTACIÓN NECESARIA
+import java.time.LocalDateTime;
 
 import com.academia.sistema_danza.models.enums.*;
 
@@ -38,4 +38,10 @@ public class LiquidacionProfesor {
 
     @Column(name = "fecha_generacion")
     private LocalDateTime fechaGeneracion;
+
+    public BigDecimal getTotalAPagar() {
+        BigDecimal base = this.totalBase != null ? this.totalBase : BigDecimal.ZERO;
+        BigDecimal comisiones = this.totalComisiones != null ? this.totalComisiones : BigDecimal.ZERO;
+        return base.add(comisiones);
+    }
 }

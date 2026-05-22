@@ -71,9 +71,11 @@ function App() {
           <Route path="asistencia" element={<RutaProtegida rolesPermitidos={['DIRECTOR', 'PROFESOR']}><AsistenciaPage /></RutaProtegida>} />
           <Route path="calendario" element={<RutaProtegida rolesPermitidos={['DIRECTOR', 'PROFESOR']}><CalendarioPage /></RutaProtegida>} />
 
+          {/* RUTAS DEL ALUMNO */}
           <Route path="alumno/cuenta" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="CUENTA" /></RutaProtegida>} />
           <Route path="alumno/clases" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="CLASES" /></RutaProtegida>} />
           <Route path="alumno/tienda" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="TIENDA" /></RutaProtegida>} />
+          <Route path="alumno/grilla" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="GRILLA" /></RutaProtegida>} />
         
         </Route>
       </Routes>

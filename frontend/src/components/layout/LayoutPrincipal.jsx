@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Wallet, GraduationCap, ClipboardCheck, Calendar, LogOut, BookOpen, Lock, ShieldCheck, ShoppingBag, CreditCard, Check, X, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, GraduationCap, ClipboardCheck, Calendar, LogOut, BookOpen, Lock, ShieldCheck, ShoppingBag, CreditCard, Check, X, ShieldAlert, CalendarDays } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -59,7 +59,9 @@ const LayoutPrincipal = () => {
     { path: '/asistencia', label: 'Asistencia', icon: ClipboardCheck, roles: ['DIRECTOR', 'PROFESOR'] },
 
     { path: '/alumno/cuenta', label: 'Estado de Cuenta', icon: CreditCard, roles: ['ALUMNO'] },
-    { path: '/alumno/clases', label: 'Mis Clases', icon: Calendar, roles: ['ALUMNO'] },
+    { path: '/alumno/clases', label: 'Mis Clases', icon: CalendarDays, roles: ['ALUMNO'] },
+    
+    { path: '/alumno/grilla', label: 'Grilla de Horarios', icon: Calendar, roles: ['ALUMNO'] },
     { path: '/alumno/tienda', label: 'Catálogo / Tienda', icon: ShoppingBag, roles: ['ALUMNO'] },
   ];
 
