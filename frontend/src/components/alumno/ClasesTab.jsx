@@ -58,7 +58,7 @@ const ClasesTab = ({ misClases, clasesDisponibles, onInscribir, onBaja }) => {
       {/* Clases disponibles */}
       <div>
         <h3 className="text-lg font-black text-gray-800 mb-4 flex items-center">
-          <PlusCircle className="w-5 h-5 mr-2 text-indigo-500" /> Anotar a Nuevas Clases
+          <PlusCircle className="w-5 h-5 mr-2 text-pink-500" /> Anotar a Nuevas Clases
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {clasesDisponibles.length === 0 ? (
@@ -69,12 +69,12 @@ const ClasesTab = ({ misClases, clasesDisponibles, onInscribir, onBaja }) => {
             clasesDisponibles.map(clase => (
               <div
                 key={clase.id}
-                className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group hover:border-indigo-300 transition-colors"
+                className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group hover:border-pink-300 transition-colors"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <p className="font-bold text-gray-800 text-lg leading-tight">{clase.disciplina.nombre}</p>
-                    <p className="text-xs font-bold text-indigo-500 mt-1 uppercase tracking-wider">
+                    <p className="text-xs font-bold text-pink-500 mt-1 uppercase tracking-wider">
                       {(clase.diasDisponiblesParaInscripcion || clase.diasSemana.split(',')).join(', ')} • {clase.horaInicio.slice(0, 5)}hs
                     </p>
                   </div>
@@ -84,7 +84,7 @@ const ClasesTab = ({ misClases, clasesDisponibles, onInscribir, onBaja }) => {
                 </div>
                 <button
                   onClick={() => onInscribir(clase)}
-                  className="w-full py-2.5 bg-gray-900 hover:bg-indigo-600 text-white font-bold rounded-xl text-sm transition-colors shadow-sm"
+                  className="w-full py-2.5 bg-gray-900 hover:bg-pink-600 text-white font-bold rounded-xl text-sm transition-colors shadow-sm"
                 >
                   Inscribir
                 </button>

@@ -10,12 +10,12 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, titulo, mensaje, textoConfir
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         
         {/* Cabecera */}
-        <div className={`p-4 flex items-center justify-between border-b ${isDanger ? 'bg-red-50 border-red-100' : 'bg-indigo-50 border-indigo-100'}`}>
+        <div className={`p-4 flex items-center justify-between border-b ${isDanger ? 'bg-red-50 border-red-100' : 'bg-pink-50 border-pink-100'}`}>
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isDanger ? 'bg-red-100 text-red-600' : 'bg-indigo-100 text-indigo-600'}`}>
+            <div className={`p-2 rounded-full ${isDanger ? 'bg-red-100 text-red-600' : 'bg-pink-100 text-pink-600'}`}>
               <AlertTriangle className="w-5 h-5" />
             </div>
-            <h3 className={`font-bold ${isDanger ? 'text-red-700' : 'text-indigo-700'}`}>{titulo}</h3>
+            <h3 className={`font-bold ${isDanger ? 'text-red-700' : 'text-pink-700'}`}>{titulo}</h3>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />
@@ -38,7 +38,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, titulo, mensaje, textoConfir
           <button 
             onClick={() => { onConfirm(); onClose(); }} 
             className={`px-5 py-2.5 text-sm font-bold text-white rounded-xl shadow-sm transition-transform active:scale-95 ${
-              isDanger ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700'
+              isDanger ? 'bg-red-500 hover:bg-red-600' : 'bg-pink-600 hover:bg-pink-700'
             }`}
           >
             {textoConfirmar}

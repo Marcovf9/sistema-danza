@@ -127,9 +127,9 @@ const AgendaProfesorPage = () => {
     return (
       <div className="max-w-lg mx-auto bg-white min-h-[80vh] shadow-xl sm:rounded-3xl flex flex-col relative overflow-hidden border border-gray-100 animate-in fade-in duration-300">
         
-        <div className="bg-indigo-600 p-6 text-white shadow-md z-10">
+        <div className="bg-pink-600 p-6 text-white shadow-md z-10">
           <div className="flex justify-between items-center mb-4">
-            <button onClick={() => setClaseActiva(null)} className="text-indigo-200 hover:text-white font-medium text-sm flex items-center transition">
+            <button onClick={() => setClaseActiva(null)} className="text-pink-200 hover:text-white font-medium text-sm flex items-center transition">
                 <ArrowLeft className="w-4 h-4 mr-1" /> Volver
             </button>
             <input 
@@ -137,28 +137,28 @@ const AgendaProfesorPage = () => {
               max={maxDate}
               value={fechaAsistencia}
               onChange={cambiarFechaAsistencia}
-              className="bg-indigo-500/50 border border-indigo-400 text-white rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors"
+              className="bg-pink-500/50 border border-pink-400 text-white rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors"
               style={{ colorScheme: 'dark' }}
             />
           </div>
           <h2 className="text-2xl font-bold">{claseActiva.disciplina}</h2>
-          <p className="text-indigo-200 flex items-center mt-1 text-sm">
+          <p className="text-pink-200 flex items-center mt-1 text-sm">
             <Clock className="w-4 h-4 mr-1" /> {claseActiva.horaInicio}hs
           </p>
         </div>
 
-        <div className="bg-indigo-50 p-4 border-b border-indigo-100 flex justify-between items-center">
-          <span className="text-indigo-800 font-medium flex items-center">
+        <div className="bg-pink-50 p-4 border-b border-pink-100 flex justify-between items-center">
+          <span className="text-pink-800 font-medium flex items-center">
             <Users className="w-4 h-4 mr-2" /> {listaAlumnos.length} Inscritos
           </span>
-          <span className="bg-white px-3 py-1 rounded-lg text-indigo-700 font-bold shadow-sm text-sm">
+          <span className="bg-white px-3 py-1 rounded-lg text-pink-700 font-bold shadow-sm text-sm">
             {presentesCount} Presentes
           </span>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
           {cargando ? (
-            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div></div>
           ) : listaAlumnos.length === 0 ? (
             <div className="text-center py-10 text-gray-400">Sin alumnos registrados.</div>
           ) : (
@@ -195,7 +195,7 @@ const AgendaProfesorPage = () => {
             <button 
               onClick={guardarAsistencia}
               disabled={guardando}
-              className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white text-lg font-bold rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center"
+              className="w-full py-4 bg-pink-600 hover:bg-pink-700 disabled:bg-gray-300 text-white text-lg font-bold rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center"
             >
               {guardando ? 'Procesando...' : <><Save className="w-5 h-5 mr-2"/> Confirmar Asistencia</>}
             </button>
@@ -208,13 +208,13 @@ const AgendaProfesorPage = () => {
   return (
     <div className="max-w-md mx-auto h-full flex flex-col space-y-6 md:max-w-3xl pb-20 animate-in fade-in duration-500">
       
-      <div className="bg-indigo-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-pink-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
         <div className="absolute bottom-0 right-10 -mb-4 w-16 h-16 rounded-full bg-white opacity-10"></div>
         
         <div className="relative z-10 flex justify-between items-center mb-6">
           <div>
-            <p className="text-indigo-200 font-medium text-sm">Portal Docente</p>
+            <p className="text-pink-200 font-medium text-sm">Portal Docente</p>
             <h2 className="text-3xl font-black mt-1">Autogestión</h2>
           </div>
           <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -222,16 +222,16 @@ const AgendaProfesorPage = () => {
           </div>
         </div>
 
-        <div className="relative z-10 flex bg-indigo-700/50 p-1 rounded-xl">
+        <div className="relative z-10 flex bg-pink-700/50 p-1 rounded-xl">
           <button 
             onClick={() => setTabActiva('CLASES')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 ${tabActiva === 'CLASES' ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:text-white'}`}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 ${tabActiva === 'CLASES' ? 'bg-white text-pink-700 shadow-sm' : 'text-pink-100 hover:text-white'}`}
           >
             <Calendar className="w-4 h-4" /> Mis Clases
           </button>
           <button 
             onClick={() => setTabActiva('RECIBOS')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 ${tabActiva === 'RECIBOS' ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:text-white'}`}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 ${tabActiva === 'RECIBOS' ? 'bg-white text-pink-700 shadow-sm' : 'text-pink-100 hover:text-white'}`}
           >
             <Receipt className="w-4 h-4" /> Mis Recibos
           </button>
@@ -239,7 +239,7 @@ const AgendaProfesorPage = () => {
       </div>
 
       {cargando && (
-        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>
+        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div></div>
       )}
 
       {error && (
@@ -259,7 +259,7 @@ const AgendaProfesorPage = () => {
                 <div key={clase.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-transform hover:scale-[1.01]">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-black tracking-wider mb-2">
+                      <span className="inline-block px-3 py-1 bg-pink-50 text-pink-700 rounded-full text-xs font-black tracking-wider mb-2">
                         {clase.disciplina} • {clase.horaInicio}
                       </span>
                       <div className="flex items-center text-gray-500 text-sm mt-1">
@@ -268,7 +268,7 @@ const AgendaProfesorPage = () => {
                       </div>
                     </div>
                     <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl px-3 py-2 border border-gray-100">
-                      <Users className="w-5 h-5 text-indigo-400 mb-1" />
+                      <Users className="w-5 h-5 text-pink-400 mb-1" />
                       <span className="text-sm font-bold text-gray-700">{clase.cantidadAlumnos}</span>
                     </div>
                   </div>
@@ -315,7 +315,7 @@ const AgendaProfesorPage = () => {
                     <p className="font-black text-gray-800">${liq.totalAPagar.toLocaleString('es-AR')}</p>
                     <button 
                       onClick={() => descargarPdf(liq.id, liq.mes, liq.anio)}
-                      className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-colors"
+                      className="p-2 text-pink-600 bg-pink-50 hover:bg-pink-600 hover:text-white rounded-lg transition-colors"
                       title="Descargar PDF"
                     >
                       <Download className="w-5 h-5" />

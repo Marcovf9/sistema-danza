@@ -88,13 +88,15 @@ const LoginPage = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-800">
       <div className="bg-white max-w-md w-full rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-500">
         
-        <div className="bg-indigo-600 p-8 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full blur-xl -ml-8 -mb-8"></div>
-          
+        <div className="bg-brand-gradient p-8 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl -ml-8 -mb-8"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-16 bg-white/5 rounded-full blur-2xl"></div>
+
           <div className="relative z-10">
-            <h1 className="text-4xl font-black text-white tracking-tight mb-2">Epifania</h1>
-            <p className="text-indigo-200 font-medium tracking-wide">Manager de Academia</p>
+            <p className="text-pink-200/80 text-xs font-bold uppercase tracking-[0.3em] mb-2">Academia de Danza</p>
+            <h1 className="text-4xl font-black text-white tracking-tight mb-1">Epifanía</h1>
+            <p className="text-white/60 font-medium tracking-widest text-sm uppercase">Dance</p>
           </div>
         </div>
 
@@ -118,7 +120,7 @@ const LoginPage = () => {
                   value={credenciales.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${
+                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all ${
                     erroresInput.email ? 'border-red-400 focus:ring-red-500' : 'border-gray-200'
                   }`}
                   placeholder="ejemplo@academia.com"
@@ -139,7 +141,7 @@ const LoginPage = () => {
                   value={credenciales.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${
+                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all ${
                     erroresInput.password ? 'border-red-400 focus:ring-red-500' : 'border-gray-200'
                   }`}
                   placeholder="••••••••"
@@ -153,7 +155,7 @@ const LoginPage = () => {
             <div className="flex justify-end">
               <Link
                 to="/olvide-password"
-                className="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+                className="text-xs text-pink-500 hover:text-pink-700 font-medium transition-colors"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
@@ -162,7 +164,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full flex justify-center items-center py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 mt-4"
+              className="w-full flex justify-center items-center py-3.5 bg-brand-gradient disabled:opacity-50 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 mt-4"
             >
               {cargando ? 'Verificando...' : <><LogIn className="w-5 h-5 mr-2" /> Ingresar</>}
             </button>

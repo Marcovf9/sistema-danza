@@ -49,7 +49,7 @@ const PanelGeneral = () => {
   if (isLoading || !data) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
       </div>
     );
   }
@@ -66,17 +66,17 @@ const PanelGeneral = () => {
         <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100 shadow-inner">
           <button
             onClick={() => setHistorico(!historico)}
-            className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${historico ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'}`}
+            className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${historico ? 'bg-pink-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'}`}
           >
             {historico ? 'Volver a Mensual' : 'Ver Histórico Total'}
           </button>
 
           {!historico && (
             <div className="flex gap-2">
-              <select value={mes} onChange={(e) => setMes(e.target.value)} className="bg-white border border-gray-200 rounded-lg text-sm p-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500">
+              <select value={mes} onChange={(e) => setMes(e.target.value)} className="bg-white border border-gray-200 rounded-lg text-sm p-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-pink-500">
                 {MESES.map(m => <option key={m.v} value={m.v}>{m.n}</option>)}
               </select>
-              <select value={anio} onChange={(e) => setAnio(e.target.value)} className="bg-white border border-gray-200 rounded-lg text-sm p-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500">
+              <select value={anio} onChange={(e) => setAnio(e.target.value)} className="bg-white border border-gray-200 rounded-lg text-sm p-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-pink-500">
                 {[2024, 2025, 2026, 2027].map(a => <option key={a} value={a}>{a}</option>)}
               </select>
 
@@ -124,9 +124,9 @@ const PanelGeneral = () => {
             <p className="text-3xl font-black text-gray-800 z-10">-${data.totalEgresos?.toLocaleString('es-AR') || '0'}</p>
           </div>
 
-          <div className="bg-indigo-600 p-6 rounded-2xl shadow-md border border-indigo-500 flex flex-col justify-center relative overflow-hidden group">
+          <div className="bg-pink-600 p-6 rounded-2xl shadow-md border border-pink-500 flex flex-col justify-center relative overflow-hidden group">
             <div className="absolute -right-4 -top-4 opacity-10 group-hover:scale-110 transition-transform"><Calculator className="w-32 h-32 text-white" /></div>
-            <div className="flex items-center gap-3 mb-2 text-indigo-100">
+            <div className="flex items-center gap-3 mb-2 text-pink-100">
               <div className="p-2 bg-white/20 rounded-lg"><DollarSign className="w-5 h-5" /></div>
               <p className="text-xs font-bold uppercase tracking-wider">Ganancia Neta Real</p>
             </div>
@@ -138,7 +138,7 @@ const PanelGeneral = () => {
       {/* GRÁFICOS - FILA 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border min-h-[350px] flex flex-col">
-          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-indigo-500" />Inscriptos por Disciplina</h3>
+          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-pink-500" />Inscriptos por Disciplina</h3>
           <div className="flex-1 w-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -171,7 +171,7 @@ const PanelGeneral = () => {
       {/* GRÁFICO DE CONVOCATORIA PROFESORES (Añadido) */}
       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px] mt-8">
         <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <GraduationCap className="w-5 h-5 text-indigo-500"/> Convocatoria por Profesor
+          <GraduationCap className="w-5 h-5 text-pink-500"/> Convocatoria por Profesor
         </h3>
         <div className="h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -190,7 +190,7 @@ const PanelGeneral = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         {/* GRÁFICO DE EDADES */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px]">
-          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><Users className="w-5 h-5 text-indigo-500"/> Edades de los Alumnos</h3>
+          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><Users className="w-5 h-5 text-pink-500"/> Edades de los Alumnos</h3>
           <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>

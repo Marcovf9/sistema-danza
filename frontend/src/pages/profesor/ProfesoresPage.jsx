@@ -117,7 +117,7 @@ const ProfesoresPage = () => {
           <p className="text-gray-500 mt-1">Calcula honorarios y administra los accesos.</p>
         </div>
         <div className="mt-4 sm:mt-0 flex gap-3 items-center">
-          <button onClick={handleAbrirCrear} className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition">
+          <button onClick={handleAbrirCrear} className="flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition">
             <Plus className="w-5 h-5 mr-1" /> Agregar Profe
           </button>
           <div className="h-8 w-px bg-gray-200 mx-2"></div>
@@ -150,7 +150,7 @@ const ProfesoresPage = () => {
                 {profesores.map((prof) => (
                   <div key={prof.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow gap-4 ${prof.activo === false ? 'opacity-50' : ''}`}>
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-indigo-50 text-indigo-700 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-pink-50 text-pink-700 rounded-full flex items-center justify-center">
                         <GraduationCap className="w-6 h-6" />
                       </div>
                       <div>
@@ -193,7 +193,7 @@ const ProfesoresPage = () => {
               </div>
               <button
                 onClick={() => descargarPdfSueldo(liquidacionPagadaId)}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md"
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md"
               >
                 <Download className="w-5 h-5" /> Descargar Recibo PDF
               </button>
@@ -215,7 +215,7 @@ const ProfesoresPage = () => {
                 <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4">Total a Transferir</p>
                 <div className="flex items-center justify-between">
                   <Landmark className="text-gray-400 w-8 h-8" />
-                  <span className="text-4xl font-black text-indigo-600">${liquidacionActiva.totalAPagar?.toLocaleString('es-AR') || '0'}</span>
+                  <span className="text-4xl font-black text-pink-600">${liquidacionActiva.totalAPagar?.toLocaleString('es-AR') || '0'}</span>
                 </div>
               </div>
               <button

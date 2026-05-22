@@ -133,10 +133,10 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-in zoom-in duration-200">
         
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-indigo-600 text-white rounded-t-3xl">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-pink-600 text-white rounded-t-3xl">
           <div>
             <h2 className="text-xl font-bold">FORMULARIO DE INSCRIPCIÓN</h2>
-            <p className="text-indigo-200 text-sm">Ficha oficial de Epifania Dance</p>
+            <p className="text-pink-200 text-sm">Ficha oficial de Epifania Dance</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X className="w-6 h-6" /></button>
         </div>
@@ -144,9 +144,9 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
         <div className="flex-1 overflow-y-auto p-6 relative">
           <form id="formAlumno" onSubmit={handleSubmit} className="space-y-6 pb-32">
             
-            <div className={`p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center gap-4 transition-colors ${formData.esMenor ? 'bg-amber-50 border-amber-200' : 'bg-indigo-50 border-indigo-200'}`}>
+            <div className={`p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center gap-4 transition-colors ${formData.esMenor ? 'bg-amber-50 border-amber-200' : 'bg-pink-50 border-pink-200'}`}>
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="esMenor" name="esMenor" checked={formData.esMenor} onChange={handleChange} className="w-5 h-5 rounded cursor-pointer accent-indigo-600" />
+                <input type="checkbox" id="esMenor" name="esMenor" checked={formData.esMenor} onChange={handleChange} className="w-5 h-5 rounded cursor-pointer accent-pink-600" />
                 <label htmlFor="esMenor" className="font-bold text-gray-800 flex items-center cursor-pointer">
                   <Baby className="w-5 h-5 mr-2" /> Este alumno es Menor de Edad
                 </label>
@@ -191,15 +191,15 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
             <div>
               <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4 border-b pb-2">Datos del Estudiante</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Nombre *</label><input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Apellido *</label><input type="text" name="apellido" value={formData.apellido} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">DNI *</label><input type="text" name="dni" value={formData.dni} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Nombre *</label><input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Apellido *</label><input type="text" name="apellido" value={formData.apellido} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">DNI *</label><input type="text" name="dni" value={formData.dni} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
 
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Lugar Nacimiento</label><input type="text" name="lugarNacimiento" value={formData.lugarNacimiento} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Fecha Nacimiento</label><input type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Teléfono</label><input type="text" name="telefono" value={formData.telefono} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Lugar Nacimiento</label><input type="text" name="lugarNacimiento" value={formData.lugarNacimiento} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Fecha Nacimiento</label><input type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Teléfono</label><input type="text" name="telefono" value={formData.telefono} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
 
-                <div className="md:col-span-2"><label className="block text-xs font-bold text-gray-600 mb-1">Dirección</label><input type="text" name="direccion" value={formData.direccion} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div className="md:col-span-2"><label className="block text-xs font-bold text-gray-600 mb-1">Dirección</label><input type="text" name="direccion" value={formData.direccion} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
                 
                 <div>
                   <label className="block text-xs font-bold text-gray-600 mb-1">Barrio</label>
@@ -208,25 +208,25 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
                     name="barrio" 
                     value={formData.barrio} 
                     onChange={handleChange} 
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" 
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" 
                   />
                 </div>
                 
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Cod. Postal</label><input type="text" name="codigoPostal" value={formData.codigoPostal} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Cod. Postal</label><input type="text" name="codigoPostal" value={formData.codigoPostal} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
 
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Localidad</label><input type="text" name="localidad" value={formData.localidad} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Localidad</label><input type="text" name="localidad" value={formData.localidad} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
               
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Provincia</label><input type="text" name="provincia" value={formData.provincia} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Provincia</label><input type="text" name="provincia" value={formData.provincia} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
                 
                 {!formData.esMenor && (
                   <div>
-                    <label className="block text-xs font-bold text-indigo-600 mb-1">Email (Acceso al Portal) *</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Requerido" className="w-full px-3 py-2 bg-indigo-50 border border-indigo-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <label className="block text-xs font-bold text-pink-600 mb-1">Email (Acceso al Portal) *</label>
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Requerido" className="w-full px-3 py-2 bg-pink-50 border border-pink-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" />
                   </div>
                 )}
 
-                <div><label className="block text-xs font-bold text-gray-600 mb-1">Cobertura Médica</label><input type="text" name="coberturaMedica" value={formData.coberturaMedica} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                <div className="md:col-span-2"><label className="block text-xs font-bold text-gray-600 mb-1">Nro. de Afiliado</label><input type="text" name="nroAfiliado" value={formData.nroAfiliado} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                <div><label className="block text-xs font-bold text-gray-600 mb-1">Cobertura Médica</label><input type="text" name="coberturaMedica" value={formData.coberturaMedica} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
+                <div className="md:col-span-2"><label className="block text-xs font-bold text-gray-600 mb-1">Nro. de Afiliado</label><input type="text" name="nroAfiliado" value={formData.nroAfiliado} onChange={handleChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500" /></div>
               </div>
             </div>
 
@@ -244,7 +244,7 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
                   }}
                   onFocus={() => setMostrarSugerenciasFam(true)}
                   placeholder="Escriba el nombre de la familia..."
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none" 
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" 
                 />
               </div>
 
@@ -253,15 +253,15 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
                   {familiasFiltradas.length > 0 ? (
                     <ul className="max-h-48 overflow-y-auto">
                       {familiasFiltradas.map(familia => (
-                        <li key={familia.id} onClick={() => seleccionarFamilia(familia)} className="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex items-center text-gray-700">
-                          <Users className="w-4 h-4 mr-3 text-indigo-500" />
+                        <li key={familia.id} onClick={() => seleccionarFamilia(familia)} className="px-4 py-3 hover:bg-pink-50 cursor-pointer flex items-center text-gray-700">
+                          <Users className="w-4 h-4 mr-3 text-pink-500" />
                           <span className="font-medium">{familia.nombreReferencia}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
                     <div className="p-4 bg-gray-50 border-t border-gray-100 text-center">
-                      <p className="text-sm font-bold text-indigo-600">"{busquedaFamilia}" se creará al guardar.</p>
+                      <p className="text-sm font-bold text-pink-600">"{busquedaFamilia}" se creará al guardar.</p>
                     </div>
                   )}
                 </div>
@@ -273,7 +273,7 @@ const AlumnoModal = ({ isOpen, onClose, onSave, alumnoAEditar }) => {
 
         <div className="flex justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50 rounded-b-3xl">
           <button type="button" onClick={onClose} className="px-6 py-3 text-gray-600 font-bold hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
-          <button type="submit" form="formAlumno" className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-95">
+          <button type="submit" form="formAlumno" className="px-8 py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-95">
             {alumnoAEditar ? 'Actualizar Ficha' : 'Guardar Inscripción'}
           </button>
         </div>

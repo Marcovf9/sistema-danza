@@ -98,13 +98,13 @@ const ClasesPage = () => {
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-            Gestión de Clases <Calendar className="ml-3 w-6 h-6 text-indigo-500" />
+            Gestión de Clases <Calendar className="ml-3 w-6 h-6 text-pink-500" />
           </h2>
           <p className="text-gray-500 mt-1">Administra los horarios y asigna profesores a cada grupo.</p>
         </div>
         <button 
           onClick={() => toast.success("Módulo de creación en desarrollo")}
-          className="mt-4 sm:mt-0 flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition shadow-sm"
+          className="mt-4 sm:mt-0 flex items-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition shadow-sm"
         >
           <Plus className="w-5 h-5 mr-2" /> Nueva Clase
         </button>
@@ -112,14 +112,14 @@ const ClasesPage = () => {
 
       {/* LISTADO DE CLASES */}
       {cargando ? (
-        <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>
+        <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {clases.map(clase => (
-            <div key={clase.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative group hover:border-indigo-300 transition-colors">
+            <div key={clase.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative group hover:border-pink-300 transition-colors">
               <button 
                 onClick={() => abrirEditor(clase)}
-                className="absolute top-4 right-4 p-2 bg-indigo-50 text-indigo-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-indigo-600 hover:text-white"
+                className="absolute top-4 right-4 p-2 bg-pink-50 text-pink-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-pink-600 hover:text-white"
                 title="Editar Profesor y Horarios"
               >
                 <Pencil className="w-4 h-4" />
@@ -130,7 +130,7 @@ const ClasesPage = () => {
                   {clase.disciplina?.nombre || 'Disciplina General'}
                 </span>
                 <div className="flex items-center gap-2 text-gray-700 font-bold">
-                  <Clock className="w-4 h-4 text-indigo-500" />
+                  <Clock className="w-4 h-4 text-pink-500" />
                   <span>{clase.diasSemana} - {formatearHora(clase.horaInicio)} hs</span>
                 </div>
               </div>
@@ -156,21 +156,21 @@ const ClasesPage = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200">
-            <div className="bg-indigo-600 p-6 text-white">
+            <div className="bg-pink-600 p-6 text-white">
               <h3 className="text-xl font-bold">Configurar Clase</h3>
-              <p className="text-indigo-200 text-sm">{claseAEditar?.disciplina?.nombre}</p>
+              <p className="text-pink-200 text-sm">{claseAEditar?.disciplina?.nombre}</p>
             </div>
             
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center">
-                  <GraduationCap className="w-4 h-4 mr-2 text-indigo-500" />
+                  <GraduationCap className="w-4 h-4 mr-2 text-pink-500" />
                   Profesor a Cargo
                 </label>
                 <select 
                   value={nuevoProfesorId} 
                   onChange={(e) => setNuevoProfesorId(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-gray-700"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none font-medium text-gray-700"
                 >
                   <option value="">-- Seleccionar Profesor --</option>
                   {profesores.map(p => (
@@ -181,13 +181,13 @@ const ClasesPage = () => {
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center">
-                  <MapPin className="w-4 h-4 mr-2 text-indigo-500" />
+                  <MapPin className="w-4 h-4 mr-2 text-pink-500" />
                   Salón
                 </label>
                 <select 
                   value={nuevoSalonId} 
                   onChange={(e) => setNuevoSalonId(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-gray-700"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none font-medium text-gray-700"
                 >
                   <option value="">-- Seleccionar Salón --</option>
                   {salones.map(s => (
@@ -199,26 +199,26 @@ const ClasesPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-indigo-500" />
+                    <Calendar className="w-4 h-4 mr-2 text-pink-500" />
                     Días (Ej: LUNES, MARTES)
                   </label>
                   <input 
                     type="text" 
                     value={nuevosDias} 
                     onChange={(e) => setNuevosDias(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-gray-700 uppercase"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none font-medium text-gray-700 uppercase"
                   />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-indigo-500" />
+                    <Clock className="w-4 h-4 mr-2 text-pink-500" />
                     Horario de Inicio
                   </label>
                   <input 
                     type="time" 
                     value={nuevaHora} 
                     onChange={(e) => setNuevaHora(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-gray-700"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none font-medium text-gray-700"
                   />
                 </div>
               </div>
@@ -228,7 +228,7 @@ const ClasesPage = () => {
                 <button 
                   onClick={guardarCambios} 
                   disabled={guardando}
-                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition disabled:bg-gray-400"
+                  className="flex-1 py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl shadow-md transition disabled:bg-gray-400"
                 >
                   {guardando ? 'Verificando...' : 'Guardar Cambios'}
                 </button>

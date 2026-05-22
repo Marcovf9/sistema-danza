@@ -95,13 +95,13 @@ const AlumnosPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div>
           <h2 className="text-3xl font-black text-gray-800 tracking-tight flex items-center">
-            <Users className="w-8 h-8 mr-3 text-indigo-600" /> Directorio de Alumnos
+            <Users className="w-8 h-8 mr-3 text-pink-600" /> Directorio de Alumnos
           </h2>
           <p className="text-gray-500 mt-1">Gestiona las inscripciones y legajos de la academia.</p>
         </div>
         <button
           onClick={handleAbrirCrear}
-          className="mt-4 sm:mt-0 flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
+          className="mt-4 sm:mt-0 flex items-center justify-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
         >
           <Plus className="w-5 h-5 mr-2" /> Nuevo Alumno
         </button>
@@ -115,14 +115,14 @@ const AlumnosPage = () => {
             placeholder="Buscar por nombre, apellido o DNI..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none shadow-sm"
           />
         </div>
 
         <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto">
           <button
             onClick={() => setMostrarActivos(true)}
-            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-all ${mostrarActivos ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-all ${mostrarActivos ? 'bg-white text-pink-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
           >
             <CheckCircle className="w-4 h-4 mr-2" /> Activos
           </button>
@@ -157,7 +157,7 @@ const AlumnosPage = () => {
                     <tr key={alumno.id} className={`hover:bg-gray-50 transition ${!alumno.activo ? 'opacity-70' : ''}`}>
                       <td className="p-4">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-black mr-3">
+                          <div className="w-10 h-10 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-black mr-3">
                             {alumno.nombre.charAt(0)}{alumno.apellido.charAt(0)}
                           </div>
                           <div>
@@ -173,7 +173,7 @@ const AlumnosPage = () => {
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center gap-2">
-                          <button onClick={() => setAlumnoEnFicha(alumno)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Ficha Completa">
+                          <button onClick={() => setAlumnoEnFicha(alumno)} className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg transition" title="Ficha Completa">
                             <FileText className="w-5 h-5" />
                           </button>
                           <button onClick={() => handleAbrirEditar(alumno)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">

@@ -35,7 +35,7 @@ const CalendarioAlumno = () => {
       {/* Cabecera un poco más compacta */}
       <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
         <h2 className="text-xl font-bold text-gray-800 flex items-center">
-          <CalendarIcon className="w-5 h-5 mr-3 text-indigo-600" /> Grilla Horaria de Clases
+          <CalendarIcon className="w-5 h-5 mr-3 text-pink-600" /> Grilla Horaria de Clases
         </h2>
         <p className="text-sm text-gray-500 mt-1">Explorá todas las clases y horarios disponibles en Epifania Dance.</p>
       </div>
@@ -43,7 +43,7 @@ const CalendarioAlumno = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {cargando ? (
           <div className="flex justify-center p-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
           </div>
         ) : (
           <div className="overflow-x-auto p-5">
@@ -64,16 +64,16 @@ const CalendarioAlumno = () => {
                     // Tarjeta de clase: padding más chico (p-2 pl-3), bordes más suaves (rounded-lg)
                     <div 
                       key={`${dia}-${clase.id}`} 
-                      className="bg-indigo-50 border border-indigo-100 rounded-lg p-2 pl-3 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
+                      className="bg-pink-50 border border-pink-100 rounded-lg p-2 pl-3 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
                     >
-                      <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                      <div className="absolute top-0 left-0 w-1 h-full bg-pink-500"></div>
                       
-                      <h4 className="font-bold text-indigo-900 text-xs mb-1.5 leading-tight truncate" title={clase.disciplina?.nombre}>
+                      <h4 className="font-bold text-pink-900 text-xs mb-1.5 leading-tight truncate" title={clase.disciplina?.nombre}>
                         {clase.disciplina?.nombre || 'Disciplina'}
                       </h4>
                       
                       <div className="space-y-1">
-                        <div className="flex items-center text-[9px] text-indigo-700 font-medium">
+                        <div className="flex items-center text-[9px] text-pink-700 font-medium">
                           <Clock className="w-3 h-3 mr-1 opacity-70" />
                           {clase.horaInicio?.slice(0, 5)}hs
                         </div>

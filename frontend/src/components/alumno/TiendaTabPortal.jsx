@@ -38,7 +38,7 @@ const TiendaTabPortal = ({ productos, onAgregar }) => (
             <button
               onClick={() => onAgregar(prod)}
               disabled={prod.stock === 0}
-              className="w-10 h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center justify-center disabled:bg-gray-300 active:scale-95 shadow-sm transition-colors"
+              className="w-10 h-10 bg-pink-600 hover:bg-pink-700 text-white rounded-xl flex items-center justify-center disabled:bg-gray-300 active:scale-95 shadow-sm transition-colors"
               title={prod.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
             >
               <Plus className="w-5 h-5" />

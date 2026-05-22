@@ -69,7 +69,7 @@ const CheckoutFlotante = ({
                 </span>
               )}
               {totalCarrito > 0 && (
-                <span className="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded">
+                <span className="text-[10px] bg-pink-50 text-pink-600 font-bold px-2 py-0.5 rounded">
                   Tienda: ${totalCarrito.toLocaleString('es-AR')}
                 </span>
               )}

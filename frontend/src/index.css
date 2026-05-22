@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Base ──────────────────────────────────────────────────────────────────── */
 body {
   @apply bg-gray-50 text-gray-900;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* ── Scrollbar personalizada (tono marca) ──────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #f9a8d4; /* pink-300 */
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #db2777; /* pink-600 */
+}
+
+/* Sidebar oscuro — sin scrollbar visible */
+aside ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+aside ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }

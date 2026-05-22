@@ -69,7 +69,7 @@ const TiendaPage = () => {
         </div>
         <button
           onClick={handleAbrirCrear}
-          className="mt-4 sm:mt-0 flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
+          className="mt-4 sm:mt-0 flex items-center justify-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
         >
           <Plus className="w-5 h-5 mr-2" /> Agregar Producto
         </button>

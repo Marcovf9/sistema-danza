@@ -208,7 +208,7 @@ const PortalAlumnoPage = ({ vista }) => {
               onClick={() => setPerfilActivoId(p.id.toString())}
               className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all whitespace-nowrap shadow-sm border ${
                 perfilActivoId === p.id.toString()
-                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-200'
+                  ? 'bg-pink-600 text-white border-pink-600 shadow-pink-200'
                   : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -221,7 +221,7 @@ const PortalAlumnoPage = ({ vista }) => {
 
       {/* Cabecera */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
-        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+        <div className="p-3 bg-pink-50 text-pink-600 rounded-xl">
           {vista === 'CUENTA' && <CreditCard className="w-8 h-8" />}
           {vista === 'CLASES' && <Calendar className="w-8 h-8" />}
           {vista === 'TIENDA' && <ShoppingBag className="w-8 h-8" />}

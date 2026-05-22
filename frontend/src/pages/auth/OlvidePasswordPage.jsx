@@ -35,12 +35,12 @@ const OlvidePasswordPage = () => {
       <div className="bg-white max-w-md w-full rounded-3xl shadow-xl overflow-hidden">
 
         {/* Header */}
-        <div className="bg-indigo-600 p-8 text-center relative overflow-hidden">
+        <div className="bg-pink-600 p-8 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl -mr-10 -mt-10" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full blur-xl -ml-8 -mb-8" />
           <div className="relative z-10">
             <h1 className="text-4xl font-black text-white tracking-tight mb-2">Epifania</h1>
-            <p className="text-indigo-200 font-medium tracking-wide">Manager de Academia</p>
+            <p className="text-pink-200 font-medium tracking-wide">Manager de Academia</p>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ const OlvidePasswordPage = () => {
                       type="email"
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all"
                       placeholder="tu@email.com"
                     />
                   </div>
@@ -76,7 +76,7 @@ const OlvidePasswordPage = () => {
                 <button
                   type="submit"
                   disabled={cargando}
-                  className="w-full flex justify-center items-center py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
+                  className="w-full flex justify-center items-center py-3.5 bg-pink-600 hover:bg-pink-700 disabled:bg-pink-400 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
                 >
                   {cargando ? 'Enviando...' : 'Enviar enlace de recuperación'}
                 </button>
@@ -97,7 +97,7 @@ const OlvidePasswordPage = () => {
           <div className="mt-6 text-center">
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-pink-600 hover:text-pink-800 font-medium transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Volver al inicio de sesión

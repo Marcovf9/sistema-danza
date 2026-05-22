@@ -76,7 +76,7 @@ const CajaPage = () => {
     toast((t) => (
       <div className="flex flex-col gap-3 p-1">
         <div className="flex items-center gap-2">
-          <AlertCircle className="w-6 h-6 text-indigo-500" />
+          <AlertCircle className="w-6 h-6 text-pink-500" />
           <p className="font-bold text-gray-800 text-lg">¿Simular Facturación?</p>
         </div>
         <p className="text-sm text-gray-600">Generará deudas para todos los alumnos activos. ¿Continuar?</p>
@@ -84,7 +84,7 @@ const CajaPage = () => {
           <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">Cancelar</button>
           <button
             onClick={() => { toast.dismiss(t.id); robotMutation.mutate(); }}
-            className="px-4 py-2 text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl shadow-sm transition"
+            className="px-4 py-2 text-sm font-bold bg-pink-600 text-white hover:bg-pink-700 rounded-xl shadow-sm transition"
           >
             Sí, simular mes
           </button>
@@ -193,7 +193,7 @@ const CajaPage = () => {
               </div>
             ) : <div></div>}
 
-            <button onClick={dispararRobot} className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl font-bold hover:bg-indigo-100 transition border border-indigo-200">
+            <button onClick={dispararRobot} className="flex items-center gap-2 bg-pink-50 text-pink-700 px-4 py-2 rounded-xl font-bold hover:bg-pink-100 transition border border-pink-200">
               <Bot className="w-5 h-5" /> Simular Facturación Mensual
             </button>
           </div>
@@ -286,7 +286,7 @@ const CajaPage = () => {
                       <p className="text-sm text-gray-400 uppercase tracking-wider mb-1">Total Cobrado</p>
                       <p className="text-3xl font-black text-white">${reciboPagado.montoTotal.toLocaleString('es-AR')}</p>
                     </div>
-                    <button onClick={() => descargarPdf(reciboPagado.id)} className="w-full bg-indigo-500 hover:bg-indigo-400 text-white py-4 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                    <button onClick={() => descargarPdf(reciboPagado.id)} className="w-full bg-pink-500 hover:bg-pink-400 text-white py-4 rounded-xl font-bold transition flex items-center justify-center gap-2">
                       <Download className="w-5 h-5" /> Imprimir PDF
                     </button>
                     <button onClick={() => setReciboPagado(null)} className="text-sm text-gray-400 hover:text-white transition">← Volver</button>
@@ -334,7 +334,7 @@ const CajaPage = () => {
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-fit">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center border-b pb-4">
-              <PlusCircle className="w-5 h-5 mr-2 text-indigo-600" /> Registrar Salida
+              <PlusCircle className="w-5 h-5 mr-2 text-pink-600" /> Registrar Salida
             </h3>
 
             <form onSubmit={handleGuardarEgreso} className="space-y-4">
@@ -343,7 +343,7 @@ const CajaPage = () => {
                 <input
                   type="text" required placeholder="Ej: Luz, Alquiler, Artículos limpieza..."
                   value={formEgreso.concepto} onChange={e => setFormEgreso({ ...formEgreso, concepto: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all"
                 />
               </div>
 
@@ -354,7 +354,7 @@ const CajaPage = () => {
                   <input
                     type="number" required placeholder="0.00" min="0" step="0.01"
                     value={formEgreso.monto} onChange={e => setFormEgreso({ ...formEgreso, monto: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all"
                   />
                 </div>
               </div>
@@ -364,7 +364,7 @@ const CajaPage = () => {
                 <textarea
                   rows="3" placeholder="Nro de factura, detalles del pago..."
                   value={formEgreso.observaciones} onChange={e => setFormEgreso({ ...formEgreso, observaciones: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all resize-none"
                 />
               </div>
 

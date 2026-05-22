@@ -19,10 +19,10 @@ const ModalInscripcion = ({ clase, nombreAlumno, diasSeleccionados, onToggleDia,
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in">
-        <div className="p-6 bg-indigo-600 text-white flex justify-between items-center">
+        <div className="p-6 bg-pink-600 text-white flex justify-between items-center">
           <div>
             <h3 className="text-xl font-bold">Inscripción</h3>
-            <p className="text-indigo-200 text-sm mt-1">{clase.disciplina.nombre}</p>
+            <p className="text-pink-200 text-sm mt-1">{clase.disciplina.nombre}</p>
           </div>
           <button onClick={onCerrar} className="p-2 hover:bg-white/20 rounded-full">
             <X className="w-6 h-6" />
@@ -41,7 +41,7 @@ const ModalInscripcion = ({ clase, nombreAlumno, diasSeleccionados, onToggleDia,
                 onClick={() => onToggleDia(dia)}
                 className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-colors ${
                   diasSeleccionados.includes(dia)
-                    ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                    ? 'bg-pink-50 border-pink-500 text-pink-700'
                     : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
                 }`}
               >
@@ -60,7 +60,7 @@ const ModalInscripcion = ({ clase, nombreAlumno, diasSeleccionados, onToggleDia,
             <button
               onClick={onConfirmar}
               disabled={diasSeleccionados.length === 0}
-              className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md disabled:bg-gray-300 transition"
+              className="flex-1 py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl shadow-md disabled:bg-gray-300 transition"
             >
               Confirmar
             </button>

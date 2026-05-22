@@ -122,10 +122,10 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
       <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-indigo-600">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-pink-600">
           <div>
             <h2 className="text-2xl font-bold text-white">{alumno.nombre} {alumno.apellido}</h2>
-            <p className="text-indigo-200 text-sm mt-1">DNI: {alumno.dni}</p>
+            <p className="text-pink-200 text-sm mt-1">DNI: {alumno.dni}</p>
           </div>
           <button onClick={onClose} className="text-white/70 hover:text-white hover:bg-white/20 p-2 rounded-full transition-colors">
             <X className="w-6 h-6" />
@@ -136,13 +136,13 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
         <div className="flex border-b border-gray-200 bg-gray-50">
           <button
             onClick={() => setTabActiva('INFO')}
-            className={`flex-1 py-3 text-sm font-bold transition-all border-b-2 ${tabActiva === 'INFO' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 py-3 text-sm font-bold transition-all border-b-2 ${tabActiva === 'INFO' ? 'border-pink-600 text-pink-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
           >
             Info Académica
           </button>
           <button
             onClick={() => setTabActiva('CUENTA')}
-            className={`flex-1 py-3 text-sm font-bold transition-all border-b-2 ${tabActiva === 'CUENTA' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 py-3 text-sm font-bold transition-all border-b-2 ${tabActiva === 'CUENTA' ? 'border-pink-600 text-pink-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
           >
             Estado de Cuenta
           </button>
@@ -161,7 +161,7 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                   {alumno.esMenor && alumno.tutor ? (
                     <p className="flex items-center">
                       <span className="font-medium mr-2">Adulto a cargo:</span>
-                      <User className="w-4 h-4 mr-1 text-indigo-500" />
+                      <User className="w-4 h-4 mr-1 text-pink-500" />
                       {alumno.tutor.nombre} {alumno.tutor.apellido}
                     </p>
                   ) : (
@@ -189,10 +189,10 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                 ) : inscripciones.length > 0 ? (
                   <ul className="space-y-3">
                     {inscripciones.map(ins => (
-                      <li key={ins.id} className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between group">
+                      <li key={ins.id} className="p-3 bg-pink-50 border border-pink-100 rounded-xl flex items-center justify-between group">
                         <div>
-                          <p className="font-bold text-indigo-900">{ins.clase.disciplina.nombre}</p>
-                          <p className="text-sm text-indigo-700 mt-1 flex items-center">
+                          <p className="font-bold text-pink-900">{ins.clase.disciplina.nombre}</p>
+                          <p className="text-sm text-pink-700 mt-1 flex items-center">
                             <Calendar className="w-3 h-3 mr-1" />
                             {ins.diasSeleccionados || ins.clase.diasSemana} - {formatearHora(ins.clase.horaInicio)}hs
                           </p>
@@ -218,7 +218,7 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                     <select
                       value={claseSeleccionadaId}
                       onChange={handleClaseChange}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium bg-gray-50"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm font-medium bg-gray-50"
                     >
                       <option value="">Seleccione una disciplina...</option>
                       {clasesDisponibles.map(c => (
@@ -240,7 +240,7 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                                   onClick={() => toggleDia(d)}
                                   className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-colors ${
                                     diasSeleccionados.includes(d)
-                                      ? 'bg-indigo-100 border-indigo-400 text-indigo-700'
+                                      ? 'bg-pink-100 border-pink-400 text-pink-700'
                                       : 'bg-white border-gray-300 text-gray-400'
                                   }`}
                                 >
@@ -255,7 +255,7 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                     <button
                       onClick={handleInscribir}
                       disabled={!claseSeleccionadaId || diasSeleccionados.length === 0 || inscribirMutation.isPending}
-                      className="w-full px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-sm font-bold transition-all shadow-sm"
+                      className="w-full px-4 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-sm font-bold transition-all shadow-sm"
                     >
                       {inscribirMutation.isPending ? 'Inscribiendo...' : 'Confirmar Inscripción'}
                     </button>
@@ -314,7 +314,7 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                 ) : (
                   <div className="space-y-3">
                     {historialPagos.map(recibo => (
-                      <div key={recibo.id} className="p-4 border border-gray-100 bg-gray-50 rounded-xl flex items-center justify-between group hover:border-indigo-200 hover:bg-white transition-all">
+                      <div key={recibo.id} className="p-4 border border-gray-100 bg-gray-50 rounded-xl flex items-center justify-between group hover:border-pink-200 hover:bg-white transition-all">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${recibo.estado === 'PAGADO' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                             <DollarSign className="w-5 h-5" />
@@ -334,7 +334,7 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                           {recibo.estado === 'PAGADO' && (
                             <button
                               onClick={() => descargarPdf(recibo.id)}
-                              className="flex items-center gap-1 text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg hover:bg-indigo-600 hover:text-white transition-colors"
+                              className="flex items-center gap-1 text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded-lg hover:bg-pink-600 hover:text-white transition-colors"
                             >
                               <Download className="w-3 h-3" /> PDF
                             </button>

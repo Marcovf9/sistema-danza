@@ -38,7 +38,7 @@ const AuditoriaPage = () => {
     if (accion.includes('COBRO') || accion.includes('PAGO')) return 'text-emerald-600 bg-emerald-50 border-emerald-200';
     if (accion.includes('BAJA') || accion.includes('ELIMINAR')) return 'text-red-600 bg-red-50 border-red-200';
     if (accion.includes('CREAR') || accion.includes('NUEVO')) return 'text-blue-600 bg-blue-50 border-blue-200';
-    return 'text-indigo-600 bg-indigo-50 border-indigo-200';
+    return 'text-pink-600 bg-pink-50 border-pink-200';
   };
 
   return (
@@ -63,7 +63,7 @@ const AuditoriaPage = () => {
             placeholder="Buscar por usuario, acción..." 
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-sm"
+            className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all font-medium text-sm"
           />
         </div>
       </div>
@@ -72,7 +72,7 @@ const AuditoriaPage = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col">
         <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
           <h3 className="font-bold text-gray-700 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-indigo-500" /> Historial de Movimientos
+            <Activity className="w-5 h-5 text-pink-500" /> Historial de Movimientos
           </h3>
           <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-200 px-2 py-1 rounded-md">
             {logsFiltrados.length} Registros
@@ -82,7 +82,7 @@ const AuditoriaPage = () => {
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="flex justify-center items-center h-40">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
             </div>
           ) : logsFiltrados.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-400">
@@ -92,11 +92,11 @@ const AuditoriaPage = () => {
           ) : (
             <div className="space-y-3">
               {logsFiltrados.map((log) => (
-                <div key={log.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md hover:border-indigo-100 transition-all gap-4 group">
+                <div key={log.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md hover:border-pink-100 transition-all gap-4 group">
                   
                   <div className="flex items-start gap-4 flex-1">
                     <div className="mt-1">
-                      <div className="w-2 h-2 rounded-full bg-gray-300 group-hover:bg-indigo-500 transition-colors"></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-300 group-hover:bg-pink-500 transition-colors"></div>
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2 mb-1">
