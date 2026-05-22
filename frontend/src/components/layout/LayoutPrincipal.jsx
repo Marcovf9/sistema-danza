@@ -129,7 +129,7 @@ const LayoutPrincipal = () => {
               <button
                 type="submit"
                 disabled={!esValido || cambiando}
-                className="w-full py-3.5 mt-4 bg-brand-gradient disabled:opacity-40 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
+                className="w-full py-3.5 mt-4 bg-gradient-to-br from-pink-600 to-violet-600 disabled:opacity-40 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
               >
                 {cambiando ? 'Actualizando...' : 'Guardar y Continuar'}
               </button>
@@ -146,7 +146,7 @@ const LayoutPrincipal = () => {
           {/* Logo */}
           <div className="p-5 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-brand-gradient flex items-center justify-center shadow-lg shadow-pink-900/40 flex-shrink-0">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-600 to-violet-600 flex items-center justify-center shadow-lg shadow-pink-900/40 flex-shrink-0">
                 <span className="text-white font-black text-lg leading-none">E</span>
               </div>
               <div className="min-w-0">
@@ -168,7 +168,7 @@ const LayoutPrincipal = () => {
                   to={item.path}
                   className={`flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'bg-brand-gradient text-white shadow-lg shadow-pink-900/30'
+                      ? 'bg-gradient-to-br from-pink-600 to-violet-600 text-white shadow-lg shadow-pink-900/30'
                       : 'text-white/55 hover:bg-white/[0.07] hover:text-white'
                   }`}
                 >

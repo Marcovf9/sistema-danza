@@ -85,93 +85,120 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-800">
-      <div className="bg-white max-w-md w-full rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-500">
-        
-        <div className="bg-brand-gradient p-8 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl -ml-8 -mb-8"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-16 bg-white/5 rounded-full blur-2xl"></div>
+    <div className="min-h-screen flex">
 
-          <div className="relative z-10">
-            <p className="text-pink-200/80 text-xs font-bold uppercase tracking-[0.3em] mb-2">Academia de Danza</p>
-            <h1 className="text-4xl font-black text-white tracking-tight mb-1">Epifanía</h1>
-            <p className="text-white/60 font-medium tracking-widest text-sm uppercase">Dance</p>
+      {/* ── Panel izquierdo — marca (solo desktop) ── */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-pink-600 to-violet-700 flex-col items-center justify-center p-12 relative overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-pink-400/20 rounded-full blur-2xl" />
+
+        <div className="relative z-10 text-center">
+          <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+            <span className="text-5xl font-black text-white">E</span>
           </div>
+          <h1 className="text-5xl font-black text-white tracking-tight leading-none mb-2">Epifanía</h1>
+          <p className="text-pink-200 font-semibold tracking-[0.4em] uppercase text-sm mb-10">Dance</p>
+          <p className="text-white/70 text-base max-w-xs leading-relaxed mx-auto">
+            Sistema de gestión para la academia. Clases, pagos y más en un solo lugar.
+          </p>
         </div>
+      </div>
 
-        <div className="p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Iniciar Sesión</h2>
+      {/* ── Panel derecho — formulario ── */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-6">
+        <div className="w-full max-w-sm animate-in fade-in zoom-in duration-500">
+
+          {/* Logo mobile */}
+          <div className="flex flex-col items-center mb-8 lg:hidden">
+            <div className="w-16 h-16 bg-gradient-to-br from-pink-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg mb-3">
+              <span className="text-3xl font-black text-white">E</span>
+            </div>
+            <h1 className="text-2xl font-black text-gray-800">
+              Epifanía <span className="text-pink-500">Dance</span>
+            </h1>
+          </div>
+
+          <h2 className="text-3xl font-black text-gray-800 mb-1">Bienvenida 👋</h2>
+          <p className="text-gray-500 text-sm mb-8">Ingresá tus credenciales para continuar.</p>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-medium rounded-r-lg">
-              {error}
+            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-xl flex items-start gap-2">
+              <span>⚠️</span> {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input 
-                  type="email" 
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="email"
                   name="email"
                   value={credenciales.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all ${
-                    erroresInput.email ? 'border-red-400 focus:ring-red-500' : 'border-gray-200'
-                  }`}
                   placeholder="ejemplo@academia.com"
+                  className={`w-full pl-10 pr-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm ${
+                    erroresInput.email ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-pink-400'
+                  }`}
                 />
               </div>
               {erroresInput.email && (
-                <p className="text-red-500 text-xs font-semibold mt-1">{erroresInput.email}</p>
+                <p className="text-red-500 text-xs font-semibold mt-1.5">{erroresInput.email}</p>
               )}
             </div>
 
+            {/* Contraseña */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Contraseña</label>
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">Contraseña</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input 
-                  type="password" 
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="password"
                   name="password"
                   value={credenciales.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none transition-all ${
-                    erroresInput.password ? 'border-red-400 focus:ring-red-500' : 'border-gray-200'
-                  }`}
                   placeholder="••••••••"
+                  className={`w-full pl-10 pr-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm ${
+                    erroresInput.password ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-pink-400'
+                  }`}
                 />
               </div>
               {erroresInput.password && (
-                <p className="text-red-500 text-xs font-semibold mt-1">{erroresInput.password}</p>
+                <p className="text-red-500 text-xs font-semibold mt-1.5">{erroresInput.password}</p>
               )}
             </div>
 
+            {/* Olvidé contraseña */}
             <div className="flex justify-end">
               <Link
                 to="/olvide-password"
-                className="text-xs text-pink-500 hover:text-pink-700 font-medium transition-colors"
+                className="text-xs text-pink-500 hover:text-pink-700 font-semibold transition-colors"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
 
+            {/* Botón */}
             <button
               type="submit"
               disabled={cargando}
-              className="w-full flex justify-center items-center py-3.5 bg-brand-gradient disabled:opacity-50 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 mt-4"
+              className="w-full flex justify-center items-center gap-2 py-3.5 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-700 hover:to-violet-700 disabled:opacity-60 text-white font-bold rounded-xl shadow-lg shadow-pink-500/25 transition-all active:scale-[0.98] text-sm"
             >
-              {cargando ? 'Verificando...' : <><LogIn className="w-5 h-5 mr-2" /> Ingresar</>}
+              {cargando
+                ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Verificando...</>
+                : <><LogIn className="w-4 h-4" /> Ingresar</>
+              }
             </button>
           </form>
-          
+
         </div>
       </div>
+
     </div>
   );
 };
