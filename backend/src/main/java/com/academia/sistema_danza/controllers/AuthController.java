@@ -7,6 +7,9 @@ import com.academia.sistema_danza.repositories.AlumnoRepository;
 import com.academia.sistema_danza.repositories.ProfesorRepository;
 import com.academia.sistema_danza.repositories.UsuarioRepository;
 import com.academia.sistema_danza.security.JwtService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +32,7 @@ public class AuthController {
     private final AlumnoRepository alumnoRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             Usuario usuario = usuarioRepository.findByEmail(request.getEmail().trim())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
@@ -87,7 +90,11 @@ public class AuthController {
 
     @Data
     public static class LoginRequest {
+        @NotBlank(message = "El email es obligatorio")
+        @Email(message = "El email no tiene un formato válido")
         private String email;
+
+        @NotBlank(message = "La contraseña es obligatoria")
         private String password;
     }
 }

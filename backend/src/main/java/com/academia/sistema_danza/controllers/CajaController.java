@@ -1,5 +1,6 @@
 package com.academia.sistema_danza.controllers;
 
+import com.academia.sistema_danza.dto.EgresoRequestDTO;
 import com.academia.sistema_danza.dto.ReciboResponseDTO;
 import com.academia.sistema_danza.models.Egreso;
 import com.academia.sistema_danza.models.Recibo;
@@ -11,6 +12,7 @@ import com.academia.sistema_danza.services.AuditoriaService;
 import com.academia.sistema_danza.services.CajaService;
 import com.academia.sistema_danza.services.FacturacionAutomaticaService;
 import com.academia.sistema_danza.services.PdfService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -93,13 +95,14 @@ public class CajaController {
     }
 
     @PostMapping("/egresos")
-    public ResponseEntity<?> registrarEgreso(@RequestBody Egreso egreso) {
-        try {
-            egreso.setFecha(LocalDateTime.now());
-            return ResponseEntity.ok(egresoRepository.save(egreso));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al registrar el egreso: " + e.getMessage());
-        }
+    public ResponseEntity<Egreso> registrarEgreso(@Valid @RequestBody EgresoRequestDTO dto) {
+        Egreso egreso = Egreso.builder()
+                .concepto(dto.getConcepto())
+                .monto(dto.getMonto())
+                .observaciones(dto.getObservaciones())
+                .fecha(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(egresoRepository.save(egreso));
     }
 
     @GetMapping("/recibos/alumno/{alumnoId}")
