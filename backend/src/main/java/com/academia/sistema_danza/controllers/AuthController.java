@@ -1,5 +1,7 @@
 package com.academia.sistema_danza.controllers;
 
+import com.academia.sistema_danza.dto.RecuperarPasswordRequestDTO;
+import com.academia.sistema_danza.dto.ResetearPasswordRequestDTO;
 import com.academia.sistema_danza.models.Alumno;
 import com.academia.sistema_danza.models.Profesor;
 import com.academia.sistema_danza.models.Usuario;
@@ -7,6 +9,7 @@ import com.academia.sistema_danza.repositories.AlumnoRepository;
 import com.academia.sistema_danza.repositories.ProfesorRepository;
 import com.academia.sistema_danza.repositories.UsuarioRepository;
 import com.academia.sistema_danza.security.JwtService;
+import com.academia.sistema_danza.services.PasswordResetService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +33,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AlumnoRepository alumnoRepository;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -73,6 +77,22 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
+    }
+
+    /**
+     * Inicia el flujo de recuperación. Siempre devuelve 200 para no revelar
+     * si el email existe en el sistema (prevención de enumeración de usuarios).
+     */
+    @PostMapping("/recuperar-password")
+    public ResponseEntity<String> recuperarPassword(@Valid @RequestBody RecuperarPasswordRequestDTO dto) {
+        passwordResetService.solicitarReset(dto.getEmail());
+        return ResponseEntity.ok("Si el email está registrado, recibirás un enlace para restablecer tu contraseña.");
+    }
+
+    @PostMapping("/resetear-password")
+    public ResponseEntity<String> resetearPassword(@Valid @RequestBody ResetearPasswordRequestDTO dto) {
+        passwordResetService.resetearPassword(dto.getToken(), dto.getNuevaPassword());
+        return ResponseEntity.ok("Contraseña actualizada con éxito. Ya podés iniciar sesión.");
     }
 
     @PostMapping("/cambiar-password")

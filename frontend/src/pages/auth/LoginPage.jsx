@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import { Lock, Mail, LogIn } from 'lucide-react';
 
@@ -150,10 +150,19 @@ const LoginPage = () => {
               )}
             </div>
 
-            <button 
-              type="submit" 
+            <div className="flex justify-end">
+              <Link
+                to="/olvide-password"
+                className="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
               disabled={cargando}
-              className="w-full flex justify-center items-center py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 mt-8"
+              className="w-full flex justify-center items-center py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 mt-4"
             >
               {cargando ? 'Verificando...' : <><LogIn className="w-5 h-5 mr-2" /> Ingresar</>}
             </button>
