@@ -1,6 +1,7 @@
 package com.academia.sistema_danza.services;
 
 import com.academia.sistema_danza.dto.*;
+import com.academia.sistema_danza.exception.RecursoNoEncontradoException;
 import com.academia.sistema_danza.models.*;
 import com.academia.sistema_danza.models.enums.RolUsuario;
 import com.academia.sistema_danza.repositories.*;
@@ -37,7 +38,7 @@ public class AlumnoService {
 
         if (dto.getTutorId() != null) {
             Alumno tutor = alumnoRepository.findById(dto.getTutorId())
-                    .orElseThrow(() -> new RuntimeException("Tutor no encontrado con id: " + dto.getTutorId()));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Tutor", dto.getTutorId()));
             alumno.setTutor(tutor);
         } else {
             crearCuentaUsuarioSiCorresponde(dto, alumno);
@@ -49,13 +50,13 @@ public class AlumnoService {
     @Transactional
     public AlumnoResponseDTO actualizarAlumno(Long id, AlumnoRequestDTO dto) {
         Alumno alumno = alumnoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Alumno no encontrado con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", id));
 
         mapearDatos(dto, alumno);
 
         if (dto.getTutorId() != null) {
             Alumno tutor = alumnoRepository.findById(dto.getTutorId())
-                    .orElseThrow(() -> new RuntimeException("Tutor no encontrado con id: " + dto.getTutorId()));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Tutor", dto.getTutorId()));
             alumno.setTutor(tutor);
         } else {
             alumno.setTutor(null);
@@ -68,7 +69,7 @@ public class AlumnoService {
     @Transactional
     public void bajaLogica(Long id) {
         Alumno alumno = alumnoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Alumno no encontrado con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", id));
         alumno.setActivo(false);
         alumnoRepository.save(alumno);
     }
@@ -146,7 +147,7 @@ public class AlumnoService {
 
         if (dto.getGrupoFamiliarId() != null) {
             GrupoFamiliar gf = grupoFamiliarRepository.findById(dto.getGrupoFamiliarId())
-                    .orElseThrow(() -> new RuntimeException("Grupo familiar no encontrado con id: " + dto.getGrupoFamiliarId()));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("GrupoFamiliar", dto.getGrupoFamiliarId()));
             alumno.setGrupoFamiliar(gf);
         } else {
             alumno.setGrupoFamiliar(null);

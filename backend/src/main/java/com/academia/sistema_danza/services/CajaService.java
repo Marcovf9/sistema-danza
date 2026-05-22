@@ -2,6 +2,7 @@ package com.academia.sistema_danza.services;
 
 import com.academia.sistema_danza.dto.DetalleReciboDTO;
 import com.academia.sistema_danza.dto.ReciboResponseDTO;
+import com.academia.sistema_danza.exception.RecursoNoEncontradoException;
 import com.academia.sistema_danza.models.*;
 import com.academia.sistema_danza.models.enums.*;
 import com.academia.sistema_danza.repositories.*;
@@ -28,7 +29,7 @@ public class CajaService {
     @Transactional
     public Recibo generarReciboPendienteMensual(Long alumnoId) {
         Alumno alumno = alumnoRepository.findById(alumnoId)
-                .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", alumnoId));
 
         List<Inscripcion> inscripciones = inscripcionRepository.findByAlumnoIdAndActivoTrue(alumnoId);
         BigDecimal cuotaBase = inscripciones.stream()
@@ -73,10 +74,10 @@ public class CajaService {
     @Transactional
     public Recibo cobrarReciboPendiente(Long reciboId, MetodoPago metodoPago) {
         Recibo recibo = reciboRepository.findById(reciboId)
-                .orElseThrow(() -> new RuntimeException("Recibo no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Recibo", reciboId));
 
         if (recibo.getEstado() == EstadoRecibo.PAGADO) {
-            throw new RuntimeException("Este recibo ya se encuentra pagado.");
+            throw new IllegalArgumentException("Este recibo ya se encuentra pagado.");
         }
 
         BigDecimal totalPagar = recibo.getMontoTotal();
