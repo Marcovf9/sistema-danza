@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
 import { Plus, Eye, Pencil, Trash2, AlertCircle } from 'lucide-react';
 import AlumnoModal from '../../components/admin/AlumnoModal';
@@ -6,55 +7,44 @@ import FichaAlumnoPanel from './FichaAlumnoPanel';
 import toast from 'react-hot-toast';
 
 const AlumnosPage = () => {
-  const [alumnos, setAlumnos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [alumnoAEditar, setAlumnoAEditar] = useState(null);
   const [alumnoEnFicha, setAlumnoEnFicha] = useState(null);
 
-  const fetchAlumnos = async () => {
-    try {
-      const response = await api.get('/alumnos');
-      setAlumnos(response.data.filter(a => a.activo !== false));
-      setAlumnos(response.data);
-    } catch (error) {
-      toast.error("Error cargando alumnos.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ── Carga ──────────────────────────────────────────────────────────────────
+  const { data: alumnos = [], isLoading } = useQuery({
+    queryKey: ['alumnos'],
+    queryFn: () => api.get('/alumnos').then(r => r.data),
+    onError: () => toast.error('Error cargando alumnos.'),
+  });
 
-  useEffect(() => {
-    fetchAlumnos();
-  }, []);
+  // ── Mutaciones ─────────────────────────────────────────────────────────────
+  const guardarMutation = useMutation({
+    mutationFn: (formData) =>
+      alumnoAEditar
+        ? api.put(`/alumnos/${alumnoAEditar.id}`, formData)
+        : api.post('/alumnos', formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumnos'] });
+      toast.success(alumnoAEditar ? '¡Alumno actualizado correctamente!' : '¡Alumno guardado correctamente!');
+      setIsModalOpen(false);
+    },
+    onError: () => toast.error('Hubo un error al guardar los datos del alumno.'),
+  });
 
-  const handleAbrirCrear = () => {
-    setAlumnoAEditar(null);
-    setIsModalOpen(true);
-  };
+  const bajaMutation = useMutation({
+    mutationFn: (id) => api.patch(`/alumnos/${id}/baja`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumnos'] });
+      toast.success('Alumno dado de baja exitosamente.');
+    },
+    onError: () => toast.error('Error al dar de baja al alumno.'),
+  });
 
-  const handleAbrirEditar = (alumno) => {
-    setAlumnoAEditar(alumno);
-    setIsModalOpen(true);
-  };
-
-  const handleGuardarAlumno = async (formData) => {
-    try {
-      if (alumnoAEditar) {
-        // MODO EDICIÓN
-        await api.put(`/alumnos/${alumnoAEditar.id}`, formData);
-        toast.success("¡Alumno actualizado correctamente!");
-      } else {
-        // MODO CREACIÓN
-        await api.post('/alumnos', formData); 
-        toast.success("¡Alumno guardado correctamente!");
-      }
-      setIsModalOpen(false); 
-      fetchAlumnos(); 
-    } catch (error) {
-      toast.error("Hubo un error al guardar los datos del alumno.");
-    }
-  };
+  // ── Handlers ───────────────────────────────────────────────────────────────
+  const handleAbrirCrear = () => { setAlumnoAEditar(null); setIsModalOpen(true); };
+  const handleAbrirEditar = (alumno) => { setAlumnoAEditar(alumno); setIsModalOpen(true); };
 
   const handleDarDeBaja = (id) => {
     toast((t) => (
@@ -70,17 +60,8 @@ const AlumnosPage = () => {
           <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">
             Cancelar
           </button>
-          <button 
-            onClick={async () => {
-              toast.dismiss(t.id);
-              try {
-                await api.patch(`/alumnos/${id}/baja`);
-                toast.success("Alumno dado de baja exitosamente.");
-                fetchAlumnos();
-              } catch (error) {
-                toast.error("Error al dar de baja al alumno.");
-              }
-            }} 
+          <button
+            onClick={() => { toast.dismiss(t.id); bajaMutation.mutate(id); }}
             className="px-4 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-xl shadow-sm transition"
           >
             Sí, dar de baja
@@ -90,6 +71,7 @@ const AlumnosPage = () => {
     ), { duration: Infinity, style: { minWidth: '350px' } });
   };
 
+  // ── UI ─────────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6 relative">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -97,7 +79,7 @@ const AlumnosPage = () => {
           <h2 className="text-2xl font-bold text-gray-800">Gestión de Alumnos</h2>
           <p className="text-sm text-gray-500 mt-1">Administra la información y fichas de los estudiantes.</p>
         </div>
-        <button 
+        <button
           onClick={handleAbrirCrear}
           className="mt-4 sm:mt-0 flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
         >
@@ -106,7 +88,7 @@ const AlumnosPage = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
         ) : (
           <div className="overflow-x-auto">
@@ -149,17 +131,17 @@ const AlumnosPage = () => {
         )}
       </div>
 
-      <AlumnoModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSave={handleGuardarAlumno}
-        alumnoAEditar={alumnoAEditar} 
+      <AlumnoModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={(formData) => guardarMutation.mutate(formData)}
+        alumnoAEditar={alumnoAEditar}
       />
 
-      <FichaAlumnoPanel 
-        isOpen={!!alumnoEnFicha} 
-        onClose={() => setAlumnoEnFicha(null)} 
-        alumno={alumnoEnFicha} 
+      <FichaAlumnoPanel
+        isOpen={!!alumnoEnFicha}
+        onClose={() => setAlumnoEnFicha(null)}
+        alumno={alumnoEnFicha}
       />
     </div>
   );
