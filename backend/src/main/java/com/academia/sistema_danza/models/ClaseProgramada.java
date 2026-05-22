@@ -29,6 +29,10 @@ public class ClaseProgramada {
     @JoinColumn(name = "profesor_titular_id")
     private Profesor profesorTitular;
 
+    @Column(name = "duracion_minutos", nullable = false)
+    @Builder.Default
+    private Integer duracionMinutos = 60;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "salon_id")
     private Salon salon;
