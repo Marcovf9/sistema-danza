@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
-import { GraduationCap, Calculator, Landmark, Plus, Pencil, Trash2, AlertCircle, Download, CheckCircle } from 'lucide-react';
+import { GraduationCap, Calculator, Landmark, Plus, Pencil, Trash2, Download, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ProfesorModal from '../../components/admin/ProfesorModal';
+import LoadingSpinner from '../../components/shared/LoadingSpinner';
+import showConfirmToast from '../../utils/confirmToast';
 
 const ProfesoresPage = () => {
   const queryClient = useQueryClient();
@@ -51,24 +53,11 @@ const ProfesoresPage = () => {
   const handleAbrirEditar = (prof) => { setProfesorAEditar(prof); setIsModalOpen(true); };
 
   const handleDarDeBaja = (id) => {
-    toast((t) => (
-      <div className="flex flex-col gap-3 p-1">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="w-6 h-6 text-red-500" />
-          <p className="font-bold text-gray-800 text-lg">¿Eliminar / Baja?</p>
-        </div>
-        <p className="text-sm text-gray-600">Este profesor ya no tendrá acceso al sistema ni aparecerá en grillas.</p>
-        <div className="flex justify-end gap-2 mt-2">
-          <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">Cancelar</button>
-          <button
-            onClick={() => { toast.dismiss(t.id); bajaMutation.mutate(id); }}
-            className="px-4 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-xl shadow-sm transition"
-          >
-            Confirmar
-          </button>
-        </div>
-      </div>
-    ), { duration: Infinity });
+    showConfirmToast({
+      titulo: '¿Eliminar / Baja?',
+      mensaje: 'Este profesor ya no tendrá acceso al sistema ni aparecerá en grillas.',
+      onConfirm: () => bajaMutation.mutate(id),
+    });
   };
 
   const handleCalcularLiquidacion = async (profesor) => {
@@ -154,7 +143,7 @@ const ProfesoresPage = () => {
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             {isLoading ? (
-              <div className="flex justify-center p-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+              <LoadingSpinner className="flex justify-center p-10" />
             ) : (
               <div className="space-y-3">
                 {profesores.map((prof) => (

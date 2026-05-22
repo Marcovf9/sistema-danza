@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
-import { Plus, Eye, Pencil, Trash2, AlertCircle } from 'lucide-react';
+import { Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import AlumnoModal from '../../components/admin/AlumnoModal';
 import FichaAlumnoPanel from './FichaAlumnoPanel';
+import LoadingSpinner from '../../components/shared/LoadingSpinner';
+import showConfirmToast from '../../utils/confirmToast';
 import toast from 'react-hot-toast';
 
 const AlumnosPage = () => {
@@ -47,28 +49,12 @@ const AlumnosPage = () => {
   const handleAbrirEditar = (alumno) => { setAlumnoAEditar(alumno); setIsModalOpen(true); };
 
   const handleDarDeBaja = (id) => {
-    toast((t) => (
-      <div className="flex flex-col gap-3 p-1">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="w-6 h-6 text-red-500" />
-          <p className="font-bold text-gray-800 text-lg">¿Dar de baja?</p>
-        </div>
-        <p className="text-sm text-gray-600">
-          El alumno pasará a estado inactivo. No perderás su historial. ¿Deseas continuar?
-        </p>
-        <div className="flex justify-end gap-2 mt-2">
-          <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">
-            Cancelar
-          </button>
-          <button
-            onClick={() => { toast.dismiss(t.id); bajaMutation.mutate(id); }}
-            className="px-4 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-xl shadow-sm transition"
-          >
-            Sí, dar de baja
-          </button>
-        </div>
-      </div>
-    ), { duration: Infinity, style: { minWidth: '350px' } });
+    showConfirmToast({
+      titulo: '¿Dar de baja?',
+      mensaje: 'El alumno pasará a estado inactivo. No perderás su historial.',
+      labelOk: 'Sí, dar de baja',
+      onConfirm: () => bajaMutation.mutate(id),
+    });
   };
 
   // ── UI ─────────────────────────────────────────────────────────────────────
@@ -89,7 +75,7 @@ const AlumnosPage = () => {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
-          <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+          <LoadingSpinner />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
