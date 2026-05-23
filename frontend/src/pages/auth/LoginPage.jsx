@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
-import { Lock, Mail, LogIn } from 'lucide-react';
+import { Lock, Mail, LogIn, Eye, EyeOff } from 'lucide-react';
 
 const LoginPage = () => {
   const [credenciales, setCredenciales] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [erroresInput, setErroresInput] = useState({ email: '', password: '' });
   const [cargando, setCargando] = useState(false);
+  const [verPassword, setVerPassword] = useState(false);
   const navigate = useNavigate();
 
   const validarEmail = (email) => {
@@ -157,16 +158,24 @@ const LoginPage = () => {
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
-                  type="password"
+                  type={verPassword ? 'text' : 'password'}
                   name="password"
                   value={credenciales.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   placeholder="••••••••"
-                  className={`w-full pl-10 pr-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm ${
+                  className={`w-full pl-10 pr-10 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm ${
                     erroresInput.password ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-pink-400'
                   }`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setVerPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {verPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {erroresInput.password && (
                 <p className="text-red-500 text-xs font-semibold mt-1.5">{erroresInput.password}</p>
