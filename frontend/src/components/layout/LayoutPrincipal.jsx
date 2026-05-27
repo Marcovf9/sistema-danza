@@ -8,7 +8,7 @@ import {
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
-const LOGO_URL = 'https://res.cloudinary.com/dhmij90ur/image/upload/v1779843641/logoepifania_c8mqu5.jpg';
+const LOGO_URL = 'https://res.cloudinary.com/dhmij90ur/image/upload/v1779844365/Screenshot_2026-05-26_at_10.12.32_PM_l0obxx.png';
 
 const LayoutPrincipal = () => {
   const location = useLocation();
