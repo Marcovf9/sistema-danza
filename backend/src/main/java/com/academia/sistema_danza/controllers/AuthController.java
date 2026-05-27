@@ -42,7 +42,7 @@ public class AuthController {
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
 
             boolean claveCorrecta = false;
-            if (usuario.getPasswordHash().startsWith("$2a$")) {
+            if (usuario.getPasswordHash().startsWith("$2")) {
                 claveCorrecta = passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash());
             } else {
                 claveCorrecta = usuario.getPasswordHash().equals(request.getPassword());
