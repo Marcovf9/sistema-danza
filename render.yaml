@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: epifania-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    # Variables de entorno — valores sensibles se configuran en el dashboard de Render
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false          # Pegar URL de TiDB desde el dashboard
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false          # Generar con: openssl rand -base64 64
+      - key: MAIL_PASSWORD
+        sync: false          # App Password de Gmail
+      - key: APP_FRONTEND_URL
+        sync: false          # https://tu-sitio.netlify.app
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false          # https://tu-sitio.netlify.app

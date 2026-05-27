@@ -1,6 +1,6 @@
 -- 0. SEGURIDAD
 CREATE TABLE usuarios (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     rol VARCHAR(50) NOT NULL,
@@ -9,12 +9,12 @@ CREATE TABLE usuarios (
 
 -- 1. PERSONAS Y DESCUENTOS
 CREATE TABLE grupos_familiares (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre_referencia VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE alumnos (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     dni VARCHAR(20) UNIQUE,
@@ -27,7 +27,7 @@ CREATE TABLE alumnos (
 );
 
 CREATE TABLE profesores (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     usuario_id BIGINT, 
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
@@ -36,20 +36,20 @@ CREATE TABLE profesores (
 
 -- 2. OPERATIVA FÍSICA
 CREATE TABLE salones (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     aforo_maximo INT NOT NULL
 );
 
 CREATE TABLE disciplinas (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
     descripcion VARCHAR(255),
     precio_base DECIMAL(10, 2)
 );
 
 CREATE TABLE clases_programadas (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     disciplina_id BIGINT NOT NULL,
     salon_id BIGINT NOT NULL,
     profesor_titular_id BIGINT NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE clases_programadas (
 );
 
 CREATE TABLE inscripciones (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     alumno_id BIGINT NOT NULL,
     clase_programada_id BIGINT NOT NULL,
     fecha_inscripcion DATE NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE inscripciones (
 );
 
 CREATE TABLE sesiones_clases (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     clase_programada_id BIGINT NOT NULL,
     fecha DATE NOT NULL,
     profesor_dictante_id BIGINT NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE sesiones_clases (
 );
 
 CREATE TABLE asistencias (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sesion_clase_id BIGINT NOT NULL,
     alumno_id BIGINT NOT NULL,
     estado VARCHAR(50) NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE asistencias (
 
 -- 3. FINANCIERO (CAJA Y PAGOS)
 CREATE TABLE recibos (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     alumno_id BIGINT, 
     fecha_emision TIMESTAMP NOT NULL,
     metodo_pago VARCHAR(50) NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE recibos (
 );
 
 CREATE TABLE detalles_recibo (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     recibo_id BIGINT NOT NULL,
     tipo_concepto VARCHAR(50) NOT NULL,
     monto DECIMAL(10, 2) NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE detalles_recibo (
 );
 
 CREATE TABLE liquidaciones_profesores (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     profesor_id BIGINT NOT NULL,
     mes INT NOT NULL,
     anio INT NOT NULL,

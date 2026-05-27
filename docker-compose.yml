@@ -1,19 +1,20 @@
 services:
 
-  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  # ── MySQL (compatible con TiDB en producción) ────────────────────────────────
   db:
-    image: postgres:16-alpine
+    image: mysql:8.0
     container_name: academia_db
     environment:
-      POSTGRES_USER:     ${DB_USER:-admin}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
-      POSTGRES_DB:       ${DB_NAME:-academia_danza}
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER:          ${DB_USER:-admin}
+      MYSQL_PASSWORD:      ${DB_PASSWORD:-password123}
+      MYSQL_DATABASE:      ${DB_NAME:-academia_danza}
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-academia_danza}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USER:-admin}", "-p${DB_PASSWORD:-password123}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -26,13 +27,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE:   prod
-      SPRING_DATASOURCE_URL:    jdbc:postgresql://db:5432/${DB_NAME:-academia_danza}
+      SPRING_PROFILES_ACTIVE:     prod
+      SPRING_DATASOURCE_URL:      jdbc:mysql://db:3306/${DB_NAME:-academia_danza}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${DB_USER:-admin}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-password123}
-      JWT_SECRET:               ${JWT_SECRET:-EstaEsUnaClaveSecretaMuyLargaYSeguraParaNuestraAcademiaEpifaniaDanza2026}
-      MAIL_PASSWORD:            ${MAIL_PASSWORD:-}
-      APP_FRONTEND_URL:         ${APP_FRONTEND_URL:-http://localhost}
+      JWT_SECRET:                 ${JWT_SECRET:-REEMPLAZAR_CON_OPENSSL_rand_base64_64}
+      MAIL_PASSWORD:              ${MAIL_PASSWORD:-}
+      APP_FRONTEND_URL:           ${APP_FRONTEND_URL:-http://localhost}
+      CORS_ALLOWED_ORIGINS:       ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
     depends_on:
       db:
         condition: service_healthy
@@ -49,4 +51,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  mysql_data:
