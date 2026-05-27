@@ -4,7 +4,6 @@ import com.academia.sistema_danza.models.LiquidacionProfesor;
 import com.academia.sistema_danza.models.Recibo;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -13,10 +12,12 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class PdfService {
 
+    private static final String LOGO_URL =
+            "https://res.cloudinary.com/dhmij90ur/image/upload/v1779843641/logoepifania_c8mqu5.jpg";
+
     private Image obtenerLogo() {
         try {
-            ClassPathResource resource = new ClassPathResource("logo.png");
-            Image logo = Image.getInstance(resource.getURL());
+            Image logo = Image.getInstance(new java.net.URL(LOGO_URL));
             logo.scaleToFit(140, 60);
             return logo;
         } catch (Exception e) {
