@@ -187,6 +187,21 @@ public class AcademicoController {
         return disciplinaRepository.findAll();
     }
 
+    @PostMapping("/disciplinas")
+    public ResponseEntity<?> crearDisciplina(@RequestBody Map<String, Object> payload) {
+        String nombre = getString(payload, "nombre", "").trim();
+        if (nombre.isEmpty()) return ResponseEntity.badRequest().body("El nombre es obligatorio.");
+        if (disciplinaRepository.findAll().stream().anyMatch(d -> d.getNombre().equalsIgnoreCase(nombre))) {
+            return ResponseEntity.badRequest().body("Ya existe una disciplina con ese nombre.");
+        }
+        Disciplina d = new Disciplina();
+        d.setNombre(nombre);
+        d.setDescripcion(getString(payload, "descripcion", null));
+        String precio = getString(payload, "precioBase", "");
+        if (!precio.isEmpty()) d.setPrecioBase(new java.math.BigDecimal(precio));
+        return ResponseEntity.ok(disciplinaRepository.save(d));
+    }
+
     // ──────────────────────────────────────────────────
     //  INSCRIPCIONES
     // ──────────────────────────────────────────────────

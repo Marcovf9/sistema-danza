@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, User, Pencil, Plus, GraduationCap, Trash2, BookOpen } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Pencil, Plus, GraduationCap, Trash2, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -60,6 +60,11 @@ const ClasesPage = () => {
   const [isNuevaOpen, setIsNuevaOpen] = useState(false);
   const [nueva, setNueva] = useState({ disciplinaId: '', profesorId: '', salonId: '', diasSemana: '', horaInicio: '09:00', duracionMinutos: 60 });
   const [creando, setCreando] = useState(false);
+
+  // Panel disciplinas
+  const [disciplinasAbiertas, setDisciplinasAbiertas] = useState(false);
+  const [nuevaDisciplina, setNuevaDisciplina] = useState({ nombre: '', descripcion: '', precioBase: '' });
+  const [guardandoDisciplina, setGuardandoDisciplina] = useState(false);
 
   // Modal eliminar
   const [claseAEliminar, setClaseAEliminar] = useState(null);
@@ -153,6 +158,22 @@ const ClasesPage = () => {
     }
   };
 
+  // ── Disciplinas ──
+  const agregarDisciplina = async () => {
+    if (!nuevaDisciplina.nombre.trim()) { toast.error('El nombre es obligatorio.'); return; }
+    setGuardandoDisciplina(true);
+    try {
+      await api.post('/academico/disciplinas', nuevaDisciplina);
+      toast.success(`Disciplina "${nuevaDisciplina.nombre}" agregada.`);
+      setNuevaDisciplina({ nombre: '', descripcion: '', precioBase: '' });
+      cargarDatos();
+    } catch (error) {
+      toast.error(error.response?.data?.error || error.response?.data || 'Error al agregar la disciplina.');
+    } finally {
+      setGuardandoDisciplina(false);
+    }
+  };
+
   // ── Eliminar ──
   const confirmarEliminar = async () => {
     setEliminando(true);
@@ -194,6 +215,64 @@ const ClasesPage = () => {
         >
           <Plus className="w-5 h-5 mr-2" /> Nueva Clase
         </button>
+      </div>
+
+      {/* PANEL DISCIPLINAS */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <button
+          onClick={() => setDisciplinasAbiertas(v => !v)}
+          className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition"
+        >
+          <span className="flex items-center gap-3 font-bold text-gray-700">
+            <BookOpen className="w-5 h-5 text-pink-500" />
+            Disciplinas ({disciplinas.length})
+          </span>
+          {disciplinasAbiertas ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+        </button>
+
+        {disciplinasAbiertas && (
+          <div className="border-t border-gray-100 p-5 space-y-4">
+            {/* Lista existente */}
+            <div className="flex flex-wrap gap-2">
+              {disciplinas.map(d => (
+                <span key={d.id} className="px-3 py-1.5 bg-pink-50 text-pink-700 rounded-lg text-sm font-semibold border border-pink-100">
+                  {d.nombre}
+                </span>
+              ))}
+              {disciplinas.length === 0 && <p className="text-sm text-gray-400">No hay disciplinas aún.</p>}
+            </div>
+
+            {/* Formulario agregar */}
+            <div className="border-t border-gray-100 pt-4">
+              <p className="text-sm font-bold text-gray-600 mb-3">Agregar nueva disciplina</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  placeholder="Nombre *"
+                  value={nuevaDisciplina.nombre}
+                  onChange={e => setNuevaDisciplina(p => ({ ...p, nombre: e.target.value }))}
+                  onKeyDown={e => e.key === 'Enter' && agregarDisciplina()}
+                  className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none text-sm font-medium"
+                />
+                <input
+                  type="text"
+                  placeholder="Descripción (opcional)"
+                  value={nuevaDisciplina.descripcion}
+                  onChange={e => setNuevaDisciplina(p => ({ ...p, descripcion: e.target.value }))}
+                  className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none text-sm font-medium"
+                />
+                <button
+                  onClick={agregarDisciplina}
+                  disabled={guardandoDisciplina}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  {guardandoDisciplina ? 'Agregando...' : 'Agregar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* LISTADO */}
