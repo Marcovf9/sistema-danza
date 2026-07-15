@@ -2,6 +2,7 @@ package com.academia.sistema_danza.controllers;
 
 import com.academia.sistema_danza.exception.RecursoNoEncontradoException;
 import com.academia.sistema_danza.models.*;
+import com.academia.sistema_danza.models.Disciplina;
 import com.academia.sistema_danza.repositories.*;
 import com.academia.sistema_danza.services.ConflictoHorarioService;
 import com.academia.sistema_danza.services.EmailService;
@@ -179,6 +180,11 @@ public class AcademicoController {
     @GetMapping("/salones")
     public List<Salon> obtenerSalones() {
         return salonRepository.findAll();
+    }
+
+    @GetMapping("/disciplinas")
+    public List<Disciplina> obtenerDisciplinas() {
+        return disciplinaRepository.findAll();
     }
 
     // ──────────────────────────────────────────────────
