@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/academico")
@@ -84,12 +85,18 @@ public class AcademicoController {
         ClaseProgramada clase = claseRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Clase", id));
 
-        String diasSemana = clase.getDiasSemana();
+        // Valores originales (para detectar qué cambió)
+        final String diasOriginales = clase.getDiasSemana();
+        final LocalTime horaOriginal = clase.getHoraInicio();
+        final Long salonOriginalId = clase.getSalon() != null ? clase.getSalon().getId() : null;
+        final Long profesorOriginalId = clase.getProfesorTitular() != null ? clase.getProfesorTitular().getId() : null;
+
+        String diasSemana = diasOriginales;
         if (payload.containsKey("diasSemana") && payload.get("diasSemana") != null) {
             diasSemana = payload.get("diasSemana").toString().toUpperCase();
         }
 
-        LocalTime horaInicio = clase.getHoraInicio();
+        LocalTime horaInicio = horaOriginal;
         if (payload.containsKey("horaInicio") && payload.get("horaInicio") != null) {
             horaInicio = LocalTime.parse(payload.get("horaInicio").toString());
         }
@@ -99,13 +106,13 @@ public class AcademicoController {
             duracion = Integer.parseInt(payload.get("duracionMinutos").toString());
         }
 
-        Long salonId = clase.getSalon() != null ? clase.getSalon().getId() : null;
+        Long salonId = salonOriginalId;
         if (payload.containsKey("salonId") && payload.get("salonId") != null
                 && !payload.get("salonId").toString().isEmpty()) {
             salonId = Long.valueOf(payload.get("salonId").toString());
         }
 
-        Long profesorId = clase.getProfesorTitular() != null ? clase.getProfesorTitular().getId() : null;
+        Long profesorId = profesorOriginalId;
         if (payload.containsKey("profesorId")) {
             String profStr = payload.get("profesorId") != null ? payload.get("profesorId").toString() : "";
             profesorId = profStr.isEmpty() ? null : Long.valueOf(profStr);
@@ -114,14 +121,21 @@ public class AcademicoController {
         // Variables efectivamente finales para uso en lambdas
         final Long finalSalonId = salonId;
         final Long finalProfesorId = profesorId;
+        final String finalDias = diasSemana;
+        final LocalTime finalHora = horaInicio;
 
-        // ── Detección de conflictos (excluye la propia clase en edición) ──
-        conflictoHorarioService.verificarConflictoSalon(finalSalonId, diasSemana, horaInicio, duracion, id);
-        conflictoHorarioService.verificarConflictoProfesor(finalProfesorId, diasSemana, horaInicio, duracion, id);
+        // ── Detección de conflictos: solo si cambió el salón, horario o profesor ──
+        boolean horarioCambio = !finalDias.equals(diasOriginales) || !finalHora.equals(horaOriginal);
+        if (horarioCambio || !Objects.equals(finalSalonId, salonOriginalId)) {
+            conflictoHorarioService.verificarConflictoSalon(finalSalonId, finalDias, finalHora, duracion, id);
+        }
+        if (horarioCambio || !Objects.equals(finalProfesorId, profesorOriginalId)) {
+            conflictoHorarioService.verificarConflictoProfesor(finalProfesorId, finalDias, finalHora, duracion, id);
+        }
 
         // Aplicar cambios
-        clase.setDiasSemana(diasSemana);
-        clase.setHoraInicio(horaInicio);
+        clase.setDiasSemana(finalDias);
+        clase.setHoraInicio(finalHora);
         clase.setDuracionMinutos(duracion);
 
         if (finalSalonId != null) {

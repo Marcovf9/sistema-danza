@@ -85,7 +85,7 @@ const ClasesPage = () => {
       setIsModalOpen(false);
       cargarDatos();
     } catch (error) {
-      toast.error(error.response?.data || "Error al actualizar la clase.");
+      toast.error(error.response?.data?.error || "Error al actualizar la clase.");
     } finally {
       setGuardando(false);
     }
