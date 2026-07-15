@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, User, Pencil, Plus, GraduationCap } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Pencil, Plus, GraduationCap, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -18,6 +18,8 @@ const ClasesPage = () => {
   const [cargando, setCargando] = useState(true);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [claseAEliminar, setClaseAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
   const [claseAEditar, setClaseAEditar] = useState(null);
   const [nuevoProfesorId, setNuevoProfesorId] = useState('');
   const [nuevosDias, setNuevosDias] = useState('');
@@ -72,6 +74,20 @@ const ClasesPage = () => {
     setIsModalOpen(true);
   };
 
+  const confirmarEliminar = async () => {
+    setEliminando(true);
+    try {
+      await api.delete(`/academico/clases/${claseAEliminar.id}`);
+      toast.success("Clase eliminada correctamente.");
+      setClaseAEliminar(null);
+      cargarDatos();
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Error al eliminar la clase.");
+    } finally {
+      setEliminando(false);
+    }
+  };
+
   const guardarCambios = async () => {
     setGuardando(true);
     try {
@@ -117,13 +133,22 @@ const ClasesPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {clases.map(clase => (
             <div key={clase.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative group hover:border-pink-300 transition-colors">
-              <button 
-                onClick={() => abrirEditor(clase)}
-                className="absolute top-4 right-4 p-2 bg-pink-50 text-pink-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-pink-600 hover:text-white"
-                title="Editar Profesor y Horarios"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
+              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => abrirEditor(clase)}
+                  className="p-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-600 hover:text-white transition"
+                  title="Editar clase"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setClaseAEliminar(clase)}
+                  className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition"
+                  title="Eliminar clase"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
 
               <div className="mb-4">
                 <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-black tracking-widest uppercase mb-2">
@@ -149,6 +174,27 @@ const ClasesPage = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN ELIMINAR */}
+      {claseAEliminar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
+            <div className="bg-red-500 p-6 text-white">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Trash2 className="w-5 h-5" /> Eliminar Clase</h3>
+              <p className="text-red-100 text-sm">{claseAEliminar.disciplina?.nombre}</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-gray-700">¿Estás segura de que querés eliminar esta clase? Se borrarán también todas las inscripciones y sesiones registradas.</p>
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => setClaseAEliminar(null)} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">Cancelar</button>
+                <button onClick={confirmarEliminar} disabled={eliminando} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition disabled:bg-gray-400">
+                  {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

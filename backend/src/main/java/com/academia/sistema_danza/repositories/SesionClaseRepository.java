@@ -12,4 +12,6 @@ import java.util.List;
 public interface SesionClaseRepository extends JpaRepository<SesionClase, Long> {
     @Query("SELECT s FROM SesionClase s WHERE s.profesorDictante.id = :profesorId AND MONTH(s.fecha) = :mes AND YEAR(s.fecha) = :anio")
     List<SesionClase> findByProfesorDictanteIdAndMesAnio(@Param("profesorId") Long profesorId, @Param("mes") int mes, @Param("anio") int anio);
+
+    List<SesionClase> findByClaseProgramadaId(Long claseProgramadaId);
 }

@@ -28,6 +28,8 @@ public class AcademicoController {
     private final ProfesorRepository profesorRepository;
     private final SalonRepository salonRepository;
     private final DisciplinaRepository disciplinaRepository;
+    private final SesionClaseRepository sesionClaseRepository;
+    private final AsistenciaRepository asistenciaRepository;
     private final ConflictoHorarioService conflictoHorarioService;
     private final EmailService emailService;
 
@@ -153,6 +155,21 @@ public class AcademicoController {
         }
 
         return ResponseEntity.ok(claseRepository.save(clase));
+    }
+
+    @DeleteMapping("/clases/{id}")
+    @Transactional
+    public ResponseEntity<?> eliminarClase(@PathVariable Long id) {
+        if (!claseRepository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Clase", id);
+        }
+        // Eliminar en orden: asistencias → sesiones → inscripciones → clase
+        sesionClaseRepository.findByClaseProgramadaId(id)
+                .forEach(s -> asistenciaRepository.deleteBySesionClaseId(s.getId()));
+        sesionClaseRepository.deleteAll(sesionClaseRepository.findByClaseProgramadaId(id));
+        inscripcionRepository.deleteByClaseId(id);
+        claseRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     // ──────────────────────────────────────────────────
