@@ -72,6 +72,7 @@ function App() {
           <Route path="auditoria" element={<RutaProtegida rolesPermitidos={['DIRECTOR']}><AuditoriaPage /></RutaProtegida>} />
           <Route path="profesor/agenda" element={<RutaProtegida rolesPermitidos={['PROFESOR']}><AgendaProfesorPage /></RutaProtegida>} />
           <Route path="clases" element={<RutaProtegida rolesPermitidos={['DIRECTOR']}><ClasesPage /></RutaProtegida>} />
+          <Route path="tienda" element={<RutaProtegida rolesPermitidos={['DIRECTOR']}><TiendaPage /></RutaProtegida>} />
           <Route path="asistencia" element={<RutaProtegida rolesPermitidos={['DIRECTOR', 'PROFESOR']}><AsistenciaPage /></RutaProtegida>} />
           <Route path="calendario" element={<RutaProtegida rolesPermitidos={['DIRECTOR', 'PROFESOR']}><CalendarioPage /></RutaProtegida>} />
 

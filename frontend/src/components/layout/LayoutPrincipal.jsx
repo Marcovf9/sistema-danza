@@ -54,6 +54,7 @@ const LayoutPrincipal = () => {
     { path: '/caja',            label: 'Caja y Cobros',  icon: Wallet,          roles: ['DIRECTOR'] },
     { path: '/profesores',      label: 'Profesores',     icon: GraduationCap,   roles: ['DIRECTOR'] },
     { path: '/clases',          label: 'Clases',         icon: Calendar,        roles: ['DIRECTOR'] },
+    { path: '/tienda',          label: 'Tienda',         icon: ShoppingBag,     roles: ['DIRECTOR'] },
     { path: '/auditoria',       label: 'Auditoría',      icon: ShieldCheck,     roles: ['DIRECTOR'] },
 
     { path: '/profesor/agenda', label: 'Mi Agenda',      icon: BookOpen,        roles: ['PROFESOR'] },
