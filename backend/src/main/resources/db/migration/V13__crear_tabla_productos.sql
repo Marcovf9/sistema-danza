@@ -1,5 +1,5 @@
 CREATE TABLE productos (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
     descripcion VARCHAR(255),
     precio DECIMAL(10, 2) NOT NULL,

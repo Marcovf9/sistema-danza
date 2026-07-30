@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> {
     List<Inscripcion> findByAlumnoIdAndActivoTrue(Long alumnoId);
+    void deleteByClaseId(Long claseId);
 }

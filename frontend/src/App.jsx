@@ -7,6 +7,8 @@ import CajaPage from './pages/admin/CajaPage';
 import ProfesoresPage from './pages/profesor/ProfesoresPage';
 import AsistenciaPage from './pages/admin/AsistenciaPage';
 import LoginPage from './pages/auth/LoginPage';
+import OlvidePasswordPage from './pages/auth/OlvidePasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import CalendarioPage from './pages/admin/CalendarioPage';
 import AgendaProfesorPage from './pages/profesor/AgendaProfesorPage';
 import AuditoriaPage from './pages/admin/AuditoriaPage';
@@ -51,6 +53,8 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/olvide-password" element={<OlvidePasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/" element={<RutaProtegida><LayoutPrincipal /></RutaProtegida>}>
           
           <Route index element={
@@ -68,12 +72,15 @@ function App() {
           <Route path="auditoria" element={<RutaProtegida rolesPermitidos={['DIRECTOR']}><AuditoriaPage /></RutaProtegida>} />
           <Route path="profesor/agenda" element={<RutaProtegida rolesPermitidos={['PROFESOR']}><AgendaProfesorPage /></RutaProtegida>} />
           <Route path="clases" element={<RutaProtegida rolesPermitidos={['DIRECTOR']}><ClasesPage /></RutaProtegida>} />
+          <Route path="tienda" element={<RutaProtegida rolesPermitidos={['DIRECTOR']}><TiendaPage /></RutaProtegida>} />
           <Route path="asistencia" element={<RutaProtegida rolesPermitidos={['DIRECTOR', 'PROFESOR']}><AsistenciaPage /></RutaProtegida>} />
           <Route path="calendario" element={<RutaProtegida rolesPermitidos={['DIRECTOR', 'PROFESOR']}><CalendarioPage /></RutaProtegida>} />
 
+          {/* RUTAS DEL ALUMNO */}
           <Route path="alumno/cuenta" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="CUENTA" /></RutaProtegida>} />
           <Route path="alumno/clases" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="CLASES" /></RutaProtegida>} />
           <Route path="alumno/tienda" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="TIENDA" /></RutaProtegida>} />
+          <Route path="alumno/grilla" element={<RutaProtegida rolesPermitidos={['ALUMNO']}><PortalAlumnoPage vista="GRILLA" /></RutaProtegida>} />
         
         </Route>
       </Routes>

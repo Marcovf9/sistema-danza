@@ -3,6 +3,7 @@ package com.academia.sistema_danza.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -11,9 +12,12 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET = "EstaEsUnaClaveSecretaMuyLargaYSeguraParaNuestraAcademiaEpifaniaDanza2026";
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private final Key SECRET_KEY;
     private static final long EXPIRATION_TIME_MS = 86400000; // 24 horas
+
+    public JwtService(@Value("${jwt.secret}") String secret) {
+        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public String generarToken(String email, String rol, Long profesorId) {
         return Jwts.builder()

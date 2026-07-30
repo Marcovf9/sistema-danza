@@ -99,9 +99,9 @@ const AsistenciaPage = () => {
     return (
       <div className="max-w-lg mx-auto bg-white min-h-[80vh] shadow-xl sm:rounded-3xl flex flex-col relative overflow-hidden border border-gray-100 animate-in fade-in duration-300">
         
-        <div className="bg-indigo-600 p-6 text-white shadow-md z-10">
+        <div className="bg-pink-600 p-6 text-white shadow-md z-10">
           <div className="flex justify-between items-center mb-4">
-            <button onClick={() => setClaseSeleccionada(null)} className="text-indigo-200 hover:text-white font-medium text-sm flex items-center transition">
+            <button onClick={() => setClaseSeleccionada(null)} className="text-pink-200 hover:text-white font-medium text-sm flex items-center transition">
                 <ArrowLeft className="w-4 h-4 mr-1" /> Volver
             </button>
             <input 
@@ -109,28 +109,28 @@ const AsistenciaPage = () => {
               max={maxDate}
               value={fechaAsistencia}
               onChange={(e) => setFechaAsistencia(e.target.value)}
-              className="bg-indigo-500/50 border border-indigo-400 text-white rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors"
+              className="bg-pink-500/50 border border-pink-400 text-white rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-white cursor-pointer transition-colors"
               style={{ colorScheme: 'dark' }}
             />
           </div>
           <h2 className="text-2xl font-bold">{claseSeleccionada.disciplina.nombre}</h2>
-          <p className="text-indigo-200 flex items-center mt-1 text-sm">
+          <p className="text-pink-200 flex items-center mt-1 text-sm">
             <Clock className="w-4 h-4 mr-1" /> {claseSeleccionada.horaInicio.slice(0,5)}hs
           </p>
         </div>
 
-        <div className="bg-indigo-50 p-4 border-b border-indigo-100 flex justify-between items-center">
-          <span className="text-indigo-800 font-medium flex items-center">
+        <div className="bg-pink-50 p-4 border-b border-pink-100 flex justify-between items-center">
+          <span className="text-pink-800 font-medium flex items-center">
             <Users className="w-4 h-4 mr-2" /> {alumnosLista.length} Inscritos
           </span>
-          <span className="bg-white px-3 py-1 rounded-lg text-indigo-700 font-bold shadow-sm text-sm">
+          <span className="bg-white px-3 py-1 rounded-lg text-pink-700 font-bold shadow-sm text-sm">
             {presentesCount} Presentes
           </span>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
           {cargandoLista ? (
-            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div></div>
           ) : alumnosLista.length === 0 ? (
             <div className="text-center p-8 text-gray-400">No hay alumnos inscritos en esta clase.</div>
           ) : (
@@ -172,7 +172,7 @@ const AsistenciaPage = () => {
               <button 
                 onClick={handleGuardar}
                 disabled={guardando}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white text-lg font-bold rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center"
+                className="w-full py-4 bg-pink-600 hover:bg-pink-700 disabled:bg-gray-300 text-white text-lg font-bold rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center"
               >
                 {guardando ? 'Guardando...' : <><Save className="w-5 h-5 mr-2" /> Confirmar Asistencia</>}
               </button>
@@ -218,18 +218,18 @@ const AsistenciaPage = () => {
             <div 
               key={clase.id} 
               onClick={() => setClaseSeleccionada(clase)}
-              className="bg-white p-6 rounded-2xl shadow-sm border border-indigo-100 hover:shadow-md hover:border-indigo-300 cursor-pointer transition-all group"
+              className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100 hover:shadow-md hover:border-pink-300 cursor-pointer transition-all group"
             >
               <div className="flex justify-between items-start mb-4">
-                <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg text-sm font-bold">
+                <span className="bg-pink-50 text-pink-700 px-3 py-1 rounded-lg text-sm font-bold">
                   {clase.horaInicio.slice(0,5)}hs
                 </span>
-                <Users className="w-5 h-5 text-gray-400 group-hover:text-indigo-500 transition-colors" />
+                <Users className="w-5 h-5 text-gray-400 group-hover:text-pink-500 transition-colors" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-1">{clase.disciplina.nombre}</h3>
               <p className="text-gray-500 text-sm">Salón: {clase.salon?.nombre || 'General'}</p>
               
-              <div className="mt-6 w-full py-2.5 bg-gray-50 group-hover:bg-indigo-600 group-hover:text-white text-center rounded-xl font-medium text-gray-600 transition-colors">
+              <div className="mt-6 w-full py-2.5 bg-gray-50 group-hover:bg-pink-600 group-hover:text-white text-center rounded-xl font-medium text-gray-600 transition-colors">
                 Pasar Lista 
               </div>
             </div>

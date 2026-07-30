@@ -1,9 +1,13 @@
 package com.academia.sistema_danza.services;
 
+import com.academia.sistema_danza.dto.DetalleReciboDTO;
+import com.academia.sistema_danza.dto.ReciboResponseDTO;
+import com.academia.sistema_danza.exception.RecursoNoEncontradoException;
 import com.academia.sistema_danza.models.*;
 import com.academia.sistema_danza.models.enums.*;
 import com.academia.sistema_danza.repositories.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,8 +15,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CajaService {
@@ -24,7 +31,7 @@ public class CajaService {
     @Transactional
     public Recibo generarReciboPendienteMensual(Long alumnoId) {
         Alumno alumno = alumnoRepository.findById(alumnoId)
-                .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", alumnoId));
 
         List<Inscripcion> inscripciones = inscripcionRepository.findByAlumnoIdAndActivoTrue(alumnoId);
         BigDecimal cuotaBase = inscripciones.stream()
@@ -35,13 +42,32 @@ public class CajaService {
             throw new RuntimeException("El alumno no tiene inscripciones activas con costo.");
         }
 
-        Recibo recibo = Recibo.builder()
-                .alumno(alumno)
-                .fechaEmision(LocalDateTime.now())
-                .estado(EstadoRecibo.PENDIENTE)
-                .metodoPago(null)
-                .detalles(new ArrayList<>())
-                .build();
+        int mesActual = LocalDate.now().getMonthValue();
+        int anioActual = LocalDate.now().getYear();
+
+        Recibo recibo = reciboRepository.findAll().stream()
+                .filter(r -> r.getAlumno().getId().equals(alumnoId) &&
+                             r.getFechaEmision().getMonthValue() == mesActual &&
+                             r.getFechaEmision().getYear() == anioActual)
+                .findFirst()
+                .orElse(null);
+
+        if (recibo != null && recibo.getEstado() == EstadoRecibo.PAGADO) {
+            log.info("El alumno {} ya tiene su recibo mensual pagado. Se omite duplicación.", alumno.getNombre());
+            return recibo;
+        }
+
+        if (recibo == null) {
+            recibo = Recibo.builder()
+                    .alumno(alumno)
+                    .fechaEmision(LocalDateTime.now())
+                    .estado(EstadoRecibo.PENDIENTE)
+                    .metodoPago(null)
+                    .detalles(new ArrayList<>())
+                    .build();
+        } else {
+            recibo.getDetalles().clear();
+        }
 
         BigDecimal totalPagar = BigDecimal.ZERO;
 
@@ -69,19 +95,13 @@ public class CajaService {
     @Transactional
     public Recibo cobrarReciboPendiente(Long reciboId, MetodoPago metodoPago) {
         Recibo recibo = reciboRepository.findById(reciboId)
-                .orElseThrow(() -> new RuntimeException("Recibo no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Recibo", reciboId));
 
         if (recibo.getEstado() == EstadoRecibo.PAGADO) {
-            throw new RuntimeException("Este recibo ya se encuentra pagado.");
+            throw new IllegalArgumentException("Este recibo ya se encuentra pagado.");
         }
 
         BigDecimal totalPagar = recibo.getMontoTotal();
-
-        if (LocalDate.now().getDayOfMonth() > 10) {
-            BigDecimal recargoMora = totalPagar.multiply(new BigDecimal("0.05"));
-            recibo.getDetalles().add(crearDetalle(recibo, TipoConcepto.RECARGO_MORA_5, recargoMora));
-            totalPagar = totalPagar.add(recargoMora);
-        }
 
         if (metodoPago == MetodoPago.TARJETA_CREDITO) {
             BigDecimal recargoTarjeta = totalPagar.multiply(new BigDecimal("0.10"));
@@ -94,6 +114,31 @@ public class CajaService {
         recibo.setEstado(EstadoRecibo.PAGADO);
 
         return reciboRepository.save(recibo);
+    }
+
+    public ReciboResponseDTO toReciboDTO(Recibo recibo) {
+        List<DetalleReciboDTO> detallesDTO = (recibo.getDetalles() != null)
+                ? recibo.getDetalles().stream()
+                        .map(d -> DetalleReciboDTO.builder()
+                                .id(d.getId())
+                                .tipoConcepto(d.getTipoConcepto())
+                                .monto(d.getMonto())
+                                .mesImputacion(d.getMesImputacion())
+                                .build())
+                        .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        return ReciboResponseDTO.builder()
+                .id(recibo.getId())
+                .alumnoId(recibo.getAlumno() != null ? recibo.getAlumno().getId() : null)
+                .alumnoNombre(recibo.getAlumno() != null ? recibo.getAlumno().getNombre() : null)
+                .alumnoApellido(recibo.getAlumno() != null ? recibo.getAlumno().getApellido() : null)
+                .fechaEmision(recibo.getFechaEmision())
+                .estado(recibo.getEstado())
+                .metodoPago(recibo.getMetodoPago())
+                .montoTotal(recibo.getMontoTotal())
+                .detalles(detallesDTO)
+                .build();
     }
 
     private DetalleRecibo crearDetalle(Recibo recibo, TipoConcepto concepto, BigDecimal monto) {

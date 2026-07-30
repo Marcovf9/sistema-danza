@@ -63,7 +63,7 @@ const CalendarioPage = () => {
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl mr-4">
+          <div className="p-3 bg-pink-50 text-pink-600 rounded-2xl mr-4">
             <Calendar className="w-8 h-8" />
           </div>
           <div>
@@ -78,7 +78,7 @@ const CalendarioPage = () => {
           <div className="min-w-[900px] grid grid-cols-7 border-b border-gray-100 bg-gray-50/50">
             <div className="p-3 border-r border-gray-100 text-[11px] font-bold text-gray-400 text-center uppercase">Hora</div>
             {dias.map(d => (
-              <div key={d} className="p-3 border-r border-gray-100 text-xs font-black text-indigo-900 text-center uppercase tracking-tighter">
+              <div key={d} className="p-3 border-r border-gray-100 text-xs font-black text-pink-900 text-center uppercase tracking-tighter">
                 {d}
               </div>
             ))}
@@ -113,8 +113,8 @@ const CalendarioPage = () => {
                       style={{ top: `${offset + 4}px`, height: '56px' }}
                       className={`absolute left-1 right-1 rounded-xl p-2 shadow-sm cursor-pointer transition-all hover:scale-105 hover:shadow-md hover:z-10 overflow-hidden border-l-[3px] ${
                         esSuClase 
-                          ? 'bg-indigo-600 border-indigo-900 text-white' 
-                          : 'bg-indigo-50 border-indigo-400 text-indigo-900'
+                          ? 'bg-pink-600 border-pink-900 text-white' 
+                          : 'bg-pink-50 border-pink-400 text-pink-900'
                       }`}
                     >
                       <p className="text-[10px] leading-tight font-black uppercase truncate">{clase.disciplina?.nombre}</p>
@@ -136,10 +136,10 @@ const CalendarioPage = () => {
       {claseDetalle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in duration-200">
-            <div className="p-6 bg-indigo-600 text-white flex justify-between items-center">
+            <div className="p-6 bg-pink-600 text-white flex justify-between items-center">
               <div>
                 <h3 className="text-xl font-black">{claseDetalle.clase.disciplina?.nombre}</h3>
-                <p className="text-indigo-100 flex items-center text-sm font-medium mt-1">
+                <p className="text-pink-100 flex items-center text-sm font-medium mt-1">
                   <User className="w-4 h-4 mr-1" /> Prof. {claseDetalle.clase.profesorTitular?.nombre} {claseDetalle.clase.profesorTitular?.apellido}
                 </p>
               </div>
@@ -178,7 +178,7 @@ const CalendarioPage = () => {
                     {claseDetalle.alumnos.map((a, idx) => (
                       <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                         <span className="font-bold text-gray-700 text-sm">{a.nombre}</span>
-                        <span className="text-xs text-indigo-600 font-mono">{a.telefono}</span>
+                        <span className="text-xs text-pink-600 font-mono">{a.telefono}</span>
                       </div>
                     ))}
                   </div>

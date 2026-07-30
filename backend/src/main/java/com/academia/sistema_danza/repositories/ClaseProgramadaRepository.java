@@ -11,5 +11,6 @@ import java.util.List;
 public interface ClaseProgramadaRepository extends JpaRepository<ClaseProgramada, Long> {
     List<ClaseProgramada> findByDiasSemana(String diaSemana);
     List<ClaseProgramada> findByProfesorTitularId(Long profesorId);
+    List<ClaseProgramada> findBySalonId(Long salonId);
     List<ClaseProgramada> findBySalonIdAndHoraInicio(Long salonId, LocalTime horaInicio);
 }

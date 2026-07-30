@@ -1,5 +1,5 @@
 CREATE TABLE auditoria_logs (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     fecha TIMESTAMP NOT NULL,
     usuario_email VARCHAR(255) NOT NULL,
     accion VARCHAR(100) NOT NULL,

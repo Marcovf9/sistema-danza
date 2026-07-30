@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
     long countBySesionClaseIdAndEstado(Long sesionClaseId, EstadoAsistencia estado);
+    void deleteBySesionClaseId(Long sesionClaseId);
 }

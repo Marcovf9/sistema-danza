@@ -1,0 +1,1 @@
+ALTER TABLE alumnos ADD COLUMN barrio VARCHAR(100);

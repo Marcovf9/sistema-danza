@@ -69,34 +69,34 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Apellido *</label>
-              <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">CBU o Alias (Para sueldos)</label>
-            <input type="text" name="cbuAlias" value={formData.cbuAlias} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+            <input type="text" name="cbuAlias" value={formData.cbuAlias} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
           </div>
 
           <div className="border-t border-gray-100 pt-5 mt-2">
-            <h3 className="text-sm font-bold text-indigo-600 mb-3 uppercase tracking-wider">Acceso al Sistema</h3>
+            <h3 className="text-sm font-bold text-pink-600 mb-3 uppercase tracking-wider">Acceso al Sistema</h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña {profesorAEditar && <span className="text-gray-400 font-normal">(Dejar vacía para no cambiar)</span>}</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
             <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl font-medium">Cancelar</button>
-            <button type="submit" className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow-sm">
+            <button type="submit" className="px-6 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium shadow-sm">
               {profesorAEditar ? 'Actualizar' : 'Crear Perfil'}
             </button>
           </div>

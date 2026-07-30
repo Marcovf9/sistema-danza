@@ -89,10 +89,10 @@ const ProductoModal = ({ isOpen, onClose, onSave, productoAEditar }) => {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in duration-200">
         
-        <div className="bg-indigo-600 p-6 text-white flex justify-between items-center">
+        <div className="bg-pink-600 p-6 text-white flex justify-between items-center">
           <div>
             <h3 className="text-xl font-bold">{productoAEditar ? 'Editar Producto' : 'Nuevo Producto'}</h3>
-            <p className="text-indigo-200 text-sm">Catálogo de Epifania Dance</p>
+            <p className="text-pink-200 text-sm">Catálogo de Epifania Dance</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
             <X className="w-6 h-6" />
@@ -115,8 +115,8 @@ const ProductoModal = ({ isOpen, onClose, onSave, productoAEditar }) => {
               ))}
               
               {formData.imagenes.length < 4 && (
-                <label className={`w-20 h-20 border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center justify-center text-indigo-400 cursor-pointer hover:bg-indigo-50 hover:border-indigo-400 transition-colors ${procesandoImagenes ? 'opacity-50 pointer-events-none' : ''}`}>
-                  {procesandoImagenes ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-500"></div> : <ImagePlus className="w-6 h-6" />}
+                <label className={`w-20 h-20 border-2 border-dashed border-pink-200 rounded-xl flex flex-col items-center justify-center text-pink-400 cursor-pointer hover:bg-pink-50 hover:border-pink-400 transition-colors ${procesandoImagenes ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {procesandoImagenes ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-pink-500"></div> : <ImagePlus className="w-6 h-6" />}
                   <input type="file" multiple accept="image/*" onChange={handleSubirImagenes} className="hidden" disabled={procesandoImagenes} />
                 </label>
               )}
@@ -127,7 +127,7 @@ const ProductoModal = ({ isOpen, onClose, onSave, productoAEditar }) => {
             <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Nombre del Artículo *</label>
             <div className="relative">
               <Tag className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <input type="text" required value={formData.nombre} onChange={(e) => setFormData({...formData, nombre: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ej: Remera Epifania Talle M" />
+              <input type="text" required value={formData.nombre} onChange={(e) => setFormData({...formData, nombre: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500" placeholder="Ej: Remera Epifania Talle M" />
             </div>
           </div>
 
@@ -136,21 +136,21 @@ const ProductoModal = ({ isOpen, onClose, onSave, productoAEditar }) => {
               <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Precio ($) *</label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <input type="number" required min="0" step="0.01" value={formData.precio} onChange={(e) => setFormData({...formData, precio: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
+                <input type="number" required min="0" step="0.01" value={formData.precio} onChange={(e) => setFormData({...formData, precio: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Stock *</label>
               <div className="relative">
                 <Package className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <input type="number" required min="0" value={formData.stock} onChange={(e) => setFormData({...formData, stock: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
+                <input type="number" required min="0" value={formData.stock} onChange={(e) => setFormData({...formData, stock: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500" />
               </div>
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Categoría *</label>
-            <select value={formData.categoria} onChange={(e) => setFormData({...formData, categoria: e.target.value})} className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-gray-700">
+            <select value={formData.categoria} onChange={(e) => setFormData({...formData, categoria: e.target.value})} className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 font-medium text-gray-700">
               <option value="INDUMENTARIA">Indumentaria</option>
               <option value="EVENTOS">Eventos / Entradas</option>
               <option value="MERCHANDISING">Merchandising / Accesorios</option>
@@ -162,13 +162,13 @@ const ProductoModal = ({ isOpen, onClose, onSave, productoAEditar }) => {
             <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Descripción <span className="font-normal">(Opcional)</span></label>
             <div className="relative">
               <AlignLeft className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <textarea value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 resize-none" rows="2" placeholder="Detalles del producto..." />
+              <textarea value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 resize-none" rows="2" placeholder="Detalles del producto..." />
             </div>
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-gray-100">
             <button type="button" onClick={onClose} className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-2xl transition">Cancelar</button>
-            <button type="submit" disabled={procesandoImagenes} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 transition disabled:bg-gray-400 active:scale-95">Guardar Producto</button>
+            <button type="submit" disabled={procesandoImagenes} className="flex-1 py-3 bg-pink-600 text-white font-bold rounded-2xl shadow-lg hover:bg-pink-700 transition disabled:bg-gray-400 active:scale-95">Guardar Producto</button>
           </div>
 
         </form>

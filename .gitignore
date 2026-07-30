@@ -12,5 +12,15 @@ frontend/node_modules/
 frontend/dist/
 frontend/.eslintcache
 
+# Variables de entorno con secrets — NUNCA commitear
+.env
+.env.local
+.env.*.local
+frontend/.env
+frontend/.env.local
+
 # Mac (Archivos ocultos del sistema)
 .DS_Store
+# Worktrees de Claude (carpetas de trabajo internas)
+.claude/
+.claire/
