@@ -1,77 +1,77 @@
-# Epifanía Dance — Sistema de Gestión
+# Epifanía Dance — Management System
 
-> Plataforma ERP completa para la academia de danza Epifanía Dance: gestión de alumnos, clases, cobros, profesores, asistencias y tienda, con portales diferenciados por rol.
+> Full ERP platform for the Epifanía Dance school: student, class, payment, teacher, attendance and shop management, with role-specific portals.
 
-**Producción:** [epifaniadanceapp.com](https://epifaniadanceapp.com)
-
----
-
-## Roles y funcionalidades
-
-### 🎓 Directora
-| Módulo | Funcionalidades |
-|--------|----------------|
-| Dashboard | Métricas en tiempo real: alumnos activos, ingresos del mes, asistencia |
-| Alumnos | Alta, edición, baja lógica, historial de pagos, acceso al portal |
-| Clases | Crear, editar y eliminar clases; asignar profesores y salones; gestión de disciplinas |
-| Profesores | Alta, edición, baja; liquidaciones mensuales; portal docente |
-| Caja y Cobros | Registro de pagos, generación de recibos PDF, egresos, historial |
-| Asistencias | Vista y registro de asistencias por clase y fecha |
-| Calendario | Grilla horaria semanal con todas las clases |
-| Tienda | Inventario de productos: crear, editar, dar de baja; control de stock |
-| Auditoría | Registro de acciones críticas del sistema |
-
-### 👩‍🏫 Profesor/a
-| Módulo | Funcionalidades |
-|--------|----------------|
-| Mi Agenda | Clases asignadas, sesiones del día |
-| Asistencias | Tomar asistencia de sus clases |
-| Grilla Horaria | Visualización del calendario semanal |
-
-### 🩰 Alumno/a
-| Módulo | Funcionalidades |
-|--------|----------------|
-| Mi Cuenta | Estado de cuenta, historial de pagos, recibos |
-| Mis Clases | Clases inscriptas, horarios |
-| Grilla Horaria | Calendario de la academia |
-| Tienda | Catálogo y carrito de compras |
+**Production:** [epifaniadanceapp.com](https://epifaniadanceapp.com)
 
 ---
 
-## Stack tecnológico
+## Roles and features
+
+### 🎓 Director
+| Module | Features |
+|--------|----------|
+| Dashboard | Real-time metrics: active students, monthly revenue, attendance |
+| Students | Create, edit, soft-delete, payment history, portal access |
+| Classes | Create, edit and delete classes; assign teachers and studios; discipline management |
+| Teachers | Create, edit, deactivate; monthly payouts; teacher portal |
+| Cash & Payments | Payment logging, PDF receipt generation, expenses, history |
+| Attendance | View and record attendance by class and date |
+| Calendar | Weekly timetable grid with every class |
+| Shop | Product inventory: create, edit, deactivate; stock control |
+| Audit log | Record of critical system actions |
+
+### 👩‍🏫 Teacher
+| Module | Features |
+|--------|----------|
+| My Schedule | Assigned classes, sessions for the day |
+| Attendance | Take attendance for their own classes |
+| Timetable | Weekly calendar view |
+
+### 🩰 Student
+| Module | Features |
+|--------|----------|
+| My Account | Account status, payment history, receipts |
+| My Classes | Enrolled classes, schedules |
+| Timetable | School calendar |
+| Shop | Catalogue and shopping cart |
+
+---
+
+## Tech stack
 
 ### Frontend
 - **React 18** + **Vite 8**
-- **Tailwind CSS** — diseño responsive con sidebar colapsable en mobile
-- **React Router v6** — rutas protegidas por rol (DIRECTOR / PROFESOR / ALUMNO)
-- **Axios** — cliente HTTP con interceptor JWT
-- **lucide-react** — iconografía
-- **react-hot-toast** — notificaciones
+- **Tailwind CSS** — responsive design with a collapsible sidebar on mobile
+- **React Router v6** — role-protected routes (DIRECTOR / TEACHER / STUDENT)
+- **Axios** — HTTP client with JWT interceptor
+- **lucide-react** — iconography
+- **react-hot-toast** — notifications
 
 ### Backend
 - **Java 21** + **Spring Boot 3**
-- **Spring Security** — autenticación stateless con JWT
+- **Spring Security** — stateless authentication with JWT
 - **Spring Data JPA** + **Hibernate**
-- **Flyway** — migraciones versionadas (V1–V22)
-- **iText** — generación de recibos en PDF
-- **JavaMail** — envío de emails (recuperación de contraseña)
+- **Flyway** — versioned migrations (V1–V22)
+- **iText** — PDF receipt generation
+- **JavaMail** — email delivery (password recovery)
 
-### Base de datos
+### Database
 - **MySQL 8.0** (local / Docker)
-- **TiDB Cloud** (producción) — serverless, compatible con MySQL
+- **TiDB Cloud** (production) — serverless, MySQL-compatible
 
-### Infraestructura
-| Servicio | Uso |
-|----------|-----|
-| **Netlify** | Deploy del frontend (SPA) |
-| **Render** | Deploy del backend (Docker) |
-| **TiDB Cloud** | Base de datos en producción |
-| **Cloudinary** | Hosting de imágenes del logo |
-| **Gmail SMTP** | Envío de emails transaccionales |
+### Infrastructure
+| Service | Purpose |
+|---------|---------|
+| **Netlify** | Frontend deployment (SPA) |
+| **Render** | Backend deployment (Docker) |
+| **TiDB Cloud** | Production database |
+| **Cloudinary** | Logo image hosting |
+| **Gmail SMTP** | Transactional email delivery |
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```
 epifaniadanceapp.com (Netlify)
@@ -88,153 +88,153 @@ TiDB Cloud (academia_danza)
 
 ---
 
-## Configuración local
+## Local setup
 
-### Requisitos
+### Requirements
 - Java 21+
 - Node.js 20+
-- Docker y Docker Compose
+- Docker and Docker Compose
 
-### 1. Clonar el repositorio
+### 1. Clone the repository
 ```bash
 git clone https://github.com/Marcovf9/sistema-danza.git
 cd sistema-danza
 ```
 
-### 2. Variables de entorno
+### 2. Environment variables
 ```bash
 cp .env.example .env
 ```
 
-Completar `.env`:
+Fill in `.env`:
 ```env
 DB_USER=admin
 DB_PASSWORD=password123
 DB_NAME=academia_danza
 
-JWT_SECRET=<generar con: openssl rand -base64 64>
-MAIL_PASSWORD=<app password de Gmail>
+JWT_SECRET=<generate with: openssl rand -base64 64>
+MAIL_PASSWORD=<Gmail app password>
 APP_FRONTEND_URL=http://localhost:5173
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
-### 3. Levantar con Docker Compose
+### 3. Start with Docker Compose
 ```bash
 docker compose up
 ```
 
-Esto levanta:
-- **MySQL** en `localhost:3306`
-- **Backend** en `localhost:8080`
-- **Frontend** (nginx) en `localhost:80`
+This spins up:
+- **MySQL** on `localhost:3306`
+- **Backend** on `localhost:8080`
+- **Frontend** (nginx) on `localhost:80`
 
-### 4. Desarrollo (frontend + backend por separado)
+### 4. Development (frontend and backend separately)
 
 **Backend:**
 ```bash
 cd backend
 ./mvnw spring-boot:run
-# Corre en :8080. Flyway aplica las migraciones automáticamente.
+# Runs on :8080. Flyway applies migrations automatically.
 ```
 
 **Frontend:**
 ```bash
 cd frontend
 npm install
-cp .env.local.example .env.local   # o crear manualmente
+cp .env.local.example .env.local   # or create it manually
 npm run dev
-# Corre en :5173 con proxy hacia :8080
+# Runs on :5173 with a proxy to :8080
 ```
 
-`.env.local` mínimo para desarrollo:
+Minimum `.env.local` for development:
 ```env
 VITE_API_URL=http://localhost:8080/api
 ```
 
 ---
 
-## Variables de entorno — Producción
+## Environment variables — Production
 
-Configurar en el dashboard de **Render** (backend):
+Set in the **Render** dashboard (backend):
 
-| Variable | Descripción |
+| Variable | Description |
 |----------|-------------|
-| `SPRING_DATASOURCE_URL` | Connection string de TiDB Cloud (con `sslMode=VERIFY_IDENTITY`) |
-| `SPRING_DATASOURCE_USERNAME` | Usuario de TiDB |
-| `SPRING_DATASOURCE_PASSWORD` | Contraseña de TiDB |
-| `JWT_SECRET` | Clave secreta para firmar tokens (`openssl rand -base64 64`) |
-| `MAIL_PASSWORD` | App Password de Gmail |
+| `SPRING_DATASOURCE_URL` | TiDB Cloud connection string (with `sslMode=VERIFY_IDENTITY`) |
+| `SPRING_DATASOURCE_USERNAME` | TiDB username |
+| `SPRING_DATASOURCE_PASSWORD` | TiDB password |
+| `JWT_SECRET` | Secret key for signing tokens (`openssl rand -base64 64`) |
+| `MAIL_PASSWORD` | Gmail app password |
 | `APP_FRONTEND_URL` | `https://epifaniadanceapp.com` |
 | `CORS_ALLOWED_ORIGINS` | `https://epifaniadanceapp.com,https://www.epifaniadanceapp.com` |
 
-Configurar en **Netlify** (frontend):
+Set in **Netlify** (frontend):
 
-| Variable | Valor |
+| Variable | Value |
 |----------|-------|
 | `VITE_API_URL` | `https://sistema-danza.onrender.com/api` |
 
 ---
 
-## Migraciones de base de datos
+## Database migrations
 
-Flyway aplica automáticamente las migraciones al iniciar el backend. Historial:
+Flyway applies migrations automatically when the backend starts. History:
 
-| Versión | Descripción |
+| Version | Description |
 |---------|-------------|
-| V1 | Tablas iniciales (usuarios, alumnos, clases, pagos, etc.) |
-| V2 | Salones |
-| V3 | Datos de prueba iniciales |
-| V4 | Grilla de clases Epifanía |
-| V5 | Usuario directora |
-| V6 | Estado en recibos |
-| V7 | Campo activo en profesores |
-| V8 | Flag `requiere_cambio_password` |
-| V9 | Tabla de egresos |
-| V10 | Fecha de liquidación |
-| V11 | Tabla de auditoría |
-| V12 | Email de alumno |
-| V13 | Tabla de productos (tienda) |
-| V14 | Tabla de imágenes de productos |
-| V15 | Usuario para alumnos |
-| V16 | Días en inscripciones |
-| V17 | Actualización datos de alumnos |
-| V18 | Reestructura tutores |
-| V19 | Barrio de alumno |
-| V20 | Duración de clase programada |
-| V21 | Tabla de tokens de recuperación de contraseña |
-| V22 | Setup producción: admin Karina, clases sin profesor nullable |
+| V1 | Initial tables (users, students, classes, payments, etc.) |
+| V2 | Studios |
+| V3 | Initial seed data |
+| V4 | Epifanía class grid |
+| V5 | Director user |
+| V6 | Status field on receipts |
+| V7 | `active` field on teachers |
+| V8 | `requires_password_change` flag |
+| V9 | Expenses table |
+| V10 | Payout date |
+| V11 | Audit table |
+| V12 | Student email |
+| V13 | Products table (shop) |
+| V14 | Product images table |
+| V15 | User accounts for students |
+| V16 | Days on enrolments |
+| V17 | Student data update |
+| V18 | Guardian restructure |
+| V19 | Student neighbourhood |
+| V20 | Scheduled class duration |
+| V21 | Password recovery tokens table |
+| V22 | Production setup: admin Karina, nullable teacher on classes |
 
 ---
 
-## Estructura del proyecto
+## Project structure
 
 ```
 sistema-danza/
 ├── backend/                        # Spring Boot
 │   ├── src/main/java/.../
 │   │   ├── controllers/            # REST endpoints
-│   │   ├── models/                 # Entidades JPA
+│   │   ├── models/                 # JPA entities
 │   │   ├── repositories/           # Spring Data repositories
-│   │   ├── services/               # Lógica de negocio
+│   │   ├── services/               # Business logic
 │   │   ├── security/               # JWT + Spring Security
-│   │   └── exception/              # Manejo global de errores
+│   │   └── exception/              # Global error handling
 │   ├── src/main/resources/
 │   │   ├── application.properties
-│   │   └── db/migration/           # Scripts Flyway (V1–V22)
+│   │   └── db/migration/           # Flyway scripts (V1–V22)
 │   └── Dockerfile
 │
 ├── frontend/                       # React + Vite
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── admin/              # Dashboard, Alumnos, Caja, Clases, Tienda...
-│   │   │   ├── profesor/           # Agenda, Profesores
-│   │   │   ├── alumno/             # Portal del alumno
-│   │   │   └── auth/               # Login, recuperación de contraseña
+│   │   │   ├── admin/              # Dashboard, Students, Cash, Classes, Shop...
+│   │   │   ├── profesor/           # Schedule, Teachers
+│   │   │   ├── alumno/             # Student portal
+│   │   │   └── auth/               # Login, password recovery
 │   │   ├── components/
-│   │   │   ├── layout/             # LayoutPrincipal (sidebar + outlet)
-│   │   │   └── admin/              # Modales reutilizables
+│   │   │   ├── layout/             # Main layout (sidebar + outlet)
+│   │   │   └── admin/              # Reusable modals
 │   │   └── services/
-│   │       └── api.js              # Axios con interceptor JWT
+│   │       └── api.js              # Axios with JWT interceptor
 │   ├── public/
 │   │   ├── favicon.png
 │   │   ├── robots.txt
@@ -242,31 +242,31 @@ sistema-danza/
 │   └── Dockerfile
 │
 ├── docker-compose.yml              # MySQL + backend + frontend
-├── netlify.toml                    # Config deploy Netlify
-├── render.yaml                     # Config deploy Render
-└── .env.example                    # Plantilla de variables de entorno
+├── netlify.toml                    # Netlify deployment config
+├── render.yaml                     # Render deployment config
+└── .env.example                    # Environment variable template
 ```
 
 ---
 
-## Autenticación
+## Authentication
 
-- Login devuelve un **JWT** almacenado en `localStorage`
-- Todos los endpoints `/api/**` requieren `Authorization: Bearer <token>` (excepto `/api/auth/**`)
-- Contraseña inicial de alumnos: su **DNI** (se fuerza cambio en el primer login)
-- Recuperación de contraseña por email (link con token de 1 hora)
-
----
-
-## Despliegue en producción
-
-1. **TiDB Cloud** — Crear cluster Serverless, obtener connection string
-2. **Render** — Nuevo Web Service, Runtime: Docker, Root Directory: `backend`, configurar variables de entorno
-3. **Netlify** — Conectar repo, Base directory: `frontend`, Build command: `npm run build`, Publish: `dist`, variable `VITE_API_URL`
-4. **Dominio** — Agregar dominio custom en Netlify, actualizar `CORS_ALLOWED_ORIGINS` en Render
+- Login returns a **JWT** stored in `localStorage`
+- All `/api/**` endpoints require `Authorization: Bearer <token>` (except `/api/auth/**`)
+- Students' initial password is their **national ID number** (a change is forced on first login)
+- Password recovery by email (link with a 1-hour token)
 
 ---
 
-## Licencia
+## Production deployment
 
-Proyecto privado — © Epifanía Dance. Todos los derechos reservados.
+1. **TiDB Cloud** — Create a Serverless cluster, get the connection string
+2. **Render** — New Web Service, Runtime: Docker, Root Directory: `backend`, set the environment variables
+3. **Netlify** — Connect the repo, Base directory: `frontend`, Build command: `npm run build`, Publish: `dist`, set `VITE_API_URL`
+4. **Domain** — Add the custom domain in Netlify, update `CORS_ALLOWED_ORIGINS` in Render
+
+---
+
+## Licence
+
+Private project — © Epifanía Dance. All rights reserved.
