@@ -14,19 +14,20 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:16-alpine
+      mysql:
+        image: mysql:8.0
         env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: password123
-          POSTGRES_DB: academia_danza_test
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: password123
+          MYSQL_DATABASE: academia_danza_test
         ports:
-          - 5432:5432
+          - 3306:3306
         options: >-
-          --health-cmd "pg_isready -U admin"
+          --health-cmd "mysqladmin ping -h localhost -u admin -ppassword123"
           --health-interval 5s
           --health-timeout 5s
-          --health-retries 10
+          --health-retries 20
 
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +42,7 @@ jobs:
       - name: Build & test
         working-directory: backend
         env:
-          SPRING_DATASOURCE_URL:      jdbc:postgresql://localhost:5432/academia_danza_test
+          SPRING_DATASOURCE_URL:      jdbc:mysql://localhost:3306/academia_danza_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: password123
           JWT_SECRET:                 ci-secret-key-para-tests-no-usar-en-produccion

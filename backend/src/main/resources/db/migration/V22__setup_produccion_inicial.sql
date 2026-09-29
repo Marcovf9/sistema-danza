@@ -1,7 +1,7 @@
 -- ── V22: Setup inicial de producción ──────────────────────────────────────────
 -- 1. Eliminar datos de prueba (profesora Ana)
 -- 2. Permitir clases sin profesor asignado
--- 3. Actualizar credenciales del usuario administrador
+-- (Las credenciales del administrador ya no se versionan: ver AdminBootstrap.)
 
 SET foreign_key_checks = 0;
 
@@ -31,11 +31,5 @@ DELETE FROM profesores WHERE id = 1;
 
 -- Eliminar usuario de Ana
 DELETE FROM usuarios WHERE email = 'profe.ana@academia.com';
-
--- Actualizar credenciales del administrador
-UPDATE usuarios
-SET email         = 'karina.faraon@gmail.com',
-    password_hash = '$2b$10$A53KHp6Lm38RU.09LmjasOBT2h8EDXFMEAWAn/NMm02t7/JjUh3uK'
-WHERE email = 'admin@gmail.com';
 
 SET foreign_key_checks = 1;

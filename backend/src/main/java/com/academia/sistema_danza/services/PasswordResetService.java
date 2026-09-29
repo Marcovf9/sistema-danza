@@ -1,6 +1,7 @@
 package com.academia.sistema_danza.services;
 
 import com.academia.sistema_danza.models.PasswordResetToken;
+import com.academia.sistema_danza.models.Usuario;
 import com.academia.sistema_danza.repositories.PasswordResetTokenRepository;
 import com.academia.sistema_danza.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ public class PasswordResetService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
+    static final int HORAS_VALIDEZ_ACTIVACION = 72;
+
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
@@ -33,20 +36,34 @@ public class PasswordResetService {
     @Transactional
     public void solicitarReset(String email) {
         usuarioRepository.findByEmail(email.trim()).ifPresent(usuario -> {
-            // Eliminar tokens anteriores del mismo usuario
-            tokenRepository.deleteByUsuarioId(usuario.getId());
-
-            String tokenUUID = UUID.randomUUID().toString();
-            PasswordResetToken resetToken = PasswordResetToken.builder()
-                    .usuario(usuario)
-                    .token(tokenUUID)
-                    .expiry(LocalDateTime.now().plusHours(1))
-                    .build();
-            tokenRepository.save(resetToken);
-
-            String linkReset = frontendUrl + "/reset-password?token=" + tokenUUID;
+            String linkReset = crearLinkConToken(usuario, LocalDateTime.now().plusHours(1));
             emailService.enviarEmailResetPassword(usuario.getEmail(), linkReset);
         });
+    }
+
+    /**
+     * Envía el email de bienvenida a una cuenta recién creada, con un enlace para
+     * que el titular elija su contraseña. Nadie más la conoce en ningún momento.
+     */
+    @Transactional
+    public void enviarActivacionCuenta(Usuario usuario) {
+        String linkActivacion = crearLinkConToken(usuario, LocalDateTime.now().plusHours(HORAS_VALIDEZ_ACTIVACION));
+        emailService.enviarEmailActivacionCuenta(usuario.getEmail(), linkActivacion, HORAS_VALIDEZ_ACTIVACION);
+    }
+
+    private String crearLinkConToken(Usuario usuario, LocalDateTime expiry) {
+        // Eliminar tokens anteriores del mismo usuario
+        tokenRepository.deleteByUsuarioId(usuario.getId());
+
+        String tokenUUID = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .usuario(usuario)
+                .token(tokenUUID)
+                .expiry(expiry)
+                .build();
+        tokenRepository.save(resetToken);
+
+        return frontendUrl + "/reset-password?token=" + tokenUUID;
     }
 
     /**

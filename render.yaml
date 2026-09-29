@@ -21,3 +21,7 @@ services:
         sync: false          # https://tu-sitio.netlify.app
       - key: CORS_ALLOWED_ORIGINS
         sync: false          # https://tu-sitio.netlify.app
+      - key: ADMIN_EMAIL
+        sync: false          # Email de la directora (solo se usa si todavía no existe ninguna)
+      - key: ADMIN_PASSWORD
+        sync: false          # Contraseña inicial de la directora

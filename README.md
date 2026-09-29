@@ -2,7 +2,17 @@
 
 > Full ERP platform for the Epifanía Dance school: student, class, payment, teacher, attendance and shop management, with role-specific portals.
 
-**Production:** [epifaniadanceapp.com](https://epifaniadanceapp.com)
+**Production:** [epifaniadanceapp.com](https://epifaniadanceapp.com) — in daily use by the school's director, teachers and students.
+
+![Director dashboard](docs/screenshots/dashboard.png)
+
+| Cash desk: pending receipts and checkout | Teacher payouts |
+|---|---|
+| ![Cash desk](docs/screenshots/caja.png) | ![Teacher payouts](docs/screenshots/profesores.png) |
+| **Weekly timetable** | **Student directory** |
+| ![Timetable](docs/screenshots/calendario.png) | ![Students](docs/screenshots/alumnos.png) |
+
+<sub>Screenshots taken from a local instance loaded with fictitious data; no real student data is shown.</sub>
 
 ---
 
@@ -114,6 +124,8 @@ DB_NAME=academia_danza
 
 JWT_SECRET=<generate with: openssl rand -base64 64>
 MAIL_PASSWORD=<Gmail app password>
+ADMIN_EMAIL=directora@example.com
+ADMIN_PASSWORD=<initial director password>
 APP_FRONTEND_URL=http://localhost:5173
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
@@ -127,6 +139,10 @@ This spins up:
 - **MySQL** on `localhost:3306`
 - **Backend** on `localhost:8080`
 - **Frontend** (nginx) on `localhost:80`
+
+On first start, if there is no DIRECTOR user yet, the backend creates one from `ADMIN_EMAIL` and
+`ADMIN_PASSWORD`. Leave `ADMIN_PASSWORD` empty and it generates a random password, prints it once in
+the backend log and forces a change on first login. No credentials live in the migrations.
 
 ### 4. Development (frontend and backend separately)
 
@@ -166,6 +182,7 @@ Set in the **Render** dashboard (backend):
 | `MAIL_PASSWORD` | Gmail app password |
 | `APP_FRONTEND_URL` | `https://epifaniadanceapp.com` |
 | `CORS_ALLOWED_ORIGINS` | `https://epifaniadanceapp.com,https://www.epifaniadanceapp.com` |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Initial director account. Only used when no DIRECTOR exists, so it never overwrites the live password |
 
 Set in **Netlify** (frontend):
 
@@ -177,7 +194,10 @@ Set in **Netlify** (frontend):
 
 ## Database migrations
 
-Flyway applies migrations automatically when the backend starts. History:
+Flyway applies migrations automatically when the backend starts. V5, V18 and V22 were edited after
+being applied (to remove credentials and to make V18 run on MySQL 8); `ChecksumsMigracionesEditadas`
+updates their stored checksums on startup, so existing databases keep booting. Any other edited
+migration still fails validation. History:
 
 | Version | Description |
 |---------|-------------|
@@ -185,7 +205,7 @@ Flyway applies migrations automatically when the backend starts. History:
 | V2 | Studios |
 | V3 | Initial seed data |
 | V4 | Epifanía class grid |
-| V5 | Director user |
+| V5 | *(emptied)* Used to seed the director; now handled by `AdminBootstrap` from environment variables |
 | V6 | Status field on receipts |
 | V7 | `active` field on teachers |
 | V8 | `requires_password_change` flag |
@@ -198,11 +218,11 @@ Flyway applies migrations automatically when the backend starts. History:
 | V15 | User accounts for students |
 | V16 | Days on enrolments |
 | V17 | Student data update |
-| V18 | Guardian restructure |
+| V18 | Guardian restructure (student ↔ guardian relationship) |
 | V19 | Student neighbourhood |
 | V20 | Scheduled class duration |
 | V21 | Password recovery tokens table |
-| V22 | Production setup: admin Karina, nullable teacher on classes |
+| V22 | Production setup: remove seed teacher, nullable teacher on classes |
 
 ---
 
@@ -253,8 +273,40 @@ sistema-danza/
 
 - Login returns a **JWT** stored in `localStorage`
 - All `/api/**` endpoints require `Authorization: Bearer <token>` (except `/api/auth/**`)
-- Students' initial password is their **national ID number** (a change is forced on first login)
+- Passwords are stored with **BCrypt**; there is no plain-text fallback
+- `POST /api/auth/cambiar-password` takes the account from the JWT, never from the request body
+- New student accounts get a **random password nobody knows** and a welcome email with a link
+  (valid for 72 hours) to choose their own
 - Password recovery by email (link with a 1-hour token)
+
+**Why not use the national ID (DNI) as the initial password?** An earlier version did, with a
+forced change on first login. The DNI is not a secret: it appears on enrolment forms, receipts and
+attendance sheets, and for minors it is known to the whole family. Anyone holding it could log in
+before the student did, and "forced change on first login" does not help if the first login is not
+the student's. The activation link reuses the existing password-reset flow, so it added no new
+moving parts, and a student who misses the email can use *Forgot your password?* at any time.
+
+---
+
+## Tests
+
+```bash
+cd backend
+./mvnw test          # unit tests only need a JDK
+./mvnw verify        # also runs contextLoads, which applies every migration to MySQL
+```
+
+The unit tests cover the business rules that move money, using Mockito, with no database:
+
+| Suite | What it pins down |
+|-------|-------------------|
+| `CajaServiceTest` | Monthly fee = sum of active disciplines; family discount 10% (2 members) / 20% (3+); no duplicate or overwritten receipt when the month is already paid; +10% card surcharge; a receipt can't be charged twice |
+| `ProfesorServiceTest` | Teacher payout: 5,000 per class taught plus 40% of the discipline fee for each student present above six; paying a payout records both the settlement and the cash expense |
+| `FacturacionAutomaticaServiceTest` | 5% late fee only on the current month's pending receipts; reminders for minors go to the guardian |
+| `AlumnoServiceTest` | New student accounts never use the DNI as password and get an activation email |
+| `AdminBootstrapTest` | Initial director created from env vars, random password when unset, existing director left untouched |
+
+CI (GitHub Actions) runs `mvn verify` against a MySQL 8 service container and builds the frontend.
 
 ---
 
@@ -269,4 +321,6 @@ sistema-danza/
 
 ## Licence
 
-Private project — © Epifanía Dance. All rights reserved.
+The source code is public so it can be read and reviewed as part of my portfolio, but it is **not
+open source**: no licence is granted to copy, modify or redistribute it. © Marco Vergara Faraon.
+The Epifanía Dance name and logo belong to the school.

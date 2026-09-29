@@ -35,6 +35,8 @@ services:
       MAIL_PASSWORD:              ${MAIL_PASSWORD:-}
       APP_FRONTEND_URL:           ${APP_FRONTEND_URL:-http://localhost}
       CORS_ALLOWED_ORIGINS:       ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      ADMIN_EMAIL:                ${ADMIN_EMAIL:-directora@example.com}
+      ADMIN_PASSWORD:             ${ADMIN_PASSWORD:-}
     depends_on:
       db:
         condition: service_healthy

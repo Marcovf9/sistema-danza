@@ -141,17 +141,16 @@ const CajaPage = () => {
 
   const enviarWhatsApp = (e, recibo) => {
     e.stopPropagation();
-    const telefono = recibo.alumno?.telefono;
+    const telefono = recibo.alumnoTelefono;
     if (!telefono) { toast.error('El alumno no tiene un teléfono registrado.'); return; }
     let numStr = telefono.replace(/\D/g, '');
     if (!numStr.startsWith('54')) numStr = '549' + numStr;
-    const mensaje = `Hola ${recibo.alumno.nombre}, te escribimos de Epifania Dance 💃. Te recordamos que tienes pendiente el pago del recibo #${recibo.id} por $${recibo.montoTotal.toLocaleString('es-AR')}. ¡Avísanos cualquier duda o cuando realices el pago! Saludos.`;
+    const mensaje = `Hola ${recibo.alumnoNombre}, te escribimos de Epifania Dance 💃. Te recordamos que tienes pendiente el pago del recibo #${recibo.id} por $${recibo.montoTotal.toLocaleString('es-AR')}. ¡Avísanos cualquier duda o cuando realices el pago! Saludos.`;
     window.open(`https://wa.me/${numStr}?text=${encodeURIComponent(mensaje)}`, '_blank');
   };
 
   const pendientesFiltrados = pendientes.filter(r =>
-    r.alumno?.nombre.toLowerCase().includes(filtroTexto.toLowerCase()) ||
-    r.alumno?.apellido.toLowerCase().includes(filtroTexto.toLowerCase())
+    `${r.alumnoNombre ?? ''} ${r.alumnoApellido ?? ''}`.toLowerCase().includes(filtroTexto.toLowerCase())
   );
 
   // ── UI ─────────────────────────────────────────────────────────────────────
@@ -231,10 +230,10 @@ const CajaPage = () => {
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center font-bold">
-                            {recibo.alumno?.nombre.charAt(0)}{recibo.alumno?.apellido.charAt(0)}
+                            {recibo.alumnoNombre?.charAt(0)}{recibo.alumnoApellido?.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-bold text-gray-800">{recibo.alumno?.nombre} {recibo.alumno?.apellido}</p>
+                            <p className="font-bold text-gray-800">{recibo.alumnoNombre} {recibo.alumnoApellido}</p>
                             <p className="text-xs text-gray-500 flex items-center gap-1">
                               <Clock className="w-3 h-3" /> Emitido: {new Date(recibo.fechaEmision).toLocaleDateString('es-AR')}
                             </p>
@@ -296,7 +295,7 @@ const CajaPage = () => {
                     <div className="space-y-6">
                       <div>
                         <p className="text-sm text-gray-400 uppercase tracking-wider">Cobrando a</p>
-                        <p className="text-xl font-bold text-white">{reciboSeleccionado.alumno?.nombre} {reciboSeleccionado.alumno?.apellido}</p>
+                        <p className="text-xl font-bold text-white">{reciboSeleccionado.alumnoNombre} {reciboSeleccionado.alumnoApellido}</p>
                       </div>
                       <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
                         <p className="text-sm text-gray-400 flex justify-between mb-2"><span>Subtotal Base</span><span>${reciboSeleccionado.montoTotal.toLocaleString('es-AR')}</span></p>

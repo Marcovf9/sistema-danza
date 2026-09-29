@@ -12,6 +12,7 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
   });
 
   const [errores, setErrores] = useState({});
+  const esReactivacion = profesorAEditar?.activo === false;
 
   useEffect(() => {
     if (isOpen) {
@@ -21,7 +22,7 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
           nombre: profesorAEditar.nombre || '',
           apellido: profesorAEditar.apellido || '',
           cbuAlias: profesorAEditar.cbuAlias || '',
-          email: profesorAEditar.usuario?.email || '',
+          email: profesorAEditar.email || '',
           password: ''
         });
       } else {
@@ -43,8 +44,10 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
       toast.error("Por favor completa los campos obligatorios.");
       return;
     }
-    if (!profesorAEditar && !formData.password) {
-      toast.error("La contraseña es obligatoria para un profesor nuevo.");
+    if ((!profesorAEditar || esReactivacion) && !formData.password) {
+      toast.error(esReactivacion
+        ? "Asignale una contraseña para reactivar su acceso."
+        : "La contraseña es obligatoria para un profesor nuevo.");
       return;
     }
 
@@ -58,7 +61,7 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50">
           <h2 className="text-2xl font-bold text-gray-800">
-            {profesorAEditar ? 'Editar Profesor' : 'Nuevo Profesor'}
+            {esReactivacion ? 'Reactivar Profesor' : profesorAEditar ? 'Editar Profesor' : 'Nuevo Profesor'}
           </h2>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full">
             <X className="w-6 h-6" />
@@ -89,7 +92,7 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
               <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña {profesorAEditar && <span className="text-gray-400 font-normal">(Dejar vacía para no cambiar)</span>}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña {profesorAEditar && !esReactivacion && <span className="text-gray-400 font-normal">(Dejar vacía para no cambiar)</span>}{esReactivacion && ' *'}</label>
               <input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
           </div>
@@ -97,7 +100,7 @@ const ProfesorModal = ({ isOpen, onClose, onSave, profesorAEditar }) => {
           <div className="flex justify-end space-x-3 pt-4">
             <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl font-medium">Cancelar</button>
             <button type="submit" className="px-6 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium shadow-sm">
-              {profesorAEditar ? 'Actualizar' : 'Crear Perfil'}
+              {esReactivacion ? 'Reactivar' : profesorAEditar ? 'Actualizar' : 'Crear Perfil'}
             </button>
           </div>
         </form>

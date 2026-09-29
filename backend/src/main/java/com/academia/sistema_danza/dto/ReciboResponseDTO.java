@@ -15,6 +15,7 @@ public class ReciboResponseDTO {
     private Long alumnoId;
     private String alumnoNombre;
     private String alumnoApellido;
+    private String alumnoTelefono;
 
     private LocalDateTime fechaEmision;
     private EstadoRecibo estado;

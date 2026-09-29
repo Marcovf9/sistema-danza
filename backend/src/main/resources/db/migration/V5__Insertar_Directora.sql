@@ -1,1 +1,8 @@
-INSERT INTO usuarios (email, password_hash, rol) VALUES ('admin@gmail.com', 'admin123', 'DIRECTOR');
+-- ── V5: Usuario directora ─────────────────────────────────────────────────────
+-- Esta migración insertaba un usuario inicial con credenciales versionadas.
+-- Ya no se crea ningún usuario desde SQL: el primer usuario DIRECTOR lo crea
+-- AdminBootstrap al arrancar, a partir de ADMIN_EMAIL y ADMIN_PASSWORD.
+--
+-- El archivo se conserva vacío para no romper la numeración de Flyway.
+-- En bases que ya aplicaron la versión anterior, ChecksumsMigracionesEditadas
+-- actualiza el checksum al arrancar.
