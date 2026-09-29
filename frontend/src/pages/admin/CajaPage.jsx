@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DollarSign, Search, Receipt, Download, Bot, CheckCircle, AlertCircle, CreditCard, Clock, TrendingUp, TrendingDown, PlusCircle, Calendar as CalendarIcon, MessageCircle, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import { mensajeError } from '../../utils/mensajeError';
 
 const CajaPage = () => {
   const queryClient = useQueryClient();
@@ -40,7 +41,7 @@ const CajaPage = () => {
       queryClient.invalidateQueries({ queryKey: ['caja', 'pendientes'] });
       toast.success('¡Pago registrado exitosamente!');
     },
-    onError: (error) => toast.error(error.response?.data || 'Error al procesar el pago.'),
+    onError: (error) => toast.error(mensajeError(error, 'Error al procesar el pago.')),
   });
 
   const egresoMutation = useMutation({

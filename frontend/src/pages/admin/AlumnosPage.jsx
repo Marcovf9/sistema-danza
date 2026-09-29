@@ -7,6 +7,7 @@ import AlumnoModal from '../../components/admin/AlumnoModal';
 import FichaAlumnoPanel from './FichaAlumnoPanel';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import showConfirmToast from '../../utils/confirmToast';
+import { mensajeError } from '../../utils/mensajeError';
 
 const AlumnosPage = () => {
   const queryClient = useQueryClient();
@@ -45,11 +46,7 @@ const AlumnosPage = () => {
       toast.success('Alumno dado de baja exitosamente.');
     },
     onError: (error) => {
-      if (error.response?.status === 400 && error.response?.data) {
-        toast.error(error.response.data, { duration: 5000 });
-      } else {
-        toast.error('Error al dar de baja al alumno.');
-      }
+      toast.error(mensajeError(error, 'Error al dar de baja al alumno.'), { duration: 5000 });
     },
   });
 

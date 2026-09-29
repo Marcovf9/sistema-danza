@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import ProfesorModal from '../../components/admin/ProfesorModal';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import showConfirmToast from '../../utils/confirmToast';
+import { mensajeError } from '../../utils/mensajeError';
 
 const ProfesoresPage = () => {
   const queryClient = useQueryClient();
@@ -38,7 +39,7 @@ const ProfesoresPage = () => {
         : profesorAEditar ? '¡Profesor actualizado!' : '¡Profesor creado con su acceso al sistema!');
       setIsModalOpen(false);
     },
-    onError: (error) => toast.error(error.response?.data?.error || 'Error al guardar el profesor.'),
+    onError: (error) => toast.error(mensajeError(error, 'Error al guardar el profesor.')),
   });
 
   const bajaMutation = useMutation({
@@ -70,7 +71,7 @@ const ProfesoresPage = () => {
       setLiquidacionActiva({ profesor, ...response.data });
       toast.success('Liquidación calculada.');
     } catch (error) {
-      toast.error(error.response?.data || 'Error al calcular la liquidación.');
+      toast.error(mensajeError(error, 'Error al calcular la liquidación.'));
     } finally {
       setCalculando(false);
     }
