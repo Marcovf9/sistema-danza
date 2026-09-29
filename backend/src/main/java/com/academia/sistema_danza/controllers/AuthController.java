@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Map;
 
 @RestController
@@ -39,17 +40,10 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             Usuario usuario = usuarioRepository.findByEmail(request.getEmail().trim())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
+                    .orElseThrow(() -> new RuntimeException("Email o contraseña incorrectos"));
 
-            boolean claveCorrecta = false;
-            if (usuario.getPasswordHash().startsWith("$2")) {
-                claveCorrecta = passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash());
-            } else {
-                claveCorrecta = usuario.getPasswordHash().equals(request.getPassword());
-            }
-
-            if (!claveCorrecta) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña incorrecta");
+            if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email o contraseña incorrectos");
             }
 
             Long entidadId = null;
@@ -95,12 +89,21 @@ public class AuthController {
         return ResponseEntity.ok("Contraseña actualizada con éxito. Ya podés iniciar sesión.");
     }
 
+    /**
+     * Cambia la contraseña del usuario autenticado. El email sale del JWT, no del
+     * body, para que nadie pueda cambiar la contraseña de otra cuenta.
+     */
     @PostMapping("/cambiar-password")
-    public ResponseEntity<?> cambiarPassword(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
+    public ResponseEntity<?> cambiarPassword(Principal principal, @RequestBody Map<String, String> request) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sesión no válida");
+        }
         String nuevaPassword = request.get("nuevaPassword");
-        
-        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow();
+        if (nuevaPassword == null || nuevaPassword.length() < 8) {
+            return ResponseEntity.badRequest().body("La contraseña debe tener al menos 8 caracteres");
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
         usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));
         usuario.setRequiereCambioPassword(false);
         usuarioRepository.save(usuario);
