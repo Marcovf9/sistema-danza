@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,9 @@ public class AlumnoService {
     private final UsuarioRepository usuarioRepository;
     private final GrupoFamiliarRepository grupoFamiliarRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetService passwordResetService;
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Transactional(readOnly = true)
     public List<AlumnoResponseDTO> findAll() {
@@ -154,17 +159,30 @@ public class AlumnoService {
         }
     }
 
+    /**
+     * La cuenta se crea con una contraseña aleatoria que nadie conoce y el alumno
+     * recibe por email un enlace para elegir la suya. No se usa el DNI como clave
+     * inicial: es un dato que conocen muchas personas (figura en fichas, recibos y
+     * planillas) y alcanzaría con él para entrar a la cuenta antes que su titular.
+     */
     private void crearCuentaUsuarioSiCorresponde(AlumnoRequestDTO dto, Alumno alumno) {
-        if (dto.getEmail() != null && !dto.getEmail().isBlank() && dto.getDni() != null) {
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             Usuario usuario = Usuario.builder()
                     .email(dto.getEmail().trim())
-                    .passwordHash(passwordEncoder.encode(dto.getDni().trim()))
+                    .passwordHash(passwordEncoder.encode(passwordAleatoria()))
                     .rol(RolUsuario.ALUMNO)
                     .requiereCambioPassword(true)
                     .build();
             usuarioRepository.save(usuario);
             alumno.setUsuarioId(usuario.getId());
+            passwordResetService.enviarActivacionCuenta(usuario);
         }
+    }
+
+    private static String passwordAleatoria() {
+        byte[] bytes = new byte[24];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private void actualizarOCrearCuenta(AlumnoRequestDTO dto, Alumno alumno) {

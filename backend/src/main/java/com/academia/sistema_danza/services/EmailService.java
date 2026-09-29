@@ -63,6 +63,49 @@ public class EmailService {
         }
     }
 
+    public void enviarEmailActivacionCuenta(String destinatario, String linkActivacion, int horasValidez) {
+        if (destinatario == null || destinatario.isEmpty()) return;
+
+        try {
+            MimeMessage mensaje = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
+
+            helper.setTo(destinatario);
+            helper.setSubject("¡Bienvenida/o a Epifania Dance! Activá tu cuenta 💃");
+
+            String htmlMsg = "<!DOCTYPE html>"
+                    + "<html lang='es'>"
+                    + "<body style='margin: 0; padding: 0; background-color: #f3f4f6; font-family: \"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif;'>"
+                    + "<table width='100%' border='0' cellspacing='0' cellpadding='0' style='background-color: #f3f4f6; padding: 40px 0;'>"
+                    + "<tr><td align='center'>"
+                    + "<table width='600' border='0' cellspacing='0' cellpadding='0' style='background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>"
+                    + "<tr><td align='center' style='background-color: #4f46e5; padding: 40px 20px;'>"
+                    + "<h1 style='color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px;'>EPIFANIA DANCE</h1>"
+                    + "<p style='color: #c7d2fe; margin: 8px 0 0 0; font-size: 14px;'>Portal de Alumnos</p>"
+                    + "</td></tr>"
+                    + "<tr><td style='padding: 40px 40px 20px 40px; color: #374151;'>"
+                    + "<h2 style='color: #1f2937; font-size: 20px; margin-top: 0;'>Tu cuenta está lista</h2>"
+                    + "<p style='font-size: 16px; line-height: 1.6; color: #4b5563;'>Desde el portal vas a poder ver tus clases, tu estado de cuenta y tus recibos. Para empezar, elegí tu contraseña:</p>"
+                    + "<div style='text-align: center; margin: 40px 0;'>"
+                    + "<a href='" + linkActivacion + "' style='display: inline-block; padding: 16px 36px; background-color: #4f46e5; color: #ffffff; font-weight: bold; font-size: 16px; text-decoration: none; border-radius: 10px; letter-spacing: 0.5px;'>Crear mi contraseña</a>"
+                    + "</div>"
+                    + "<p style='font-size: 13px; color: #9ca3af; line-height: 1.5;'>Este enlace vence en <strong>" + horasValidez + " horas</strong>. Si vence, podés pedir uno nuevo desde <em>¿Olvidaste tu contraseña?</em> en la pantalla de ingreso.</p>"
+                    + "<p style='font-size: 12px; color: #d1d5db; word-break: break-all; margin-top: 16px;'>O copiá este link: <a href='" + linkActivacion + "' style='color: #818cf8;'>" + linkActivacion + "</a></p>"
+                    + "</td></tr>"
+                    + "<tr><td align='center' style='padding: 24px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0;'>"
+                    + "<p style='margin: 0; font-size: 12px; color: #94a3b8;'>Este es un mensaje automático del sistema. Por favor no respondas a este correo.</p>"
+                    + "</td></tr>"
+                    + "</table></td></tr></table>"
+                    + "</body></html>";
+
+            helper.setText(htmlMsg, true);
+            mailSender.send(mensaje);
+            log.info("📧 Email de activación enviado a: {}", destinatario);
+        } catch (Exception e) {
+            log.error("❌ Error al enviar email de activación a {}", destinatario, e);
+        }
+    }
+
     private String formatearMonto(String montoStr) {
         try {
             BigDecimal monto = new BigDecimal(montoStr);
