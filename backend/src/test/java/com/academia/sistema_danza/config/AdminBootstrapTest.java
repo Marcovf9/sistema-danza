@@ -55,6 +55,34 @@ class AdminBootstrapTest {
         verify(usuarios, never()).save(any());
     }
 
+    @Test
+    void siLaDirectoraExistenteTieneLaContrasenaEnTextoPlanoSeLeAsignaUnaNueva() throws Exception {
+        Usuario heredada = Usuario.builder().email("admin@gmail.com").passwordHash("admin123")
+                .rol(RolUsuario.DIRECTOR).requiereCambioPassword(false).build();
+        when(usuarios.existsByRol(RolUsuario.DIRECTOR)).thenReturn(true);
+        when(usuarios.findByRol(RolUsuario.DIRECTOR)).thenReturn(java.util.List.of(heredada));
+
+        runner("directora@example.com", "S3creta-de-prueba").run(null);
+
+        verify(usuarios).save(heredada);
+        assertThat(heredada.getEmail()).isEqualTo("admin@gmail.com");
+        assertThat(encoder.matches("S3creta-de-prueba", heredada.getPasswordHash())).isTrue();
+        assertThat(heredada.getRequiereCambioPassword()).isTrue();
+    }
+
+    @Test
+    void noTocaUnaDirectoraQueYaTieneHashBcrypt() throws Exception {
+        Usuario actual = Usuario.builder().email("directora@example.com").passwordHash(encoder.encode("vigente"))
+                .rol(RolUsuario.DIRECTOR).build();
+        when(usuarios.existsByRol(RolUsuario.DIRECTOR)).thenReturn(true);
+        when(usuarios.findByRol(RolUsuario.DIRECTOR)).thenReturn(java.util.List.of(actual));
+
+        runner("directora@example.com", "otra").run(null);
+
+        verify(usuarios, never()).save(any());
+        assertThat(encoder.matches("vigente", actual.getPasswordHash())).isTrue();
+    }
+
     private ApplicationRunner runner(String email, String password) {
         return new AdminBootstrap().crearDirectoraInicial(usuarios, encoder, email, password);
     }

@@ -20,8 +20,8 @@ import java.util.Base64;
  * Si ADMIN_PASSWORD no está definida se genera una al azar, se imprime una única
  * vez en el log y se fuerza el cambio en el primer login.
  *
- * <p>Si ya hay una directora cargada no hace nada, así que no pisa la contraseña
- * de producción en cada arranque.
+ * <p>Si ya hay una directora cargada no pisa su contraseña, salvo que esté guardada
+ * en texto plano (ver {@link #reemplazarPasswordsEnTextoPlano}).
  */
 @Slf4j
 @Configuration
@@ -34,6 +34,7 @@ public class AdminBootstrap {
 
         return args -> {
             if (usuarios.existsByRol(RolUsuario.DIRECTOR)) {
+                reemplazarPasswordsEnTextoPlano(usuarios, encoder, passwordConfigurada);
                 return;
             }
 
@@ -62,6 +63,40 @@ public class AdminBootstrap {
                 log.info("Usuario DIRECTOR inicial creado a partir de ADMIN_EMAIL/ADMIN_PASSWORD: {}", email);
             }
         };
+    }
+
+    /**
+     * Una base que se quedó en V21 conserva la directora que insertaba la V5 original,
+     * con la contraseña en texto plano. El login solo acepta BCrypt, así que esa cuenta
+     * quedaría inutilizable: se le asigna ADMIN_PASSWORD (o una aleatoria que se muestra
+     * una vez en el log) y se fuerza el cambio en el primer ingreso.
+     */
+    private static void reemplazarPasswordsEnTextoPlano(UsuarioRepository usuarios, PasswordEncoder encoder,
+            String passwordConfigurada) {
+        for (Usuario directora : usuarios.findByRol(RolUsuario.DIRECTOR)) {
+            if (directora.getPasswordHash() != null && directora.getPasswordHash().startsWith("$2")) {
+                continue;
+            }
+            boolean generada = passwordConfigurada == null || passwordConfigurada.isBlank();
+            String password = generada ? passwordAleatoria() : passwordConfigurada;
+            directora.setPasswordHash(encoder.encode(password));
+            directora.setRequiereCambioPassword(true);
+            usuarios.save(directora);
+
+            if (generada) {
+                log.warn("""
+
+                        ===========================================================
+                         La directora {} tenía la contraseña en texto plano.
+                         Nueva contraseña temporal: {}
+                         Guardala ahora: no vuelve a mostrarse.
+                        ===========================================================
+                        """, directora.getEmail(), password);
+            } else {
+                log.warn("La directora {} tenía la contraseña en texto plano; se reemplazó por ADMIN_PASSWORD",
+                        directora.getEmail());
+            }
+        }
     }
 
     private static String passwordAleatoria() {
