@@ -133,6 +133,7 @@ public class CajaService {
                 .alumnoId(recibo.getAlumno() != null ? recibo.getAlumno().getId() : null)
                 .alumnoNombre(recibo.getAlumno() != null ? recibo.getAlumno().getNombre() : null)
                 .alumnoApellido(recibo.getAlumno() != null ? recibo.getAlumno().getApellido() : null)
+                .alumnoTelefono(recibo.getAlumno() != null ? recibo.getAlumno().getTelefono() : null)
                 .fechaEmision(recibo.getFechaEmision())
                 .estado(recibo.getEstado())
                 .metodoPago(recibo.getMetodoPago())
