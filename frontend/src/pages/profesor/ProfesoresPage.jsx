@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
-import { GraduationCap, Calculator, Landmark, Plus, Pencil, Trash2, Download, CheckCircle } from 'lucide-react';
+import { GraduationCap, Calculator, Landmark, Plus, Pencil, Trash2, Download, CheckCircle, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ProfesorModal from '../../components/admin/ProfesorModal';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -33,10 +33,12 @@ const ProfesoresPage = () => {
         : api.post('/profesores', formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profesores'] });
-      toast.success(profesorAEditar ? '¡Profesor actualizado!' : '¡Profesor creado con su acceso al sistema!');
+      toast.success(profesorAEditar?.activo === false
+        ? '¡Profesor reactivado con acceso al sistema!'
+        : profesorAEditar ? '¡Profesor actualizado!' : '¡Profesor creado con su acceso al sistema!');
       setIsModalOpen(false);
     },
-    onError: () => toast.error('Error al guardar el profesor.'),
+    onError: (error) => toast.error(error.response?.data?.error || 'Error al guardar el profesor.'),
   });
 
   const bajaMutation = useMutation({
@@ -148,8 +150,8 @@ const ProfesoresPage = () => {
             ) : (
               <div className="space-y-3">
                 {profesores.map((prof) => (
-                  <div key={prof.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow gap-4 ${prof.activo === false ? 'opacity-50' : ''}`}>
-                    <div className="flex items-center gap-4">
+                  <div key={prof.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow gap-4`}>
+                    <div className={`flex items-center gap-4 ${prof.activo === false ? 'opacity-50' : ''}`}>
                       <div className="w-12 h-12 bg-pink-50 text-pink-700 rounded-full flex items-center justify-center">
                         <GraduationCap className="w-6 h-6" />
                       </div>
@@ -162,8 +164,14 @@ const ProfesoresPage = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleAbrirEditar(prof)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar"><Pencil className="w-5 h-5" /></button>
-                      <button onClick={() => handleDarDeBaja(prof.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Baja"><Trash2 className="w-5 h-5" /></button>
+                      {prof.activo === false ? (
+                        <button onClick={() => handleAbrirEditar(prof)} className="px-3 py-2 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition font-bold text-sm flex items-center gap-1" title="Reactivar"><RotateCcw className="w-4 h-4" /> Reactivar</button>
+                      ) : (
+                        <>
+                          <button onClick={() => handleAbrirEditar(prof)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar"><Pencil className="w-5 h-5" /></button>
+                          <button onClick={() => handleDarDeBaja(prof.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Baja"><Trash2 className="w-5 h-5" /></button>
+                        </>
+                      )}
                       <button
                         onClick={() => handleCalcularLiquidacion(prof)}
                         disabled={calculando === prof.id}

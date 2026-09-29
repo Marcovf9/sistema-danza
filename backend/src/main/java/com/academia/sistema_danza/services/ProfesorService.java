@@ -38,13 +38,7 @@ public class ProfesorService {
 
     @Transactional
     public ProfesorResponseDTO crearProfesor(ProfesorRequestDTO dto) {
-        Usuario nuevoUsuario = Usuario.builder()
-                .email(dto.getEmail())
-                .passwordHash(passwordEncoder.encode(dto.getPassword()))
-                .rol(RolUsuario.PROFESOR)
-                .requiereCambioPassword(true)
-                .build();
-        usuarioRepository.save(nuevoUsuario);
+        Usuario nuevoUsuario = crearUsuarioProfesor(dto);
 
         Profesor nuevoProfesor = Profesor.builder()
                 .nombre(dto.getNombre())
@@ -66,15 +60,50 @@ public class ProfesorService {
         profe.setCbuAlias(dto.getCbuAlias());
         profesorRepository.save(profe);
 
+        // La baja borra el usuario de acceso: editar a un profesor sin usuario lo reactiva
+        if (profe.getUsuarioId() == null) {
+            Usuario nuevoUsuario = crearUsuarioProfesor(dto);
+            profe.setUsuarioId(nuevoUsuario.getId());
+            profe.setActivo(true);
+            profesorRepository.save(profe);
+            return toResponseDTO(profe, nuevoUsuario.getEmail());
+        }
+
         Usuario usuario = usuarioRepository.findById(profe.getUsuarioId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario del profesor", profe.getUsuarioId()));
-        usuario.setEmail(dto.getEmail());
+        String email = dto.getEmail().trim();
+        if (!email.equalsIgnoreCase(usuario.getEmail())) {
+            validarEmailDisponible(email);
+        }
+        usuario.setEmail(email);
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             usuario.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+            // La eligió la directora: el profesor debe cambiarla al entrar
+            usuario.setRequiereCambioPassword(true);
         }
         usuarioRepository.save(usuario);
 
         return toResponseDTO(profe, dto.getEmail());
+    }
+
+    private Usuario crearUsuarioProfesor(ProfesorRequestDTO dto) {
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Hay que asignarle una contraseña para darle acceso al sistema.");
+        }
+        String email = dto.getEmail().trim();
+        validarEmailDisponible(email);
+        return usuarioRepository.save(Usuario.builder()
+                .email(email)
+                .passwordHash(passwordEncoder.encode(dto.getPassword()))
+                .rol(RolUsuario.PROFESOR)
+                .requiereCambioPassword(true)
+                .build());
+    }
+
+    private void validarEmailDisponible(String email) {
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Ya existe una cuenta con el email " + email + ".");
+        }
     }
 
     @Transactional

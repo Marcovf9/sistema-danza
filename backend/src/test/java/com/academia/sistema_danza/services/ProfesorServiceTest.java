@@ -19,7 +19,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.academia.sistema_danza.dto.ProfesorRequestDTO;
+import com.academia.sistema_danza.models.enums.RolUsuario;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -103,6 +109,59 @@ class ProfesorServiceTest {
         assertThat(egreso.getValue().getMonto()).isEqualByComparingTo("42600");
         assertThat(egreso.getValue().getConcepto()).contains("Sofía Ruiz");
         assertThat(egreso.getValue().getObservaciones()).contains(MES + " / " + ANIO);
+    }
+
+    // ── Alta, baja y reactivación ─────────────────────────────────────────────
+
+    @Test
+    void editarUnProfesorDadoDeBajaLoReactivaConUnUsuarioNuevo() {
+        Profesor inactivo = Profesor.builder().id(PROFESOR_ID).nombre("Sofía").apellido("Ruiz")
+                .activo(false).usuarioId(null).build();
+        when(profesorRepository.findById(PROFESOR_ID)).thenReturn(Optional.of(inactivo));
+        when(usuarioRepository.findByEmail("sofia@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("Clave1234")).thenReturn("$2a$hash");
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> {
+            Usuario u = inv.getArgument(0);
+            u.setId(50L);
+            return u;
+        });
+
+        var respuesta = profesorService.actualizarProfesor(PROFESOR_ID, datos("sofia@example.com", "Clave1234"));
+
+        assertThat(inactivo.getActivo()).isTrue();
+        assertThat(inactivo.getUsuarioId()).isEqualTo(50L);
+        assertThat(respuesta.getEmail()).isEqualTo("sofia@example.com");
+        ArgumentCaptor<Usuario> usuario = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).save(usuario.capture());
+        assertThat(usuario.getValue().getRol()).isEqualTo(RolUsuario.PROFESOR);
+        assertThat(usuario.getValue().getRequiereCambioPassword()).isTrue();
+    }
+
+    @Test
+    void paraReactivarHayQueAsignarUnaContrasena() {
+        Profesor inactivo = Profesor.builder().id(PROFESOR_ID).nombre("Sofía").apellido("Ruiz")
+                .activo(false).usuarioId(null).build();
+        when(profesorRepository.findById(PROFESOR_ID)).thenReturn(Optional.of(inactivo));
+
+        assertThatThrownBy(() -> profesorService.actualizarProfesor(PROFESOR_ID, datos("sofia@example.com", "")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("contraseña");
+        assertThat(inactivo.getActivo()).isFalse();
+    }
+
+    @Test
+    void noSePuedeCrearUnProfesorConUnEmailQueYaTieneCuenta() {
+        when(usuarioRepository.findByEmail("sofia@example.com")).thenReturn(Optional.of(new Usuario()));
+
+        assertThatThrownBy(() -> profesorService.crearProfesor(datos("sofia@example.com", "Clave1234")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ya existe una cuenta");
+        verify(usuarioRepository, never()).save(any());
+        verify(profesorRepository, never()).save(any());
+    }
+
+    private static ProfesorRequestDTO datos(String email, String password) {
+        return ProfesorRequestDTO.builder().nombre("Sofía").apellido("Ruiz").email(email).password(password).build();
     }
 
     private void sesion(Long id, String precioCuota, long presentes) {
