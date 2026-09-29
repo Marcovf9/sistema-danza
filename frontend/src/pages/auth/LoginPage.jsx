@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import { Lock, Mail, LogIn, Eye, EyeOff } from 'lucide-react';
+import { mensajeError } from '../../utils/mensajeError';
 
 const LoginPage = () => {
   const [credenciales, setCredenciales] = useState({ email: '', password: '' });
@@ -79,7 +80,7 @@ const LoginPage = () => {
       }
       
     } catch (err) {
-      setError(err.response?.data || 'Error al conectar con el servidor. Verifica tus credenciales.');
+      setError(mensajeError(err, 'Error al conectar con el servidor. Verifica tus credenciales.'));
     } finally {
       setCargando(false);
     }
