@@ -183,7 +183,6 @@ Set in the **Render** dashboard (backend):
 | `APP_FRONTEND_URL` | `https://epifaniadanceapp.com` |
 | `CORS_ALLOWED_ORIGINS` | `https://epifaniadanceapp.com,https://www.epifaniadanceapp.com` |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Initial director account. Only used when no DIRECTOR exists, so it never overwrites the live password |
-| `FLYWAY_REPAIR_ON_START` | `true` for a single deploy after an applied migration was edited (runs `flyway repair` to realign checksums). Remove it afterwards |
 
 Set in **Netlify** (frontend):
 
@@ -195,7 +194,10 @@ Set in **Netlify** (frontend):
 
 ## Database migrations
 
-Flyway applies migrations automatically when the backend starts. History:
+Flyway applies migrations automatically when the backend starts. V5, V18 and V22 were edited after
+being applied (to remove credentials and to make V18 run on MySQL 8); `ChecksumsMigracionesEditadas`
+updates their stored checksums on startup, so existing databases keep booting. Any other edited
+migration still fails validation. History:
 
 | Version | Description |
 |---------|-------------|

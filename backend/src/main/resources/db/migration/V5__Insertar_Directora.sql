@@ -4,5 +4,5 @@
 -- AdminBootstrap al arrancar, a partir de ADMIN_EMAIL y ADMIN_PASSWORD.
 --
 -- El archivo se conserva vacío para no romper la numeración de Flyway.
--- Una base que ya aplicó la versión anterior necesita un `flyway repair`
--- (ver FLYWAY_REPAIR_ON_START en el README).
+-- En bases que ya aplicaron la versión anterior, ChecksumsMigracionesEditadas
+-- actualiza el checksum al arrancar.
