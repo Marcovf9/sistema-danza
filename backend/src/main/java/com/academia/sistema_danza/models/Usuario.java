@@ -33,9 +33,6 @@ public class Usuario {
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
 
-    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private Profesor profesor;
-
     @Builder.Default
     @Column(name = "requiere_cambio_password", nullable = false)
     private Boolean requiereCambioPassword = false;
