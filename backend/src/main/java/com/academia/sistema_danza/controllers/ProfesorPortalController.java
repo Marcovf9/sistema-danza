@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class ProfesorPortalController {
 
     private final UsuarioRepository usuarioRepository;
+    private final ProfesorRepository profesorRepository;
     private final ClaseProgramadaRepository claseRepository;
     private final InscripcionRepository inscripcionRepository;
     private final SesionClaseRepository sesionClaseRepository;
@@ -33,19 +34,26 @@ public class ProfesorPortalController {
     private final LiquidacionProfesorRepository liquidacionRepository;
     private final PdfService pdfService;
 
-    @GetMapping("/agenda")
-    public ResponseEntity<?> obtenerMiAgenda(Authentication auth) {
+    private Profesor resolverProfesor(Authentication auth) {
         Usuario usuario = usuarioRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return profesorRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Tu cuenta no tiene un perfil de profesor asignado."));
+    }
 
-        if (usuario.getProfesor() == null) {
-            return ResponseEntity.badRequest().body("Tu cuenta no tiene un perfil de profesor asignado.");
+    @GetMapping("/agenda")
+    public ResponseEntity<?> obtenerMiAgenda(Authentication auth) {
+        Profesor miProfesor;
+        try {
+            miProfesor = resolverProfesor(auth);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
-        Long miProfesorId = usuario.getProfesor().getId();
+        Long miProfesorId = miProfesor.getId();
 
         List<Map<String, Object>> miAgenda = claseRepository.findAll().stream()
-                .filter(clase -> clase.getProfesorTitular() != null && 
+                .filter(clase -> clase.getProfesorTitular() != null &&
                                  clase.getProfesorTitular().getId().equals(miProfesorId))
                 .map(clase -> {
                     Map<String, Object> dto = new HashMap<>();
@@ -53,12 +61,12 @@ public class ProfesorPortalController {
                     dto.put("disciplina", clase.getDisciplina().getNombre());
                     dto.put("salon", clase.getSalon().getNombre());
                     dto.put("horaInicio", clase.getHoraInicio() != null ? clase.getHoraInicio().toString().substring(0, 5) : "S/H");
-                    
+
                     long inscriptos = inscripcionRepository.findAll().stream()
                             .filter(ins -> ins.isActivo() && ins.getClase().getId().equals(clase.getId()))
                             .count();
                     dto.put("cantidadAlumnos", inscriptos);
-                    
+
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -69,21 +77,21 @@ public class ProfesorPortalController {
     @GetMapping("/agenda/{claseId}/asistencia")
     @Transactional
     public ResponseEntity<?> obtenerListaParaAsistencia(
-            @PathVariable Long claseId, 
+            @PathVariable Long claseId,
             @RequestParam(required = false) String fecha,
             Authentication auth) {
-            
-        Usuario usuario = usuarioRepository.findByEmail(auth.getName()).orElseThrow();
-        Long miProfesorId = usuario.getProfesor().getId();
+
+        Profesor miProfesor = resolverProfesor(auth);
+        Long miProfesorId = miProfesor.getId();
 
         ClaseProgramada clase = claseRepository.findById(claseId).orElseThrow();
-        
+
         if (!clase.getProfesorTitular().getId().equals(miProfesorId)) {
             return ResponseEntity.status(403).body("No tienes permiso para tomar lista en esta clase.");
         }
 
         LocalDate fechaAsistencia = (fecha != null && !fecha.isEmpty()) ? LocalDate.parse(fecha) : LocalDate.now();
-        
+
         Optional<SesionClase> sesionOpt = sesionClaseRepository.findAll().stream()
                 .filter(s -> s.getClaseProgramada().getId().equals(claseId) && s.getFecha().equals(fechaAsistencia))
                 .findFirst();
@@ -95,7 +103,7 @@ public class ProfesorPortalController {
             SesionClase nuevaSesion = SesionClase.builder()
                     .claseProgramada(clase)
                     .fecha(fechaAsistencia)
-                    .profesorDictante(usuario.getProfesor())
+                    .profesorDictante(miProfesor)
                     .build();
             sesionHoy = sesionClaseRepository.save(nuevaSesion);
         }
@@ -104,7 +112,7 @@ public class ProfesorPortalController {
                 .filter(ins -> ins.isActivo() && ins.getClase().getId().equals(claseId))
                 .map(ins -> {
                     Alumno alumno = ins.getAlumno();
-                    
+
                     Optional<Asistencia> asistenciaPrevia = asistenciaRepository.findAll().stream()
                             .filter(a -> a.getSesionClase().getId().equals(sesionHoy.getId()) && a.getAlumno().getId().equals(alumno.getId()))
                             .findFirst();
@@ -113,7 +121,7 @@ public class ProfesorPortalController {
                     dto.put("alumnoId", alumno.getId());
                     dto.put("nombre", alumno.getNombre());
                     dto.put("apellido", alumno.getApellido());
-                    dto.put("estado", asistenciaPrevia.map(a -> a.getEstado().name()).orElse(null)); 
+                    dto.put("estado", asistenciaPrevia.map(a -> a.getEstado().name()).orElse(null));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -150,36 +158,36 @@ public class ProfesorPortalController {
 
     @GetMapping("/liquidaciones")
     public ResponseEntity<?> obtenerMisLiquidaciones(Authentication auth) {
-        Usuario usuario = usuarioRepository.findByEmail(auth.getName()).orElseThrow();
-        Long miProfesorId = usuario.getProfesor().getId();
-        
+        Profesor miProfesor = resolverProfesor(auth);
+        Long miProfesorId = miProfesor.getId();
+
         List<LiquidacionProfesor> liquidaciones = liquidacionRepository.findAll().stream()
                 .filter(l -> l.getProfesor().getId().equals(miProfesorId) && l.getEstado() == EstadoLiquidacion.PAGADO)
                 .sorted(Comparator.comparing(LiquidacionProfesor::getAnio).thenComparing(LiquidacionProfesor::getMes).reversed())
                 .collect(Collectors.toList());
-                
+
         return ResponseEntity.ok(liquidaciones);
     }
 
     @GetMapping("/liquidaciones/{id}/pdf")
     public ResponseEntity<byte[]> descargarMiReciboSueldo(@PathVariable Long id, Authentication auth) {
         try {
-            Usuario usuario = usuarioRepository.findByEmail(auth.getName()).orElseThrow();
-            Long miProfesorId = usuario.getProfesor().getId();
-            
+            Profesor miProfesor = resolverProfesor(auth);
+            Long miProfesorId = miProfesor.getId();
+
             LiquidacionProfesor liquidacion = liquidacionRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Liquidación no encontrada"));
-            
+
             if (!liquidacion.getProfesor().getId().equals(miProfesorId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-            
+
             byte[] pdfBytes = pdfService.generarReciboSueldoPdf(liquidacion);
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "Recibo_Honorarios_" + liquidacion.getMes() + "_" + liquidacion.getAnio() + ".pdf");
-            
+
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
