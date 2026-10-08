@@ -17,14 +17,23 @@ import TiendaPage from './pages/admin/TiendaPage';
 import PortalAlumnoPage from './pages/alumno/PortalAlumnoPage';
 
 
+const destinoPorRol = (rol) =>
+  rol === 'PROFESOR' ? '/profesor/agenda' : rol === 'ALUMNO' ? '/alumno/cuenta' : '/dashboard';
+
 const RutaProtegida = ({ children, rolesPermitidos }) => {
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('rol');
 
   if (!token) return <Navigate to="/login" replace />;
   if (rolesPermitidos && !rolesPermitidos.includes(rol)) {
-    return <Navigate to={rol === 'PROFESOR' ? '/profesor/agenda' : '/dashboard'} replace />;
+    return <Navigate to={destinoPorRol(rol)} replace />;
   }
+  return children;
+};
+
+const RutaPublica = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (token) return <Navigate to={destinoPorRol(localStorage.getItem('rol'))} replace />;
   return children;
 };
 
@@ -52,7 +61,7 @@ function App() {
       />
 
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<RutaPublica><LoginPage /></RutaPublica>} />
         <Route path="/olvide-password" element={<OlvidePasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/" element={<RutaProtegida><LayoutPrincipal /></RutaProtegida>}>
