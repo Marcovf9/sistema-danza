@@ -196,12 +196,12 @@ const AsistenciaPage = () => {
       </div>
 
       {rolActual === 'DIRECTOR' && (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl flex items-center gap-4">
-          <span className="text-yellow-800 font-bold text-sm">Simular vista como:</span>
-          <select 
-            value={profesorActual} 
+        <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-xl flex items-center gap-3">
+          <span className="text-yellow-800 font-bold text-sm whitespace-nowrap flex-shrink-0">Ver como:</span>
+          <select
+            value={profesorActual}
             onChange={(e) => setProfesorActual(e.target.value)}
-            className="px-3 py-2 border-none rounded-lg bg-white shadow-sm font-medium text-gray-700 outline-none"
+            className="flex-1 min-w-0 px-3 py-2 border-none rounded-lg bg-white shadow-sm font-medium text-gray-700 outline-none text-sm"
           >
             {profesores.map(p => <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>)}
           </select>

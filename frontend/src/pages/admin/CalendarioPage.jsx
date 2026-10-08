@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import api from '../../services/api';
 import { Calendar, User, MapPin, X, Users, Clock } from 'lucide-react';
 
@@ -41,7 +41,8 @@ const colorDisciplina = (nombre) => {
   return PALETA[h % PALETA.length];
 };
 
-const ALTURA_HORA = 72; // px por hora — un poco más que antes para mejor legibilidad
+const ALTURA_HORA = 72;
+const ALTURA_VACIA = 12; // px para horas sin clases — casi invisible
 
 const CalendarioPage = () => {
   const [clases, setClases] = useState([]);
@@ -52,7 +53,40 @@ const CalendarioPage = () => {
   const profesorId = localStorage.getItem('entidadId') || '';
 
   const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
-  const horas = Array.from({ length: 15 }, (_, i) => i + 8);
+
+  // Calcula rango de horas y alturas dinámicas según las clases cargadas
+  const { horas, alturasPorHora, offsetsPorHora, horasOcupadas } = useMemo(() => {
+    const ocupadas = new Set();
+    clases.forEach(c => {
+      const { h } = obtenerHoraMinutos(c.horaInicio);
+      ocupadas.add(h);
+    });
+
+    const hMin = ocupadas.size ? Math.min(...ocupadas) : 8;
+    const hMax = clases.length
+      ? Math.max(...clases.map(c => {
+          const { h, m } = obtenerHoraMinutos(c.horaInicio);
+          return h + Math.ceil((m + (c.duracionMinutos || 60)) / 60);
+        }))
+      : 22;
+
+    const hs = Array.from({ length: Math.max(1, hMax - hMin + 1) }, (_, i) => i + hMin);
+    const alturas = {};
+    const offsets = {};
+    let acum = 0;
+    hs.forEach(h => {
+      offsets[h] = acum;
+      alturas[h] = ocupadas.has(h) ? ALTURA_HORA : ALTURA_VACIA;
+      acum += alturas[h];
+    });
+    return { horas: hs, alturasPorHora: alturas, offsetsPorHora: offsets, horasOcupadas: ocupadas };
+  }, [clases]);
+
+  const getYOffset = (horaInt, minInt) => {
+    const base = offsetsPorHora[horaInt] ?? 0;
+    const alt = alturasPorHora[horaInt] ?? ALTURA_HORA;
+    return base + (minInt / 60) * alt;
+  };
 
   useEffect(() => { fetchClases(); }, []);
 
@@ -116,7 +150,7 @@ const CalendarioPage = () => {
               {/* Columna de horas */}
               <div className="col-span-1 border-r border-gray-100">
                 {horas.map(h => (
-                  <div key={h} style={{ height: ALTURA_HORA }} className="border-b border-gray-50 flex items-start justify-center pt-2 text-[11px] font-bold text-gray-300">
+                  <div key={h} style={{ height: alturasPorHora[h] }} className={`border-b flex items-start justify-center text-[11px] font-bold ${horasOcupadas.has(h) ? 'border-gray-50 pt-2 text-gray-300' : 'border-gray-100/40 text-transparent'}`}>
                     {h}:00
                   </div>
                 ))}
@@ -137,12 +171,12 @@ const CalendarioPage = () => {
                 return (
                   <div key={dia} className="col-span-1 border-r border-gray-100 last:border-r-0 relative">
                     {horas.map(h => (
-                      <div key={h} style={{ height: ALTURA_HORA }} className="border-b border-gray-50" />
+                      <div key={h} style={{ height: alturasPorHora[h] }} className={`border-b ${horasOcupadas.has(h) ? 'border-gray-50' : 'border-gray-100/30'}`} />
                     ))}
 
                     {clasesDelDia.map(clase => {
                       const { h: horaInt, m: minInt } = obtenerHoraMinutos(clase.horaInicio);
-                      const top = (horaInt - 8) * ALTURA_HORA + (minInt / 60) * ALTURA_HORA + 3;
+                      const top = getYOffset(horaInt, minInt) + 3;
                       const altura = Math.max(36, ((clase.duracionMinutos || 60) / 60) * ALTURA_HORA - 6);
 
                       const esSuClase = profesorId && clase.profesorTitular?.id === parseInt(profesorId);
