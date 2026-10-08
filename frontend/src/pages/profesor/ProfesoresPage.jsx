@@ -114,12 +114,12 @@ const ProfesoresPage = () => {
   // ── UI ─────────────────────────────────────────────────────────────────────
   return (
     <div className="h-full flex flex-col space-y-6">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center">Staff Docente y Sueldos</h2>
-          <p className="text-gray-500 mt-1">Calcula honorarios y administra los accesos.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">Staff Docente y Sueldos</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Calcula honorarios y administra los accesos.</p>
         </div>
-        <div className="mt-4 sm:mt-0 flex gap-3 items-center">
+        <div className="mt-3 sm:mt-0 flex flex-wrap gap-2 sm:gap-3 items-center">
           <button onClick={handleAbrirCrear} className="flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition">
             <Plus className="w-5 h-5 mr-1" /> Agregar Profe
           </button>

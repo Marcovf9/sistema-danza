@@ -185,13 +185,13 @@ const AsistenciaPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl mr-4">
-          <ClipboardCheck className="w-8 h-8" />
+      <div className="flex items-center bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="p-2.5 sm:p-3 bg-blue-50 text-blue-600 rounded-xl mr-3 sm:mr-4 flex-shrink-0">
+          <ClipboardCheck className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-gray-800">Toma de Asistencia</h2>
-          <p className="text-gray-500 mt-1">Selecciona una clase para pasar lista</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800">Toma de Asistencia</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Selecciona una clase para pasar lista</p>
         </div>
       </div>
 
@@ -215,22 +215,22 @@ const AsistenciaPage = () => {
           </div>
         ) : (
           clasesHoy.map(clase => (
-            <div 
-              key={clase.id} 
+            <div
+              key={clase.id}
               onClick={() => setClaseSeleccionada(clase)}
-              className="bg-white p-6 rounded-2xl shadow-sm border border-pink-100 hover:shadow-md hover:border-pink-300 cursor-pointer transition-all group"
+              className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-pink-100 hover:shadow-md hover:border-pink-300 cursor-pointer transition-all group active:scale-[0.98]"
             >
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-start mb-3">
                 <span className="bg-pink-50 text-pink-700 px-3 py-1 rounded-lg text-sm font-bold">
                   {clase.horaInicio.slice(0,5)}hs
                 </span>
                 <Users className="w-5 h-5 text-gray-400 group-hover:text-pink-500 transition-colors" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-1">{clase.disciplina.nombre}</h3>
-              <p className="text-gray-500 text-sm">Salón: {clase.salon?.nombre || 'General'}</p>
-              
-              <div className="mt-6 w-full py-2.5 bg-gray-50 group-hover:bg-pink-600 group-hover:text-white text-center rounded-xl font-medium text-gray-600 transition-colors">
-                Pasar Lista 
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1">{clase.disciplina.nombre}</h3>
+              <p className="text-gray-500 text-xs sm:text-sm">Salón: {clase.salon?.nombre || 'General'}</p>
+
+              <div className="mt-4 sm:mt-6 w-full py-2.5 bg-gray-50 group-hover:bg-pink-600 group-hover:text-white text-center rounded-xl font-medium text-gray-600 transition-colors text-sm">
+                Pasar Lista
               </div>
             </div>
           ))

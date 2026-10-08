@@ -159,12 +159,12 @@ const CajaPage = () => {
     <div className="h-full flex flex-col space-y-6">
 
       {/* CABECERA */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 flex items-center">
-            Caja y Tesorería <DollarSign className="ml-3 w-8 h-8 text-emerald-500" />
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800 flex items-center">
+            Caja y Tesorería <DollarSign className="ml-2 sm:ml-3 w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
           </h2>
-          <p className="text-gray-500 mt-1">Gestión de ingresos por cuotas y registro de gastos de la academia.</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Gestión de ingresos por cuotas y registro de gastos de la academia.</p>
         </div>
 
         <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto">
@@ -185,16 +185,16 @@ const CajaPage = () => {
 
       {tabActiva === 'INGRESOS' && (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             {esEpocaDeMora && pendientes.length > 0 ? (
-              <div className="bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-sm shadow-sm animate-in fade-in">
-                <AlertCircle className="w-5 h-5" />
+              <div className="bg-red-50 text-red-700 border border-red-200 px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-xs sm:text-sm shadow-sm animate-in fade-in w-full sm:w-auto">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 Estamos a día {diaActual}. Hay {pendientes.length} cuotas vencidas.
               </div>
             ) : <div></div>}
 
-            <button onClick={dispararRobot} className="flex items-center gap-2 bg-pink-50 text-pink-700 px-4 py-2 rounded-xl font-bold hover:bg-pink-100 transition border border-pink-200">
-              <Bot className="w-5 h-5" /> Simular Facturación Mensual
+            <button onClick={dispararRobot} className="flex items-center gap-2 bg-pink-50 text-pink-700 px-3 sm:px-4 py-2 rounded-xl font-bold hover:bg-pink-100 transition border border-pink-200 text-xs sm:text-sm w-full sm:w-auto justify-center sm:justify-start">
+              <Bot className="w-4 h-4 sm:w-5 sm:h-5" /> Simular Facturación Mensual
             </button>
           </div>
 

@@ -107,16 +107,16 @@ const AlumnosPage = () => {
   // ── UI ─────────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
         <div>
-          <h2 className="text-3xl font-black text-gray-800 tracking-tight flex items-center">
-            <Users className="w-8 h-8 mr-3 text-pink-600" /> Directorio de Alumnos
+          <h2 className="text-xl sm:text-3xl font-black text-gray-800 tracking-tight flex items-center">
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 text-pink-600" /> Directorio de Alumnos
           </h2>
-          <p className="text-gray-500 mt-1">Gestiona las inscripciones y legajos de la academia.</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Gestiona las inscripciones y legajos de la academia.</p>
         </div>
         <button
           onClick={handleAbrirCrear}
-          className="mt-4 sm:mt-0 flex items-center justify-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
+          className="w-full sm:w-auto flex items-center justify-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-xl transition-all shadow-sm active:scale-95"
         >
           <Plus className="w-5 h-5 mr-2" /> Nuevo Alumno
         </button>
@@ -150,25 +150,61 @@ const AlumnosPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest">Alumno</th>
-                  <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest">DNI</th>
-                  <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest">Contacto</th>
-                  <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {alumnosFiltrados.length === 0 ? (
-                  <tr><td colSpan="4" className="p-8 text-center text-gray-500">No se encontraron alumnos con estos filtros.</td></tr>
-                ) : (
-                  alumnosFiltrados.map((alumno) => (
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : alumnosFiltrados.length === 0 ? (
+        <div className="bg-white rounded-2xl p-8 text-center text-gray-500 shadow-sm border border-gray-100">No se encontraron alumnos con estos filtros.</div>
+      ) : (
+        <>
+          {/* Vista tarjetas — mobile */}
+          <div className="md:hidden space-y-3">
+            {alumnosFiltrados.map((alumno) => (
+              <div key={alumno.id} className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-3 ${!alumno.activo ? 'opacity-70' : ''}`}>
+                <div className="w-11 h-11 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-black text-sm flex-shrink-0">
+                  {alumno.nombre.charAt(0)}{alumno.apellido.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-bold text-gray-800 text-sm">{alumno.apellido}, {alumno.nombre}</p>
+                    {alumno.esMenor && <span className="text-[9px] font-black text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full uppercase">Menor</span>}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">{alumno.dni || 'Sin DNI'} · {alumno.telefono || 'Sin tel.'}</p>
+                </div>
+                <div className="flex gap-1 flex-shrink-0">
+                  <button onClick={() => setAlumnoEnFicha(alumno)} className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg transition" title="Ficha">
+                    <FileText className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleAbrirEditar(alumno)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  {mostrarActivos ? (
+                    <button onClick={() => handleDarDeBaja(alumno.id, alumno.nombre)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Dar de baja">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button onClick={() => handleReactivar(alumno.id, alumno.nombre)} className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition" title="Reactivar">
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Vista tabla — desktop */}
+          <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest">Alumno</th>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest">DNI</th>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest">Contacto</th>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {alumnosFiltrados.map((alumno) => (
                     <tr key={alumno.id} className={`hover:bg-gray-50 transition ${!alumno.activo ? 'opacity-70' : ''}`}>
                       <td className="p-4">
                         <div className="flex items-center">
@@ -194,7 +230,6 @@ const AlumnosPage = () => {
                           <button onClick={() => handleAbrirEditar(alumno)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">
                             <Edit className="w-5 h-5" />
                           </button>
-
                           {mostrarActivos ? (
                             <button onClick={() => handleDarDeBaja(alumno.id, alumno.nombre)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Dar de baja">
                               <Trash2 className="w-5 h-5" />
@@ -212,13 +247,13 @@ const AlumnosPage = () => {
                         </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       <AlumnoModal
         isOpen={isModalOpen}

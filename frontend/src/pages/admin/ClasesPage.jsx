@@ -225,16 +225,16 @@ const ClasesPage = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
 
       {/* CABECERA */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-            Gestión de Clases <Calendar className="ml-3 w-6 h-6 text-pink-500" />
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
+            Gestión de Clases <Calendar className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6 text-pink-500" />
           </h2>
-          <p className="text-gray-500 mt-1">Administra los horarios y asigna profesores a cada grupo.</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Administra los horarios y asigna profesores a cada grupo.</p>
         </div>
         <button
           onClick={abrirNueva}
-          className="mt-4 sm:mt-0 flex items-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition shadow-sm"
+          className="mt-3 sm:mt-0 w-full sm:w-auto flex items-center justify-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition shadow-sm"
         >
           <Plus className="w-5 h-5 mr-2" /> Nueva Clase
         </button>
@@ -304,16 +304,16 @@ const ClasesPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {clases.map(clase => (
-            <div key={clase.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative group hover:border-pink-300 transition-colors">
-              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => verInscritos(clase)} className="p-2 bg-violet-50 text-violet-600 rounded-lg hover:bg-violet-600 hover:text-white transition" title="Ver inscritos">
-                  <Users className="w-4 h-4" />
+            <div key={clase.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 relative group hover:border-pink-300 transition-colors">
+              <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                <button onClick={() => verInscritos(clase)} className="p-1.5 sm:p-2 bg-violet-50 text-violet-600 rounded-lg hover:bg-violet-600 hover:text-white transition" title="Ver inscritos">
+                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
-                <button onClick={() => abrirEditor(clase)} className="p-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-600 hover:text-white transition" title="Editar">
-                  <Pencil className="w-4 h-4" />
+                <button onClick={() => abrirEditor(clase)} className="p-1.5 sm:p-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-600 hover:text-white transition" title="Editar">
+                  <Pencil className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
-                <button onClick={() => setClaseAEliminar(clase)} className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition" title="Eliminar">
-                  <Trash2 className="w-4 h-4" />
+                <button onClick={() => setClaseAEliminar(clase)} className="p-1.5 sm:p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition" title="Eliminar">
+                  <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
               <div className="mb-4">

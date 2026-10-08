@@ -137,30 +137,30 @@ const PanelGeneral = () => {
 
       {/* GRÁFICOS - FILA 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border min-h-[350px] flex flex-col">
-          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-pink-500" />Inscriptos por Disciplina</h3>
-          <div className="flex-1 w-full min-h-[250px]">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border">
+          <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm sm:text-base"><TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />Inscriptos por Disciplina</h3>
+          <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={data.alumnosPorDisciplina || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5}>
+                <Pie data={data.alumnosPorDisciplina || []} dataKey="value" nameKey="name" cx="50%" cy="45%" innerRadius={55} outerRadius={85} paddingAngle={5}>
                   {(data.alumnosPorDisciplina || []).map((_, i) => <Cell key={i} fill={COLORES[i % COLORES.length]} />)}
                 </Pie>
-                <Tooltip cursor={{ fill: '#f9fafb' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend wrapperStyle={{ fontSize: '13px', fontWeight: '500', paddingTop: '20px' }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }} />
+                <Legend wrapperStyle={{ fontSize: '11px', fontWeight: '500', paddingTop: '8px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border min-h-[350px] flex flex-col">
-          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><CreditCard className="w-5 h-5 text-emerald-500" />Métodos de Ingreso</h3>
-          <div className="flex-1 w-full min-h-[250px]">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border">
+          <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm sm:text-base"><CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />Métodos de Ingreso</h3>
+          <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.metodosPago || []} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+              <BarChart data={data.metodosPago || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280', fontWeight: '500' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} tickFormatter={(value) => `$${value}`} />
-                <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value) => `$${value.toLocaleString('es-AR')}`} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280', fontWeight: '500' }} dy={8} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} tickFormatter={(value) => `$${value}`} />
+                <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }} formatter={(value) => `$${value.toLocaleString('es-AR')}`} />
                 <Bar dataKey="value" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={60} />
               </BarChart>
             </ResponsiveContainer>
@@ -168,18 +168,18 @@ const PanelGeneral = () => {
         </div>
       </div>
 
-      {/* GRÁFICO DE CONVOCATORIA PROFESORES (Añadido) */}
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px] mt-8">
-        <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <GraduationCap className="w-5 h-5 text-pink-500"/> Convocatoria por Profesor
+      {/* GRÁFICO DE CONVOCATORIA PROFESORES */}
+      <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
+        <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm sm:text-base">
+          <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500"/> Convocatoria por Profesor
         </h3>
-        <div className="h-[250px]">
+        <div className="h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.profesores || []} margin={{top: 0, right: 0, left: -20, bottom: 0}}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#6b7280'}} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#6b7280'}} />
-              <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#6b7280'}} dy={8} />
+              <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#6b7280'}} />
+              <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px'}} />
               <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={60} name="Alumnos Inscritos" />
             </BarChart>
           </ResponsiveContainer>
@@ -187,36 +187,36 @@ const PanelGeneral = () => {
       </div>
 
       {/* GRÁFICOS - FILA 2 (Edades y Barrios) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* GRÁFICO DE EDADES */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px]">
-          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2"><Users className="w-5 h-5 text-pink-500"/> Edades de los Alumnos</h3>
-          <div className="h-[250px]">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
+          <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm sm:text-base"><Users className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500"/> Edades de los Alumnos</h3>
+          <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={data.edades} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                <Pie data={data.edades} dataKey="value" nameKey="name" cx="50%" cy="45%" outerRadius={70} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
                   {data.edades.map((entry, index) => <Cell key={index} fill={COLORES[index % COLORES.length]} />)}
                 </Pie>
-                <Tooltip />
-                <Legend />
+                <Tooltip contentStyle={{borderRadius: '12px', border: 'none', fontSize: '12px'}} />
+                <Legend wrapperStyle={{fontSize: '11px'}} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* GRÁFICO DE BARRIOS */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[350px]">
-          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-emerald-500"/> Distribución por Barrios
+        <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
+          <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm sm:text-base">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500"/> Distribución por Barrios
           </h3>
-          <div className="h-[250px]">
+          <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.localidades} layout="vertical">
+              <BarChart data={data.localidades} layout="vertical" margin={{top: 0, right: 10, left: 0, bottom: 0}}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                 <XAxis type="number" hide/>
-                <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12}} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
+                <YAxis dataKey="name" type="category" width={90} tick={{fontSize: 10}} />
+                <Tooltip contentStyle={{borderRadius: '12px', border: 'none', fontSize: '12px'}} />
+                <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={18} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -224,7 +224,7 @@ const PanelGeneral = () => {
       </div>
 
       {/* ALERTAS DE ABANDONO */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden mt-8">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden">
         <div className="absolute right-0 top-0 w-2 h-full bg-red-500"></div>
         <h3 className="font-bold text-red-600 mb-6 flex items-center gap-2 text-lg"><AlertTriangle className="w-6 h-6" /> Alumnos en Riesgo de Abandono</h3>
 
