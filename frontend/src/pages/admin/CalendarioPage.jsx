@@ -34,8 +34,16 @@ const PALETA = [
   { bg: 'bg-fuchsia-100', border: 'border-l-fuchsia-500', text: 'text-fuchsia-900', sub: 'text-fuchsia-600', dot: 'bg-fuchsia-500' },
 ];
 
+// Overrides explícitos para disciplinas con colores similares entre sí
+const COLORES_OVERRIDE = {
+  'Folklore':          PALETA[4],  // amber
+  'Street Dance':      PALETA[7],  // rose
+  'Street Dance Teens':PALETA[1],  // violet
+};
+
 const colorDisciplina = (nombre) => {
   if (!nombre) return PALETA[0];
+  if (COLORES_OVERRIDE[nombre]) return COLORES_OVERRIDE[nombre];
   let h = 0;
   for (let i = 0; i < nombre.length; i++) h = ((h * 31) + nombre.charCodeAt(i)) >>> 0;
   return PALETA[h % PALETA.length];

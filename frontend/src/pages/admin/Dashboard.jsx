@@ -63,24 +63,22 @@ const PanelGeneral = () => {
           <p className="text-gray-500 mt-1">Resumen General de Epifania Dance</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100 shadow-inner">
+        <div className="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-100 shadow-inner">
           <button
             onClick={() => setHistorico(!historico)}
-            className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${historico ? 'bg-pink-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'}`}
+            className={`px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${historico ? 'bg-pink-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'}`}
           >
             {historico ? 'Volver a Mensual' : 'Ver Histórico Total'}
           </button>
 
           {!historico && (
-            <div className="flex gap-2">
+            <>
               <select value={mes} onChange={(e) => setMes(e.target.value)} className="bg-white border border-gray-200 rounded-lg text-sm p-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-pink-500">
                 {MESES.map(m => <option key={m.v} value={m.v}>{m.n}</option>)}
               </select>
               <select value={anio} onChange={(e) => setAnio(e.target.value)} className="bg-white border border-gray-200 rounded-lg text-sm p-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-pink-500">
                 {[2024, 2025, 2026, 2027].map(a => <option key={a} value={a}>{a}</option>)}
               </select>
-
-              <div className="h-8 w-px bg-gray-300 mx-1"></div>
               <button
                 onClick={descargarExcel}
                 className="flex items-center px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold shadow-sm transition-colors"
@@ -88,7 +86,7 @@ const PanelGeneral = () => {
               >
                 <Download className="w-4 h-4 mr-2" /> Excel
               </button>
-            </div>
+            </>
           )}
         </div>
       </div>
