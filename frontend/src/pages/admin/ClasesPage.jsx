@@ -185,7 +185,10 @@ const ClasesPage = () => {
     setInscritos([]);
     setCargandoInscritos(true);
     try {
-      const res = await api.get(`/calendario/clase/${clase.id}/detalles`);
+      const rol = localStorage.getItem('rol') || 'DIRECTOR';
+      const res = await api.get(`/calendario/clase/${clase.id}/detalles`, {
+        headers: { rol },
+      });
       setInscritos(res.data.alumnos || []);
     } catch {
       toast.error('Error al cargar los alumnos inscritos.');
