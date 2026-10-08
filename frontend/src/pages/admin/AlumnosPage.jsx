@@ -36,7 +36,7 @@ const AlumnosPage = () => {
       toast.success(alumnoAEditar ? '¡Alumno actualizado correctamente!' : '¡Alumno guardado correctamente!');
       setIsModalOpen(false);
     },
-    onError: () => toast.error('Hubo un error al guardar los datos del alumno.'),
+    onError: (error) => toast.error(mensajeError(error, 'Hubo un error al guardar los datos del alumno.'), { duration: 6000 }),
   });
 
   const bajaMutation = useMutation({
@@ -56,7 +56,16 @@ const AlumnosPage = () => {
       queryClient.invalidateQueries({ queryKey: ['alumnos'] });
       toast.success('¡Alumno reactivado con éxito!');
     },
-    onError: () => toast.error('Error al reactivar.'),
+    onError: (error) => toast.error(mensajeError(error, 'Error al reactivar.')),
+  });
+
+  const eliminarMutation = useMutation({
+    mutationFn: (id) => api.delete(`/alumnos/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumnos'] });
+      toast.success('Alumno eliminado definitivamente.');
+    },
+    onError: (error) => toast.error(mensajeError(error, 'Error al eliminar el alumno.')),
   });
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -78,6 +87,15 @@ const AlumnosPage = () => {
       mensaje: `¿Deseas volver a activar el perfil de ${nombre}? Podrá volver a inscribirse a clases.`,
       labelOk: 'Sí, reactivar',
       onConfirm: () => reactivarMutation.mutate(id),
+    });
+  };
+
+  const handleEliminar = (id, nombre) => {
+    showConfirmToast({
+      titulo: '¿Eliminar definitivamente?',
+      mensaje: `Esto borrará a ${nombre} y todos sus datos. No se puede deshacer.`,
+      labelOk: 'Sí, eliminar',
+      onConfirm: () => eliminarMutation.mutate(id),
     });
   };
 
@@ -182,9 +200,14 @@ const AlumnosPage = () => {
                               <Trash2 className="w-5 h-5" />
                             </button>
                           ) : (
-                            <button onClick={() => handleReactivar(alumno.id, alumno.nombre)} className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition" title="Reactivar">
-                              <RotateCcw className="w-5 h-5" />
-                            </button>
+                            <>
+                              <button onClick={() => handleReactivar(alumno.id, alumno.nombre)} className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition" title="Reactivar">
+                                <RotateCcw className="w-5 h-5" />
+                              </button>
+                              <button onClick={() => handleEliminar(alumno.id, alumno.nombre)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Eliminar definitivamente">
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>

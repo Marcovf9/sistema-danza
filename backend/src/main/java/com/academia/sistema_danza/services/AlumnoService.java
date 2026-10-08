@@ -23,6 +23,8 @@ public class AlumnoService {
     private final AlumnoRepository alumnoRepository;
     private final UsuarioRepository usuarioRepository;
     private final GrupoFamiliarRepository grupoFamiliarRepository;
+    private final InscripcionRepository inscripcionRepository;
+    private final AsistenciaRepository asistenciaRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetService passwordResetService;
 
@@ -37,6 +39,17 @@ public class AlumnoService {
 
     @Transactional
     public AlumnoResponseDTO crearAlumno(AlumnoRequestDTO dto) {
+        if (dto.getDni() != null && !dto.getDni().isBlank()) {
+            alumnoRepository.findByDni(dto.getDni().trim()).ifPresent(existente -> {
+                String estado = existente.isActivo() ? "activo" : "inactivo";
+                throw new IllegalArgumentException("Ya existe un alumno " + estado + " con el DNI " + dto.getDni().trim() + ".");
+            });
+        }
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            usuarioRepository.findByEmail(dto.getEmail().trim()).ifPresent(u ->
+                    { throw new IllegalArgumentException("Ya existe una cuenta con el email " + dto.getEmail().trim() + "."); });
+        }
+
         Alumno alumno = new Alumno();
         mapearDatos(dto, alumno);
         alumno.setActivo(true);
@@ -77,6 +90,26 @@ public class AlumnoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", id));
         alumno.setActivo(false);
         alumnoRepository.save(alumno);
+    }
+
+    @Transactional
+    public void reactivar(Long id) {
+        Alumno alumno = alumnoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", id));
+        alumno.setActivo(true);
+        alumnoRepository.save(alumno);
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        Alumno alumno = alumnoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno", id));
+        asistenciaRepository.deleteByAlumnoId(id);
+        inscripcionRepository.deleteByAlumnoId(id);
+        if (alumno.getUsuarioId() != null) {
+            usuarioRepository.deleteById(alumno.getUsuarioId());
+        }
+        alumnoRepository.deleteById(id);
     }
 
     public AlumnoResponseDTO toResponseDTO(Alumno a) {

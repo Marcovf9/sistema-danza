@@ -5,6 +5,7 @@ import com.academia.sistema_danza.dto.AlumnoResponseDTO;
 import com.academia.sistema_danza.services.AlumnoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,5 +36,17 @@ public class AlumnoController {
     @PatchMapping("/{id}/baja")
     public void bajaLogica(@PathVariable Long id) {
         alumnoService.bajaLogica(id);
+    }
+
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivar(@PathVariable Long id) {
+        alumnoService.reactivar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        alumnoService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
