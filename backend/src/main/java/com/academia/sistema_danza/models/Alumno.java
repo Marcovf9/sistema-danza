@@ -37,6 +37,7 @@ public class Alumno {
     @JoinColumn(name = "grupo_familiar_id")
     private GrupoFamiliar grupoFamiliar;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "alumno")
     private List<Inscripcion> inscripciones;
 
