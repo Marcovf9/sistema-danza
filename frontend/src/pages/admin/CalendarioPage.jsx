@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { Calendar, User, MapPin, X, Users } from 'lucide-react';
+import { Calendar, User, MapPin, X, Users, Clock } from 'lucide-react';
 
 const formatearHora = (hora) => {
-  if (!hora) return "00:00";
-  if (Array.isArray(hora)) {
-    return `${hora[0].toString().padStart(2, '0')}:${(hora[1] || 0).toString().padStart(2, '0')}`;
-  }
+  if (!hora) return '00:00';
+  if (Array.isArray(hora)) return `${hora[0].toString().padStart(2, '0')}:${(hora[1] || 0).toString().padStart(2, '0')}`;
   return hora.toString().slice(0, 5);
 };
 
@@ -20,20 +18,43 @@ const obtenerHoraMinutos = (hora) => {
   return { h: 0, m: 0 };
 };
 
+// Paleta de colores — una por disciplina, asignada por hash del nombre
+const PALETA = [
+  { bg: 'bg-pink-100',    border: 'border-l-pink-500',    text: 'text-pink-900',    sub: 'text-pink-600',    dot: 'bg-pink-500'    },
+  { bg: 'bg-violet-100',  border: 'border-l-violet-500',  text: 'text-violet-900',  sub: 'text-violet-600',  dot: 'bg-violet-500'  },
+  { bg: 'bg-blue-100',    border: 'border-l-blue-500',    text: 'text-blue-900',    sub: 'text-blue-600',    dot: 'bg-blue-500'    },
+  { bg: 'bg-emerald-100', border: 'border-l-emerald-500', text: 'text-emerald-900', sub: 'text-emerald-600', dot: 'bg-emerald-500' },
+  { bg: 'bg-amber-100',   border: 'border-l-amber-500',   text: 'text-amber-900',   sub: 'text-amber-600',   dot: 'bg-amber-500'   },
+  { bg: 'bg-orange-100',  border: 'border-l-orange-500',  text: 'text-orange-900',  sub: 'text-orange-600',  dot: 'bg-orange-500'  },
+  { bg: 'bg-teal-100',    border: 'border-l-teal-500',    text: 'text-teal-900',    sub: 'text-teal-600',    dot: 'bg-teal-500'    },
+  { bg: 'bg-rose-100',    border: 'border-l-rose-500',    text: 'text-rose-900',    sub: 'text-rose-600',    dot: 'bg-rose-500'    },
+  { bg: 'bg-cyan-100',    border: 'border-l-cyan-500',    text: 'text-cyan-900',    sub: 'text-cyan-600',    dot: 'bg-cyan-500'    },
+  { bg: 'bg-indigo-100',  border: 'border-l-indigo-500',  text: 'text-indigo-900',  sub: 'text-indigo-600',  dot: 'bg-indigo-500'  },
+  { bg: 'bg-lime-100',    border: 'border-l-lime-500',    text: 'text-lime-900',    sub: 'text-lime-600',    dot: 'bg-lime-500'    },
+  { bg: 'bg-fuchsia-100', border: 'border-l-fuchsia-500', text: 'text-fuchsia-900', sub: 'text-fuchsia-600', dot: 'bg-fuchsia-500' },
+];
+
+const colorDisciplina = (nombre) => {
+  if (!nombre) return PALETA[0];
+  let h = 0;
+  for (let i = 0; i < nombre.length; i++) h = ((h * 31) + nombre.charCodeAt(i)) >>> 0;
+  return PALETA[h % PALETA.length];
+};
+
+const ALTURA_HORA = 72; // px por hora — un poco más que antes para mejor legibilidad
+
 const CalendarioPage = () => {
   const [clases, setClases] = useState([]);
   const [claseDetalle, setClaseDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   const rol = localStorage.getItem('rol');
   const profesorId = localStorage.getItem('entidadId') || '';
 
   const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
   const horas = Array.from({ length: 15 }, (_, i) => i + 8);
 
-  useEffect(() => {
-    fetchClases();
-  }, []);
+  useEffect(() => { fetchClases(); }, []);
 
   const fetchClases = async () => {
     try {
@@ -49,12 +70,12 @@ const CalendarioPage = () => {
   const verDetalles = async (clase) => {
     try {
       const res = await api.get(`/calendario/clase/${clase.id}/detalles`, {
-        headers: { rol, profesorId: profesorId }
+        headers: { rol, profesorId },
       });
       setClaseDetalle(res.data);
     } catch (err) {
       if (err.response?.status === 403) {
-        setClaseDetalle({ clase, alumnos: null, error: "No tienes permiso para ver la lista de alumnos." });
+        setClaseDetalle({ clase, alumnos: null, error: 'No tenés permiso para ver la lista de alumnos.' });
       }
     }
   };
@@ -74,119 +95,151 @@ const CalendarioPage = () => {
       </div>
 
       <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <div className="min-w-[1024px] grid grid-cols-8 border-b border-gray-100 bg-gray-50/50">
-            <div className="p-3 border-r border-gray-100 text-[11px] font-bold text-gray-400 text-center uppercase">Hora</div>
-            {dias.map(d => (
-              <div key={d} className="p-3 border-r border-gray-100 text-xs font-black text-pink-900 text-center uppercase tracking-tighter">
-                {d}
-              </div>
-            ))}
+        {loading ? (
+          <div className="flex justify-center p-16">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600" />
           </div>
-
-          <div className="min-w-[1024px] grid grid-cols-8 relative bg-white">
-            {/* Columna de Horas */}
-            <div className="col-span-1 border-r border-gray-50">
-              {horas.map(h => (
-                <div key={h} className="h-16 border-b border-gray-50 flex items-start justify-center pt-1.5 text-[11px] font-bold text-gray-400">
-                  {h}:00
+        ) : (
+          <div className="overflow-x-auto">
+            {/* Cabecera de días */}
+            <div className="min-w-[1200px] grid grid-cols-8 border-b border-gray-100 bg-gray-50/80 sticky top-0 z-20">
+              <div className="p-3 border-r border-gray-100 text-[11px] font-bold text-gray-400 text-center uppercase tracking-widest">Hora</div>
+              {dias.map(d => (
+                <div key={d} className="p-3 border-r border-gray-100 text-xs font-black text-gray-700 text-center uppercase tracking-wider last:border-r-0">
+                  {d}
                 </div>
               ))}
             </div>
 
-            {/* Columnas de Días y Clases */}
-            {dias.map(dia => {
-              const clasesDelDia = clases.filter(c => c.diasSemana?.includes(dia));
+            {/* Grilla */}
+            <div className="min-w-[1200px] grid grid-cols-8 relative bg-white">
+              {/* Columna de horas */}
+              <div className="col-span-1 border-r border-gray-100">
+                {horas.map(h => (
+                  <div key={h} style={{ height: ALTURA_HORA }} className="border-b border-gray-50 flex items-start justify-center pt-2 text-[11px] font-bold text-gray-300">
+                    {h}:00
+                  </div>
+                ))}
+              </div>
 
-              // Detectar clases simultáneas para mostrarlas lado a lado
-              const horaKey = c => formatearHora(c.horaInicio);
-              const grupos = {};
-              clasesDelDia.forEach(c => {
-                const k = horaKey(c);
-                if (!grupos[k]) grupos[k] = [];
-                grupos[k].push(c);
-              });
+              {/* Columnas por día */}
+              {dias.map(dia => {
+                const clasesDelDia = clases.filter(c => c.diasSemana?.includes(dia));
 
-              return (
-                <div key={dia} className="col-span-1 border-r border-gray-50 relative h-full">
-                  {horas.map(h => <div key={h} className="h-16 border-b border-gray-50"></div>)}
+                // Agrupar por hora exacta de inicio para detectar solapamientos
+                const grupos = {};
+                clasesDelDia.forEach(c => {
+                  const k = formatearHora(c.horaInicio);
+                  if (!grupos[k]) grupos[k] = [];
+                  grupos[k].push(c);
+                });
 
-                  {clasesDelDia.map(clase => {
-                    const { h: horaInt, m: minInt } = obtenerHoraMinutos(clase.horaInicio);
-                    const offset = (horaInt - 8) * 64 + (minInt / 60) * 64;
-                    const esSuClase = profesorId && clase.profesorTitular && clase.profesorTitular.id === parseInt(profesorId);
+                return (
+                  <div key={dia} className="col-span-1 border-r border-gray-100 last:border-r-0 relative">
+                    {horas.map(h => (
+                      <div key={h} style={{ height: ALTURA_HORA }} className="border-b border-gray-50" />
+                    ))}
 
-                    const grupo = grupos[horaKey(clase)];
-                    const idx = grupo.indexOf(clase);
-                    const total = grupo.length;
-                    const pct = 100 / total;
+                    {clasesDelDia.map(clase => {
+                      const { h: horaInt, m: minInt } = obtenerHoraMinutos(clase.horaInicio);
+                      const top = (horaInt - 8) * ALTURA_HORA + (minInt / 60) * ALTURA_HORA + 3;
+                      const altura = Math.max(36, ((clase.duracionMinutos || 60) / 60) * ALTURA_HORA - 6);
 
-                    return (
-                      <div
-                        key={clase.id}
-                        onClick={() => verDetalles(clase)}
-                        style={{
-                          top: `${offset + 4}px`,
-                          height: '56px',
-                          left: `${idx * pct}%`,
-                          width: `${pct}%`,
-                        }}
-                        className={`absolute px-1 rounded-xl p-2 shadow-sm cursor-pointer transition-all hover:shadow-md hover:z-10 overflow-hidden border-l-[3px] ${
-                          esSuClase
-                            ? 'bg-pink-600 border-pink-900 text-white'
-                            : 'bg-pink-50 border-pink-400 text-pink-900'
-                        }`}
-                      >
-                        <p className="text-[9px] leading-tight font-black uppercase truncate">{clase.disciplina?.nombre}</p>
-                        <div className="flex items-center mt-0.5 opacity-80">
-                          <MapPin className="w-2 h-2 mr-0.5 flex-shrink-0" />
-                          <span className="text-[8px] font-bold truncate">{formatearHora(clase.horaInicio)}hs</span>
+                      const esSuClase = profesorId && clase.profesorTitular?.id === parseInt(profesorId);
+                      const color = esSuClase ? null : colorDisciplina(clase.disciplina?.nombre);
+
+                      const grupo = grupos[formatearHora(clase.horaInicio)];
+                      const idx = grupo.indexOf(clase);
+                      const total = grupo.length;
+                      const pct = 100 / total;
+
+                      // Decidir cuánta info mostrar según espacio disponible
+                      const mostrarProfe = altura >= 60 && total <= 2;
+                      const mostrarSalon = altura >= 76 && total === 1;
+
+                      return (
+                        <div
+                          key={clase.id}
+                          onClick={() => verDetalles(clase)}
+                          style={{
+                            top: `${top}px`,
+                            height: `${altura}px`,
+                            left: `${idx * pct + 0.5}%`,
+                            width: `${pct - 1}%`,
+                          }}
+                          className={`absolute rounded-lg cursor-pointer transition-all hover:shadow-md hover:z-10 overflow-hidden border-l-[3px] px-1.5 py-1 flex flex-col justify-between
+                            ${esSuClase
+                              ? 'bg-pink-600 border-l-pink-900 text-white shadow-sm shadow-pink-200'
+                              : `${color.bg} ${color.border} ${color.text} shadow-sm`
+                            }`}
+                        >
+                          <p className="text-[9px] leading-snug font-black uppercase truncate">
+                            {clase.disciplina?.nombre}
+                          </p>
+                          <div className="space-y-0.5">
+                            {mostrarProfe && clase.profesorTitular && (
+                              <p className={`text-[8px] font-semibold truncate ${esSuClase ? 'text-pink-200' : color.sub}`}>
+                                {clase.profesorTitular.nombre} {clase.profesorTitular.apellido}
+                              </p>
+                            )}
+                            {mostrarSalon && clase.salon && (
+                              <p className={`text-[8px] font-semibold truncate ${esSuClase ? 'text-pink-200' : color.sub}`}>
+                                {clase.salon.nombre}
+                              </p>
+                            )}
+                            <p className={`text-[8px] font-bold ${esSuClase ? 'text-pink-200' : color.sub}`}>
+                              {formatearHora(clase.horaInicio)}hs
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modal de Detalle */}
       {claseDetalle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in duration-200">
-            <div className="p-6 bg-pink-600 text-white flex justify-between items-center">
+            <div className="p-6 bg-gradient-to-r from-pink-600 to-violet-600 text-white flex justify-between items-start">
               <div>
                 <h3 className="text-xl font-black">{claseDetalle.clase.disciplina?.nombre}</h3>
-                <p className="text-pink-100 flex items-center text-sm font-medium mt-1">
-                  <User className="w-4 h-4 mr-1" /> Prof. {claseDetalle.clase.profesorTitular?.nombre} {claseDetalle.clase.profesorTitular?.apellido}
-                </p>
+                {claseDetalle.clase.profesorTitular ? (
+                  <p className="text-pink-100 flex items-center text-sm font-medium mt-1">
+                    <User className="w-4 h-4 mr-1" />
+                    Prof. {claseDetalle.clase.profesorTitular.nombre} {claseDetalle.clase.profesorTitular.apellido}
+                  </p>
+                ) : (
+                  <p className="text-pink-200 text-sm mt-1 italic">Sin profesor asignado</p>
+                )}
               </div>
-              <button onClick={() => setClaseDetalle(null)} className="p-2 hover:bg-white/20 rounded-full">
+              <button onClick={() => setClaseDetalle(null)} className="p-2 hover:bg-white/20 rounded-full transition">
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="p-6 space-y-6">
-              <div className="flex justify-between p-4 bg-gray-50 rounded-2xl">
-                <div className="text-center">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase">Horario</p>
-                  {/* Usamos el formateador seguro aquí también */}
-                  <p className="font-bold text-gray-800">{formatearHora(claseDetalle.clase.horaInicio)}hs</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase">Salón</p>
-                  <p className="font-bold text-gray-800">{claseDetalle.clase.salon?.nombre}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase">Días</p>
-                  <p className="font-bold text-gray-800 text-xs">{claseDetalle.clase.diasSemana}</p>
-                </div>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Horario', valor: `${formatearHora(claseDetalle.clase.horaInicio)}hs`, icon: <Clock className="w-4 h-4" /> },
+                  { label: 'Salón', valor: claseDetalle.clase.salon?.nombre ?? '—', icon: <MapPin className="w-4 h-4" /> },
+                  { label: 'Días', valor: claseDetalle.clase.diasSemana, icon: <Calendar className="w-4 h-4" /> },
+                ].map(({ label, valor, icon }) => (
+                  <div key={label} className="p-3 bg-gray-50 rounded-2xl text-center">
+                    <div className="flex justify-center mb-1 text-pink-400">{icon}</div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{label}</p>
+                    <p className="font-bold text-gray-800 text-xs mt-0.5 break-words">{valor}</p>
+                  </div>
+                ))}
               </div>
 
               <div>
-                <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
+                <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center">
                   <Users className="w-4 h-4 mr-2" /> Alumnos Inscritos
                 </h4>
                 {claseDetalle.error ? (
@@ -194,7 +247,7 @@ const CalendarioPage = () => {
                     ⚠️ {claseDetalle.error}
                   </p>
                 ) : claseDetalle.alumnos?.length > 0 ? (
-                  <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                     {claseDetalle.alumnos.map((a, idx) => (
                       <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                         <span className="font-bold text-gray-700 text-sm">{a.nombre}</span>
@@ -203,7 +256,7 @@ const CalendarioPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-center italic text-sm">No hay alumnos inscritos en esta clase.</p>
+                  <p className="text-gray-400 text-center italic text-sm py-4">No hay alumnos inscritos en esta clase.</p>
                 )}
               </div>
             </div>
