@@ -82,14 +82,14 @@ const CalendarioPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+      <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="p-3 bg-pink-50 text-pink-600 rounded-2xl mr-4">
-            <Calendar className="w-8 h-8" />
+          <div className="p-2.5 sm:p-3 bg-pink-50 text-pink-600 rounded-2xl mr-3 sm:mr-4 flex-shrink-0">
+            <Calendar className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-gray-800">Grilla Epifania Dance</h2>
-            <p className="text-gray-500">Organización semanal de salones y disciplinas</p>
+            <h2 className="text-xl sm:text-3xl font-black text-gray-800">Grilla Epifania Dance</h2>
+            <p className="text-xs sm:text-sm text-gray-500">Organización semanal de salones y disciplinas</p>
           </div>
         </div>
       </div>

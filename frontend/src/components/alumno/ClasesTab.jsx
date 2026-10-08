@@ -31,23 +31,23 @@ const ClasesTab = ({ misClases, clasesDisponibles, onInscribir, onBaja }) => {
             </div>
           ) : (
             misClases.map(ins => (
-              <div key={ins.id} className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100 flex items-center gap-5 relative overflow-hidden group">
+              <div key={ins.id} className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-emerald-100 flex items-center gap-3 sm:gap-5 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-2 h-full bg-emerald-400"></div>
-                <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-emerald-50 text-emerald-600 rounded-xl sm:rounded-2xl flex items-center justify-center font-black text-xs sm:text-lg shadow-inner flex-shrink-0">
                   {ins.clase.horaInicio.slice(0, 5)}
                 </div>
-                <div className="flex-1">
-                  <p className="font-bold text-gray-800 text-lg leading-tight">{ins.clase.disciplina.nombre}</p>
-                  <p className="text-sm font-bold text-gray-500 mt-1 uppercase tracking-wider">
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-800 text-base sm:text-lg leading-tight truncate">{ins.clase.disciplina.nombre}</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mt-0.5 uppercase tracking-wider truncate">
                     {ins.diasSeleccionados || ins.clase.diasSemana}
                   </p>
                 </div>
                 <button
                   onClick={() => handleDarDeBaja(ins.id, ins.clase.disciplina.nombre)}
-                  className="mr-3 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                  className="flex-shrink-0 mr-1 sm:mr-3 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                   title="Anular inscripción"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             ))

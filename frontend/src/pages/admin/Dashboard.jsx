@@ -57,7 +57,7 @@ const PanelGeneral = () => {
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-gray-800">Estado de la Academia</h1>
           <p className="text-gray-500 mt-1">Resumen General de Epifania Dance</p>
@@ -100,7 +100,7 @@ const PanelGeneral = () => {
             <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl shadow-inner"><Users className="w-8 h-8" /></div>
             <div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Población Estudiantil</p>
-              <p className="text-3xl font-black text-gray-800">{data.alumnosActivos || 0} Alumnos Activos</p>
+              <p className="text-xl sm:text-3xl font-black text-gray-800">{data.alumnosActivos || 0} Alumnos Activos</p>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ const PanelGeneral = () => {
               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><DollarSign className="w-5 h-5" /></div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Cobros Acumulados</p>
             </div>
-            <p className="text-3xl font-black text-gray-800 z-10">${data.ingresos?.toLocaleString('es-AR') || '0'}</p>
+            <p className="text-2xl sm:text-3xl font-black text-gray-800 z-10">${data.ingresos?.toLocaleString('es-AR') || '0'}</p>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center relative overflow-hidden group hover:border-red-200 transition-colors">
@@ -121,7 +121,7 @@ const PanelGeneral = () => {
               <div className="p-2 bg-red-50 text-red-600 rounded-lg"><Activity className="w-5 h-5" /></div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Gastos y Sueldos</p>
             </div>
-            <p className="text-3xl font-black text-gray-800 z-10">-${data.totalEgresos?.toLocaleString('es-AR') || '0'}</p>
+            <p className="text-2xl sm:text-3xl font-black text-gray-800 z-10">-${data.totalEgresos?.toLocaleString('es-AR') || '0'}</p>
           </div>
 
           <div className="bg-pink-600 p-6 rounded-2xl shadow-md border border-pink-500 flex flex-col justify-center relative overflow-hidden group">
@@ -130,7 +130,7 @@ const PanelGeneral = () => {
               <div className="p-2 bg-white/20 rounded-lg"><DollarSign className="w-5 h-5" /></div>
               <p className="text-xs font-bold uppercase tracking-wider">Ganancia Neta Real</p>
             </div>
-            <p className="text-4xl font-black text-white z-10">${data.balanceNeto?.toLocaleString('es-AR') || '0'}</p>
+            <p className="text-3xl sm:text-4xl font-black text-white z-10">${data.balanceNeto?.toLocaleString('es-AR') || '0'}</p>
           </div>
         </div>
       </div>

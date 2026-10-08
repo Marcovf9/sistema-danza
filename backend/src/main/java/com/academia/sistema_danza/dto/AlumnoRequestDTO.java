@@ -25,6 +25,7 @@ public class AlumnoRequestDTO {
     private String lugarNacimiento;
     private String direccion;
     private String codigoPostal;
+    private String barrio;
     private String localidad;
     private String provincia;
     private String facebook;

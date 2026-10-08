@@ -220,19 +220,19 @@ const PortalAlumnoPage = ({ vista }) => {
       )}
 
       {/* Cabecera */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
-        <div className="p-3 bg-pink-50 text-pink-600 rounded-xl">
-          {vista === 'CUENTA' && <CreditCard className="w-8 h-8" />}
-          {vista === 'CLASES' && <Calendar className="w-8 h-8" />}
-          {vista === 'TIENDA' && <ShoppingBag className="w-8 h-8" />}
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-3 sm:gap-4">
+        <div className="p-2.5 sm:p-3 bg-pink-50 text-pink-600 rounded-xl flex-shrink-0">
+          {vista === 'CUENTA' && <CreditCard className="w-6 h-6 sm:w-8 sm:h-8" />}
+          {vista === 'CLASES' && <Calendar className="w-6 h-6 sm:w-8 sm:h-8" />}
+          {vista === 'TIENDA' && <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8" />}
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">
             {vista === 'CUENTA' && 'Estado de Cuenta'}
             {vista === 'CLASES' && 'Gestión de Clases'}
             {vista === 'TIENDA' && 'Catálogo Oficial'}
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
             Gestionando la información de {perfilActual?.nombre}.
           </p>
         </div>

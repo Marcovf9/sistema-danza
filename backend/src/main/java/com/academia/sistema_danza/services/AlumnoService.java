@@ -125,6 +125,7 @@ public class AlumnoService {
                 .lugarNacimiento(a.getLugarNacimiento())
                 .direccion(a.getDireccion())
                 .codigoPostal(a.getCodigoPostal())
+                .barrio(a.getBarrio())
                 .localidad(a.getLocalidad())
                 .provincia(a.getProvincia())
                 .facebook(a.getFacebook())
@@ -174,6 +175,7 @@ public class AlumnoService {
         alumno.setLugarNacimiento(dto.getLugarNacimiento());
         alumno.setDireccion(dto.getDireccion());
         alumno.setCodigoPostal(dto.getCodigoPostal());
+        alumno.setBarrio(dto.getBarrio());
         alumno.setLocalidad(dto.getLocalidad());
         alumno.setProvincia(dto.getProvincia());
         alumno.setFacebook(dto.getFacebook());
