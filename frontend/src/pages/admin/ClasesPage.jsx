@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, User, Pencil, Plus, GraduationCap, Trash2, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Pencil, Plus, GraduationCap, Trash2, BookOpen, ChevronDown, ChevronUp, Users, X } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -69,6 +69,11 @@ const ClasesPage = () => {
   // Modal eliminar
   const [claseAEliminar, setClaseAEliminar] = useState(null);
   const [eliminando, setEliminando] = useState(false);
+
+  // Modal inscritos
+  const [claseInscritos, setClaseInscritos] = useState(null);
+  const [inscritos, setInscritos] = useState([]);
+  const [cargandoInscritos, setCargandoInscritos] = useState(false);
 
   useEffect(() => { cargarDatos(); }, []);
 
@@ -171,6 +176,21 @@ const ClasesPage = () => {
       toast.error(error.response?.data?.error || error.response?.data || 'Error al agregar la disciplina.');
     } finally {
       setGuardandoDisciplina(false);
+    }
+  };
+
+  // ── Inscritos ──
+  const verInscritos = async (clase) => {
+    setClaseInscritos(clase);
+    setInscritos([]);
+    setCargandoInscritos(true);
+    try {
+      const res = await api.get(`/calendario/clase/${clase.id}/detalles`);
+      setInscritos(res.data.alumnos || []);
+    } catch {
+      toast.error('Error al cargar los alumnos inscritos.');
+    } finally {
+      setCargandoInscritos(false);
     }
   };
 
@@ -283,6 +303,9 @@ const ClasesPage = () => {
           {clases.map(clase => (
             <div key={clase.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative group hover:border-pink-300 transition-colors">
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => verInscritos(clase)} className="p-2 bg-violet-50 text-violet-600 rounded-lg hover:bg-violet-600 hover:text-white transition" title="Ver inscritos">
+                  <Users className="w-4 h-4" />
+                </button>
                 <button onClick={() => abrirEditor(clase)} className="p-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-600 hover:text-white transition" title="Editar">
                   <Pencil className="w-4 h-4" />
                 </button>
@@ -378,6 +401,55 @@ const ClasesPage = () => {
                 <button onClick={confirmarEliminar} disabled={eliminando} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition disabled:bg-gray-400">
                   {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL INSCRITOS */}
+      {claseInscritos && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200">
+            <div className="bg-violet-600 p-6 text-white flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <Users className="w-5 h-5" /> Alumnos Inscritos
+                </h3>
+                <p className="text-violet-200 text-sm mt-1">
+                  {claseInscritos.disciplina?.nombre} — {claseInscritos.diasSemana}
+                </p>
+              </div>
+              <button onClick={() => setClaseInscritos(null)} className="p-2 hover:bg-white/20 rounded-full transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              {cargandoInscritos ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600" />
+                </div>
+              ) : inscritos.length > 0 ? (
+                <ul className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                  {inscritos.map((a, idx) => (
+                    <li key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-xs font-black">
+                          {a.nombre?.charAt(0)}{a.apellido?.charAt(0) ?? ''}
+                        </div>
+                        <span className="font-bold text-gray-800 text-sm">{a.apellido ? `${a.apellido}, ${a.nombre}` : a.nombre}</span>
+                      </div>
+                      {a.telefono && <span className="text-xs text-gray-500 font-mono">{a.telefono}</span>}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-gray-400 italic text-sm py-8">No hay alumnos inscritos en esta clase.</p>
+              )}
+              <div className="mt-4 pt-4 border-t border-gray-100 text-right">
+                <span className="text-xs text-gray-400 font-medium">
+                  {inscritos.length} alumno{inscritos.length !== 1 ? 's' : ''}
+                </span>
               </div>
             </div>
           </div>

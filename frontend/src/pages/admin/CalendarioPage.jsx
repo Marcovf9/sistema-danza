@@ -28,8 +28,8 @@ const CalendarioPage = () => {
   const rol = localStorage.getItem('rol');
   const profesorId = localStorage.getItem('entidadId') || '';
 
-  const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
-  const horas = Array.from({ length: 15 }, (_, i) => i + 8); 
+  const dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
+  const horas = Array.from({ length: 15 }, (_, i) => i + 8);
 
   useEffect(() => {
     fetchClases();
@@ -75,7 +75,7 @@ const CalendarioPage = () => {
 
       <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-w-[900px] grid grid-cols-7 border-b border-gray-100 bg-gray-50/50">
+          <div className="min-w-[1024px] grid grid-cols-8 border-b border-gray-100 bg-gray-50/50">
             <div className="p-3 border-r border-gray-100 text-[11px] font-bold text-gray-400 text-center uppercase">Hora</div>
             {dias.map(d => (
               <div key={d} className="p-3 border-r border-gray-100 text-xs font-black text-pink-900 text-center uppercase tracking-tighter">
@@ -84,7 +84,7 @@ const CalendarioPage = () => {
             ))}
           </div>
 
-          <div className="min-w-[900px] grid grid-cols-7 relative bg-white">
+          <div className="min-w-[1024px] grid grid-cols-8 relative bg-white">
             {/* Columna de Horas */}
             <div className="col-span-1 border-r border-gray-50">
               {horas.map(h => (

@@ -49,10 +49,6 @@ public class Alumno {
     @Column(name = "usuario_id")
     private Long usuarioId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", insertable = false, updatable = false)
-    private Usuario usuario;
-
     @Column(name = "lugar_nacimiento", length = 100)
     private String lugarNacimiento;
 

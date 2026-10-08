@@ -191,14 +191,14 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
                     {inscripciones.map(ins => (
                       <li key={ins.id} className="p-3 bg-pink-50 border border-pink-100 rounded-xl flex items-center justify-between group">
                         <div>
-                          <p className="font-bold text-pink-900">{ins.clase.disciplina.nombre}</p>
+                          <p className="font-bold text-pink-900">{ins.clase?.disciplina?.nombre ?? '—'}</p>
                           <p className="text-sm text-pink-700 mt-1 flex items-center">
                             <Calendar className="w-3 h-3 mr-1" />
-                            {ins.diasSeleccionados || ins.clase.diasSemana} - {formatearHora(ins.clase.horaInicio)}hs
+                            {ins.diasSeleccionados || ins.clase?.diasSemana} - {formatearHora(ins.clase?.horaInicio)}hs
                           </p>
                         </div>
                         <button
-                          onClick={() => handleDarDeBaja(ins.id, ins.clase.disciplina.nombre)}
+                          onClick={() => handleDarDeBaja(ins.id, ins.clase?.disciplina?.nombre ?? '—')}
                           className="p-2 text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                           title="Dar de baja"
                         >
