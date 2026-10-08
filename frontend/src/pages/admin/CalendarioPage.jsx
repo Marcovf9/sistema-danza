@@ -95,39 +95,59 @@ const CalendarioPage = () => {
             </div>
 
             {/* Columnas de Días y Clases */}
-            {dias.map(dia => (
-              <div key={dia} className="col-span-1 border-r border-gray-50 relative h-full">
-                {horas.map(h => <div key={h} className="h-16 border-b border-gray-50"></div>)}
-                
-                {clases.filter(c => c.diasSemana.includes(dia)).map(clase => {
-                  
-                  const { h: horaInt, m: minInt } = obtenerHoraMinutos(clase.horaInicio);
-                  
-                  const offset = (horaInt - 8) * 64 + (minInt / 60) * 64;
-                  const esSuClase = profesorId && clase.profesorTitular && clase.profesorTitular.id === parseInt(profesorId);
+            {dias.map(dia => {
+              const clasesDelDia = clases.filter(c => c.diasSemana?.includes(dia));
 
-                  return (
-                    <div 
-                      key={clase.id}
-                      onClick={() => verDetalles(clase)}
-                      style={{ top: `${offset + 4}px`, height: '56px' }}
-                      className={`absolute left-1 right-1 rounded-xl p-2 shadow-sm cursor-pointer transition-all hover:scale-105 hover:shadow-md hover:z-10 overflow-hidden border-l-[3px] ${
-                        esSuClase 
-                          ? 'bg-pink-600 border-pink-900 text-white' 
-                          : 'bg-pink-50 border-pink-400 text-pink-900'
-                      }`}
-                    >
-                      <p className="text-[10px] leading-tight font-black uppercase truncate">{clase.disciplina?.nombre}</p>
-                      <div className="flex items-center mt-0.5 opacity-80">
-                        <MapPin className="w-2.5 h-2.5 mr-1" />
-                        {/* Usamos el formateador seguro */}
-                        <span className="text-[9px] font-bold">{formatearHora(clase.horaInicio)}hs</span>
+              // Detectar clases simultáneas para mostrarlas lado a lado
+              const horaKey = c => formatearHora(c.horaInicio);
+              const grupos = {};
+              clasesDelDia.forEach(c => {
+                const k = horaKey(c);
+                if (!grupos[k]) grupos[k] = [];
+                grupos[k].push(c);
+              });
+
+              return (
+                <div key={dia} className="col-span-1 border-r border-gray-50 relative h-full">
+                  {horas.map(h => <div key={h} className="h-16 border-b border-gray-50"></div>)}
+
+                  {clasesDelDia.map(clase => {
+                    const { h: horaInt, m: minInt } = obtenerHoraMinutos(clase.horaInicio);
+                    const offset = (horaInt - 8) * 64 + (minInt / 60) * 64;
+                    const esSuClase = profesorId && clase.profesorTitular && clase.profesorTitular.id === parseInt(profesorId);
+
+                    const grupo = grupos[horaKey(clase)];
+                    const idx = grupo.indexOf(clase);
+                    const total = grupo.length;
+                    const pct = 100 / total;
+
+                    return (
+                      <div
+                        key={clase.id}
+                        onClick={() => verDetalles(clase)}
+                        style={{
+                          top: `${offset + 4}px`,
+                          height: '56px',
+                          left: `${idx * pct}%`,
+                          width: `${pct}%`,
+                        }}
+                        className={`absolute px-1 rounded-xl p-2 shadow-sm cursor-pointer transition-all hover:shadow-md hover:z-10 overflow-hidden border-l-[3px] ${
+                          esSuClase
+                            ? 'bg-pink-600 border-pink-900 text-white'
+                            : 'bg-pink-50 border-pink-400 text-pink-900'
+                        }`}
+                      >
+                        <p className="text-[9px] leading-tight font-black uppercase truncate">{clase.disciplina?.nombre}</p>
+                        <div className="flex items-center mt-0.5 opacity-80">
+                          <MapPin className="w-2 h-2 mr-0.5 flex-shrink-0" />
+                          <span className="text-[8px] font-bold truncate">{formatearHora(clase.horaInicio)}hs</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
