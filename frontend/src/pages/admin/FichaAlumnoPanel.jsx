@@ -24,11 +24,15 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
   const { data, isLoading: cargando } = useQuery({
     queryKey: ['ficha', alumno?.id],
     queryFn: async () => {
+      const catchConLog = (label) => (err) => {
+        console.warn(`[FichaAlumno] Error en ${label}:`, err?.response?.status, err?.response?.data ?? err?.message);
+        return { data: [] };
+      };
       const [inscripcionesRes, clasesRes, asistenciaRes, pagosRes] = await Promise.all([
-        api.get(`/academico/inscripciones/alumno/${alumno.id}`).catch(() => ({ data: [] })),
-        api.get('/academico/clases').catch(() => ({ data: [] })),
-        api.get(`/asistencias/alumno/${alumno.id}`).catch(() => ({ data: [] })),
-        api.get(`/caja/recibos/alumno/${alumno.id}`).catch(() => ({ data: [] })),
+        api.get(`/academico/inscripciones/alumno/${alumno.id}`).catch(catchConLog('inscripciones')),
+        api.get('/academico/clases').catch(catchConLog('clases')),
+        api.get(`/asistencias/alumno/${alumno.id}`).catch(catchConLog('asistencias')),
+        api.get(`/caja/recibos/alumno/${alumno.id}`).catch(catchConLog('recibos')),
       ]);
       return {
         inscripciones: Array.isArray(inscripcionesRes.data) ? inscripcionesRes.data : [],
@@ -38,7 +42,6 @@ const FichaAlumnoPanel = ({ isOpen, onClose, alumno }) => {
       };
     },
     enabled: isOpen && !!alumno,
-    onError: (e) => console.error('Error cargando ficha:', e),
   });
 
   const { inscripciones = [], clasesDisponibles = [], historialAsistencia = [], historialPagos = [] } = data || {};
